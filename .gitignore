@@ -1,0 +1,60 @@
+# Build results
+bin/
+obj/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Visual Studio
+.vscode/
+.vs/
+
+# Mac build
+**/bin/
+**/obj/
+*.app/
+
+# Windows build
+*.exe
+*.dll
+*.pdb
+*.cache
+*.mdb
+
+# iOS build
+*.ipa
+*.dSYM/
+*.app
+
+# Android build
+*.apk
+*.aab
+*.dex
+*.apk.idsig
+*.apk.sig
+
+# MAUI specific
+Platforms/**/bin/
+Platforms/**/obj/
+Resources/Raw/*.db
+
+# Xamarin related (a veces útil en proyectos MAUI)
+*.apk
+*.ap_
+*.dex
+*.class
+*.jar
+*.keystore
+*.properties
+*.so
+
+# JetBrains Rider
+.idea/
+
+# Others
+*.DS_Store
+Thumbs.db
+*.log
