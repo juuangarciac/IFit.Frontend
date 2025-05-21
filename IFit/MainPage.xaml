@@ -3,12 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="IFit.MainPage"
              Shell.NavBarIsVisible="False">
-    <ScrollView BackgroundColor="#222831">
+    <ScrollView BackgroundColor="{StaticResource BackgroundPrimaryDark}">
         <!-- Main Grid -->
-        <Grid HorizontalOptions="Center"
-              BackgroundColor="#222831"
-              RowSpacing="10"
-            >
+        <Grid Style="{StaticResource BasicGrid}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
@@ -30,8 +27,7 @@
 
                 <!-- Title/Subtitle -->
                 <Grid Grid.Row="0"
-                      RowSpacing="5"
-                      Margin="15, 15, 15, 45">
+                      RowSpacing="5">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
@@ -50,14 +46,14 @@
                         HorizontalTextAlignment="Center"
                         TextColor="WhiteSmoke"
                         FontFamily="Montserrat-Medium"
-                        FontSize="22"/>
+                        FontSize="20"/>
 
                     <Label Grid.Row="2"
                         Text=" Rutina, Progreso, Estilo."
                         HorizontalTextAlignment="Center"
                         TextColor="WhiteSmoke"
                         FontFamily="Montserrat-Medium"
-                        FontSize="22"/>
+                        FontSize="20"/>
                 </Grid>
 
                 <!-- SignUp/SignIn Buttons -->
@@ -72,22 +68,15 @@
                     
                     <!-- Registrarme -->
                     <Button Grid.Row="0"
-                        BackgroundColor="#393E46"
                             Text="Registrarme"
-                            TextColor="WhiteSmoke"
-                            FontFamily="Montserrat-Bold"
-                            FontSize="18"
-                            CornerRadius="40"
+                            Style="{StaticResource ButtonBold-XL-dark}"
                         ></Button>
                     
                     <!-- Iniciar sesion -->
                     <Button Grid.Row="1"
-                        BackgroundColor="WhiteSmoke"
                             Text="Iniciar sesión"
-                            TextColor="#222831"
-                            FontFamily="Montserrat-Bold"
-                            FontSize="18"
-                            CornerRadius="40"
+                            Style="{StaticResource ButtonBold-XL-light}"
+                        Clicked="OnSignInClicked"
                         ></Button>
                 </Grid>
             </Grid>

@@ -5,7 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
     <!-- Note: For Android please see also Platforms\Android\Resources\values\colors.xml -->
-
+    <!-- Default colors -->
     <Color x:Key="Primary">#512BD4</Color>
     <Color x:Key="PrimaryDark">#ac99ea</Color>
     <Color x:Key="PrimaryDarkText">#242424</Color>
@@ -42,4 +42,21 @@
     <SolidColorBrush x:Key="Gray600Brush" Color="{StaticResource Gray600}"/>
     <SolidColorBrush x:Key="Gray900Brush" Color="{StaticResource Gray900}"/>
     <SolidColorBrush x:Key="Gray950Brush" Color="{StaticResource Gray950}"/>
+    
+    <!-- Main palette -->
+    <Color x:Key="PrimaryColor">#222831</Color>
+    <Color x:Key="SecondaryColor">#393E46</Color>
+    <Color x:Key="TertiaryColor">#FFD369</Color>
+    <Color x:Key="QuaternaryColor">#EEEEEE</Color>
+
+    <!-- Colors for texts or backgrounds -->
+    <Color x:Key="TextPrimaryColorLight">#EEEEEE</Color>
+    <Color x:Key="TextSecondaryColorLight">#F5F5F5</Color>
+    <Color x:Key="TextPrimaryColorDark">#393E46</Color>
+    <Color x:Key="TextSecondaryColorDark">#393E46</Color>
+
+    <Color x:Key="BackgroundPrimaryDark">#222831</Color>
+    <Color x:Key="BackgroundSecondaryDark">#393E46</Color>
+    <Color x:Key="BackgroundPrimaryLight">#EEEEEE</Color>
+    <Color x:Key="BackgroundSecondaryLight">#F5F5F5</Color>
 </ResourceDictionary>
