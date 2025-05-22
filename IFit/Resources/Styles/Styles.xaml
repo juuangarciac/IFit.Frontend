@@ -8,6 +8,8 @@
     <Style x:Key="BasicButton" TargetType="Button">
         <Setter Property="CornerRadius" Value="40" />
     </Style>
+
+    <x:Int32 x:Key="CornerRadiusRectangle">8</x:Int32>
     
     <!-- Buttons Styles -->
     <Style x:Key="ButtonBold-XL" TargetType="Button" BasedOn="{StaticResource BasicButton}">

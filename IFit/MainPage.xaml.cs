@@ -7,7 +7,7 @@
             InitializeComponent();
         }
 
-        private async void OnSignInClicked(object sender, EventArgs e)
+        private async void OnSignUpClicked(object sender, EventArgs e)
         {
             await Shell.Current.GoToAsync("///SignUpPage");
         }
