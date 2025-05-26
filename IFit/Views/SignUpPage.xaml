@@ -44,7 +44,7 @@
             </Grid>
 
 
-            <!-- SignIn with Ifit account -->
+            <!-- SignUp with Ifit account -->
             <Grid Grid.Row="1"
                   Margin="15, 0, 15, 15"
                   RowSpacing="15">
@@ -116,9 +116,9 @@
                 
                 <!-- Terms and condition -->
                 <Label Grid.Row="3"
-       HorizontalTextAlignment="Center"
-       VerticalTextAlignment="Center"
-       HorizontalOptions="Center">
+                       HorizontalTextAlignment="Center"
+                       VerticalTextAlignment="Center"
+                       HorizontalOptions="Center">          
                     <Label.FormattedText>
                         <FormattedString>
                             <Span Text="Al crear una cuenta en IFit, aceptas nuestros "
@@ -147,9 +147,14 @@
                     </Label.FormattedText>
                 </Label>
 
+                <Button Grid.Row="4"
+                        Text="Crear cuenta"
+                        Style="{StaticResource ButtonBold-XL-yellow}"
+                        CornerRadius="{StaticResource CornerRadiusRectangle}" />
+
             </Grid>
             
-            <!-- SignIn with Third party services -->
+            <!-- SignUp with Third party services -->
             <Grid Grid.Row="2"
                   Margin="15, 15, 15, 15"
                   RowSpacing="15">
@@ -160,15 +165,46 @@
                 </Grid.RowDefinitions>
                 
                 <!-- or image -->
-                   
-                <!-- Sign In with Google -->
+                <Grid Grid.Row="0"
+                       ColumnSpacing="20"
+                       Padding="20,0">
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Línea izquierda -->
+                    <BoxView Grid.Column="0"
+                              HeightRequest="1"
+                              BackgroundColor="{StaticResource TextSecondaryColorLight}"
+                              VerticalOptions="Center" />
+
+                    <!-- Texto central -->
+                    <Label Grid.Column="1"
+                            Text="O"
+                            HorizontalTextAlignment="Center"
+                            VerticalTextAlignment="Center"
+                            FontFamily="Montserrat-Light"
+                            FontSize="16"
+                            TextColor="{StaticResource TextSecondaryColorLight}" />
+
+                    <!-- Línea derecha -->
+                    <BoxView Grid.Column="2"
+                              HeightRequest="1"
+                              BackgroundColor="{StaticResource TextSecondaryColorLight}"
+                              VerticalOptions="Center" />
+                </Grid>
+
+                <!-- Sign Up with Google -->
                 <Button Grid.Row="1"
                         Text="Registrarme con Google"
                         Style="{DynamicResource ButtonBold-XL-light}"
                         CornerRadius="{StaticResource CornerRadiusRectangle}"
                         ImageSource="googlelogopngsmall.png"
                     />
-                <!-- Sign In with Apple -->
+                <!-- Sign Up with Apple -->
                 <Button Grid.Row="2"
                         Text="Registrarme con Apple"
                         Style="{DynamicResource ButtonBold-XL-light}"

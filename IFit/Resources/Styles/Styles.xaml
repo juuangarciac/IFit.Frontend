@@ -22,6 +22,11 @@
         <Setter Property="TextColor" Value="{StaticResource TextPrimaryColorLight}" />
     </Style>
 
+    <Style x:Key="ButtonBold-XL-yellow" TargetType="Button" BasedOn="{StaticResource ButtonBold-XL}">
+        <Setter Property="BackgroundColor" Value="{StaticResource BackgroundSecondaryDark}" />
+        <Setter Property="TextColor" Value="{StaticResource TertiaryColor}" />
+    </Style>
+
     <Style x:Key="ButtonBold-XL-light" TargetType="Button" BasedOn="{StaticResource ButtonBold-XL}">
         <Setter Property="BackgroundColor" Value="{StaticResource BackgroundPrimaryLight}" />
         <Setter Property="TextColor" Value="{StaticResource TextPrimaryColorDark}" />
