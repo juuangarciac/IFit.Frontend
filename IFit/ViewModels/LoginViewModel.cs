@@ -28,7 +28,8 @@ namespace IFit.ViewModels
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
                 var client = new HttpClient();
-                var response = await client.PostAsync("http://10.0.2.2:8080/login", content);
+                string BaseAddress = DeviceInfo.Platform == DevicePlatform.Android ? "http://10.0.2.2:8080" : "http://localhost:8080";
+                var response = await client.PostAsync(BaseAddress + "/login", content);
 
                 if (response.IsSuccessStatusCode)
                 {

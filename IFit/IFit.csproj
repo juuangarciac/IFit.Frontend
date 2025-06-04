@@ -59,6 +59,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Remove="Platforms\Android\Resources\xml\network_security_config.xml" />
 	  <None Remove="Resources\Splash\logo.png" />
 	</ItemGroup>
 
