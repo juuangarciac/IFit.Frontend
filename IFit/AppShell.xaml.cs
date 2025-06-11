@@ -10,7 +10,9 @@ namespace IFit
 
             // Routing
             Routing.RegisterRoute("MainPage", typeof(MainPage));
-            Routing.RegisterRoute("SignUpPage", typeof(SignUpPage));
+            Routing.RegisterRoute("SignUpView", typeof(SignUpView));
+            Routing.RegisterRoute("SignInView", typeof(SignInView));
+            Routing.RegisterRoute("VerificationView", typeof(VerificationView));
         }
     }
 }

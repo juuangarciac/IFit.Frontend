@@ -9,11 +9,11 @@
 
         private async void OnSignUpClicked(object sender, EventArgs e)
         {
-            await Shell.Current.GoToAsync("///SignUpPage");
+            await Shell.Current.GoToAsync("///SignUpView");
         }
         private async void OnSignInClicked(object sender, EventArgs e)
         {
-            await Shell.Current.GoToAsync("///SignInPage");
+            await Shell.Current.GoToAsync("///SignIniew");
         }
     }
 

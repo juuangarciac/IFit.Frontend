@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="IFit.Views.VerificationView"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:IFit.ViewModels"
+             Shell.NavBarIsVisible="False">
+    <ContentPage.BindingContext>
+      <vm:VerificationViewModel />
+   </ContentPage.BindingContext>
+        <!-- Main Grid -->
+    <Grid 
+        BackgroundColor="{StaticResource SecondaryColor}" 
+        VerticalOptions="Fill">
+
+        <Image Source="verificationpageimg.jpg" 
+               Aspect="AspectFill"
+               Opacity="0.55" />
+
+            <!-- Text Grid -->
+        <Grid HorizontalOptions="Center"
+              VerticalOptions="Center" 
+              RowSpacing="80"
+              Style="{StaticResource BasicGrid}" >
+            
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            
+            <!-- Title -->
+            <Grid Grid.Row="0" >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <Label Grid.Column="0"
+                       HorizontalTextAlignment="Center"
+                       VerticalTextAlignment="Center">
+                    <Label.FormattedText Grid.Column="0">
+                        <FormattedString>
+                            <Span Text="Casi listo para entrenar con" 
+                                  TextColor="{StaticResource TextPrimaryColorLight}"
+                                  FontFamily="MontserratBold"
+                                  FontSize="28"/>
+                            <Span Text=" IFit"
+                                  TextColor="{StaticResource TertiaryColor}"
+                                  FontFamily="MontserratBold"
+                                  FontSize="28" />
+                        </FormattedString>
+                    </Label.FormattedText>
+                </Label>
+                
+
+                <Button Grid.Column="1" 
+                        BackgroundColor="Transparent"
+                        ImageSource="cancel.svg"
+                        Clicked="onCancelClicked" />
+            </Grid>
+            <!-- Subtitle -->
+            <Label Grid.Row="1"
+                   HorizontalTextAlignment="Center"
+                   VerticalTextAlignment="Center">
+                <Label.FormattedText>
+                    <FormattedString>
+                        <Span Text="Hemos enviado un correo a, " 
+                               TextColor="{StaticResource TextPrimaryColorLight}"
+                               FontFamily="MontserratSemiBold"
+                               FontSize="20"/>
+                        <Span Text="{Binding Email}"
+                               TextColor="{StaticResource TertiaryColor}"
+                               FontFamily="MontserratBold"
+                               FontSize="20" />
+                    </FormattedString>
+                </Label.FormattedText>
+            </Label>
+            <!-- Text -->
+            <Label Grid.Row="2"
+                   HorizontalTextAlignment="Center"
+                   VerticalTextAlignment="Center"
+                   Text="Por favor, revisa tu bandeja de entrada haz clic en el enlace de verificación."
+                   TextColor="{StaticResource TextPrimaryColorLight}"
+                   FontFamily="MontserratSemiBold"
+                   FontSize="20"/>
+        </Grid>
+    </Grid>
+</ContentPage>

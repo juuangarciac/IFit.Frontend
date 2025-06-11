@@ -15,12 +15,21 @@
 
     <ShellContent
         Title="SignUp"
-        ContentTemplate="{DataTemplate views:SignUpPage}"
-        Route="SignUpPage" />
+        ContentTemplate="{DataTemplate views:SignUpView}"
+        Route="SignUpView" />
 
     <ShellContent
         Title="SignIn"
-        ContentTemplate="{DataTemplate views:SignInPage}"
-        Route="SignInPage" />
+        ContentTemplate="{DataTemplate views:SignInView}"
+        Route="SignInView" />
 
+    <ShellContent
+        Title="Verification"
+        ContentTemplate="{DataTemplate views:VerificationView}"
+        Route="VerificationView" />
+
+    <ShellContent
+        Title="Error"
+        ContentTemplate="{DataTemplate views:ErrorView}"
+        Route="ErrorView" />
 </Shell>

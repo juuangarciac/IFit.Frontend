@@ -64,22 +64,36 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="FluentValidation" Version="12.0.0" />
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
+		<PackageReference Include="Plugin.ValidationRules" Version="1.5.0" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Compile Update="Views\SignUpPage.xaml.cs">
-	    <DependentUpon>SignUpPage.xaml</DependentUpon>
+	  <Compile Update="Views\SignInView.xaml.cs">
+	    <DependentUpon>SignInView.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\SignUpView.xaml.cs">
+	    <DependentUpon>SignUpView.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\VerificationView.xaml.cs">
+	    <DependentUpon>VerificationView.xaml</DependentUpon>
 	  </Compile>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <MauiXaml Update="Views\SignInPage.xaml">
+	  <MauiXaml Update="Views\ErrorView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Views\SignUpPage.xaml">
+	  <MauiXaml Update="Views\SignInView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\SignUpView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\VerificationView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	</ItemGroup>
