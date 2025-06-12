@@ -1,4 +1,5 @@
-﻿using IFit.Models.Dtos;
+﻿using IFit.Models;
+using IFit.Models.Dtos;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,7 +33,46 @@ namespace IFit.Services
                         await App.Current.MainPage.DisplayAlert("Bienvenido", loginResponse?.Message, "OK");
                     }
 
-                    // Navegar a la siguiente página
+                }
+                else
+                {
+                    if (App.Current?.MainPage != null)
+                    {
+                        await App.Current.MainPage.DisplayAlert("Error", "Credenciales inválidas", "OK");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                if (App.Current?.MainPage != null)
+                {
+                    await App.Current.MainPage.DisplayAlert("Error", ex.ToString(), "OK");
+                }
+            }
+        }
+ 
+
+     public async Task SignUpAsync(string Username, string Email, string Password)
+        {
+            try
+            {
+                var request = new AppUser { Username = Username, Email = Email, Password = Password };
+                var json = JsonSerializer.Serialize(request);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var client = new HttpClient();
+                var response = await client.PostAsync(AppSettings.BaseAddress + "/auth/signup", content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    var loginResponse = JsonSerializer.Deserialize<AppUser>(responseBody);
+
+
+                    if (App.Current?.MainPage != null)
+                    {
+                        await App.Current.MainPage.DisplayAlert("Bienvenido", loginResponse?.Name, "OK");
+                    }
                 }
                 else
                 {

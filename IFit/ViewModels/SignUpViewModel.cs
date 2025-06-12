@@ -19,27 +19,47 @@ namespace IFit.ViewModels
 {
     class SignUpViewModel
     {
-        public Validatable<string> Name { get; set; } = new Validatable<string>();
-        public Validatable<string> Email { get; set; } = new Validatable<string>();
-        public Validatable<string> Password { get; set; } = new Validatable<string>();
+        public String Name { get; set; } = string.Empty;
+        public String Email { get; set; }  = string.Empty;
+        public String Password { get; set; } = string.Empty;
+
+        public Validatable<string> ValidatableName { get; set; } = new Validatable<string>();
+        public Validatable<string> ValidatableEmail { get; set; } = new Validatable<string>();
+        public Validatable<string> ValidatablePassword { get; set; } = new Validatable<string>();
 
         public AppUserService appUserService;
+        public AuthenticationService authenticationService;
 
         public ICommand RegisterCommand { get; }
 
         public SignUpViewModel()
         {
             appUserService = new AppUserService();
-            RegisterCommand = new Command(saveAppUserCredentials);
+            authenticationService = new AuthenticationService();
+
+            RegisterCommand = new Command(CreateAccount);
         }
 
-        public async void saveAppUserCredentials()
+        public async void CreateAccount()
         {
+            Console.WriteLine("Username: " + Name + ", UserEmail: " + Email);
+
+            // Setter values
+            ValidatableName.Value = Name;
+            ValidatableEmail.Value = Email;
+            ValidatablePassword.Value = Password;
+
             // Validate the user input
             this.AddValidations();
-            this.Validate();
 
-            if (await EmailAlreadyExists(Email.Value))
+            StringBuilder validationMessages = this.Validate();
+            if (!string.IsNullOrEmpty(validationMessages.ToString()))
+            {
+                Application.Current?.MainPage?.DisplayAlert("Error de validación", validationMessages.ToString(), "OK");
+                return;
+            }
+
+            if (await EmailAlreadyExists(ValidatableEmail.Value))
             {
                 if (App.Current?.MainPage != null) 
                 {
@@ -49,46 +69,44 @@ namespace IFit.ViewModels
             }
 
             // Save in Preferences User credentials
-            Preferences.Set("UserName", Name.Value);
-            Preferences.Set("UserEmail", Email.Value);
-            Preferences.Set("UserPassword", Password.Value);
+            Preferences.Set("UserName", ValidatableName.Value);
+            Preferences.Set("UserEmail", ValidatableEmail.Value);
+            Preferences.Set("UserPassword", ValidatablePassword.Value);
 
+            await authenticationService.SignUpAsync(ValidatableName.Value, ValidatableEmail.Value, ValidatablePassword.Value);
             Console.WriteLine("Username: " + Name + ", UserEmail: " + Email + " saved.");
 
-            if (Shell.Current != null) 
-            {
-                await Shell.Current.GoToAsync("///VerificationView");
-            }
+            // await Shell.Current.GoToAsync("///VerificationPage");
         }
 
-        private void Validate()
+        private StringBuilder Validate()
         {
             // Validate the Name, Email, and Password fields
-            if (!Name.Validate() || !Email.Validate() || !Password.Validate())
+            var validationMessages = new StringBuilder();
+
+            if (!ValidatableName.Validate() || !ValidatableEmail.Validate() || !ValidatablePassword.Validate())
             {
                 // If validation fails, show an alert with the validation messages
-                var validationMessages = new StringBuilder();
-                foreach (var error in Name.Errors.Concat(Email.Errors).Concat(Password.Errors))
+                foreach (var error in ValidatableName.Errors.Concat(ValidatableEmail.Errors).Concat(ValidatablePassword.Errors))
                 {
                     validationMessages.AppendLine(error);
                 }
-
-                Application.Current?.MainPage?.DisplayAlert("Error de validación", validationMessages.ToString(), "OK");
             }
+            return validationMessages;
         }
 
         private void AddValidations()
         {
             // IsNotNullOrEmpty validation for Name, Email, and Password
-            Name.Validations.Add(new IsNotNullOrEmptyRule<string> { ValidationMessage = "El nombre es obligatorio." });
-            Email.Validations.Add(new IsNotNullOrEmptyRule<string> { ValidationMessage = "El correo electrónico es obligatorio." });
-            Password.Validations.Add(new IsNotNullOrEmptyRule<string> { ValidationMessage = "La contraseña es obligatoria." });
+            ValidatableName.Validations.Add(new IsNotNullOrEmptyRule<string> { ValidationMessage = "El nombre es obligatorio." });
+            ValidatableEmail.Validations.Add(new IsNotNullOrEmptyRule<string> { ValidationMessage = "El correo electrónico es obligatorio." });
+            ValidatablePassword.Validations.Add(new IsNotNullOrEmptyRule<string> { ValidationMessage = "La contraseña es obligatoria." });
 
             // Email validation
-            Email.Validations.Add(new IsValidEmailRule<string> { ValidationMessage = "El correo electrónico no es válido." });
+            ValidatableEmail.Validations.Add(new IsValidEmailRule<string> { ValidationMessage = "El correo electrónico no es válido." });
 
             // Password validation
-            Password.Validations.Add(new IsValidPasswordRule<string> { ValidationMessage = "La contraseña debe tener al menos 8 caracteres e incluir: una letra mayúscula, una letra minúscula, un número y un símbolo especial (como @, #, $, %, etc.)." });
+            ValidatablePassword.Validations.Add(new IsValidPasswordRule<string> { ValidationMessage = "La contraseña debe tener al menos 8 caracteres e incluir: una letra mayúscula, una letra minúscula, un número y un símbolo especial (como @, #, $, %, etc.)." });
         }
 
         private async Task<Boolean> EmailAlreadyExists(string email)

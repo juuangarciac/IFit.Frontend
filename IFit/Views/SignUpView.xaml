@@ -92,7 +92,8 @@
                                 FontFamily="Montserrat-Regular"
                                 FontSize="16"
                                 BackgroundColor="Transparent" 
-                               Text="{Binding Email}"/>
+                               Text="{Binding Email}" 
+                               />
                     </Border.Content>
                 </Border>
                 <!-- Password Entry -->

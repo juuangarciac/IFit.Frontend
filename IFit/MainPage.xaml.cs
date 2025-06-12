@@ -13,7 +13,7 @@
         }
         private async void OnSignInClicked(object sender, EventArgs e)
         {
-            await Shell.Current.GoToAsync("///SignIniew");
+            await Shell.Current.GoToAsync("///SignInView");
         }
     }
 

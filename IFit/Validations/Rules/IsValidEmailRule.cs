@@ -10,7 +10,7 @@ namespace IFit.Validations.Rules
 {
     public class IsValidEmailRule<T> : Plugin.ValidationRules.Interfaces.IValidationRule<T>
     {
-        private readonly Regex _regex = new(@"^([w.-]+)@([w-]+)((.(w){2,3})+)$");
+        private readonly Regex _regex = new(@"^([\w\.-]+)@([\w-]+)((\.(\w){2,3})+)$");
 
         public string ValidationMessage { get; set; } = string.Empty;
 
