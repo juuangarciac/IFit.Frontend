@@ -10,7 +10,7 @@ namespace IFit.ViewModels
 {
     public class SignInViewModel
     {
-        public string Username { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
 
         private AuthenticationService authenticationService;
@@ -21,7 +21,7 @@ namespace IFit.ViewModels
         {
             // Initialize the AuthenticationService instance
             authenticationService = new AuthenticationService();
-            LoginCommand = new Command(async () => await authenticationService.LoginAsync(Username, Password));
+            LoginCommand = new Command(async () => await authenticationService.LoginAsync(Email, Password));
         }
 
     }

@@ -6,12 +6,9 @@ using System.Threading.Tasks;
 
 namespace IFit.Models.Dtos
 {
-    public class SignInRequestDto
+    public class EmailValidationResponseDto
     {
-        public string email { get; set; } = string.Empty;
-        public string password { get; set; } = string.Empty;
-
+        public Boolean isVerified { get; set; }
+        public String ServerResponse { get; set; }
     }
-
 }
-

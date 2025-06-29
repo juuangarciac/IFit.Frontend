@@ -4,7 +4,8 @@
              xmlns:vm="clr-namespace:IFit.ViewModels"
              x:Class="IFit.Views.SignInView"
              Title="SignInView"
-             Shell.NavBarIsVisible="False">
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{StaticResource  BackgroundPrimaryDark}" >
     <ContentPage.BindingContext>
         <vm:SignInViewModel />
     </ContentPage.BindingContext>
@@ -75,7 +76,7 @@
                              FontFamily="Montserrat-Regular"
                              FontSize="16"
                              BackgroundColor="Transparent" 
-                               Text="{Binding username}"/>
+                               Text="{Binding Email}"/>
                     </Border.Content>
                 </Border>
 
@@ -96,7 +97,7 @@
                              FontSize="16"
                              IsPassword="True"
                              BackgroundColor="Transparent" 
-                               Text="{Binding password}"/>
+                               Text="{Binding Password}"/>
                     </Border.Content>
                 </Border>
 

@@ -4,7 +4,8 @@
              xmlns:vm="clr-namespace:IFit.ViewModels"
              x:Class="IFit.Views.SignUpView"
              Title="SignUpView"
-             Shell.NavBarIsVisible="False">
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{StaticResource  BackgroundPrimaryDark}" >
     <ContentPage.BindingContext>
         <vm:SignUpViewModel></vm:SignUpViewModel>
     </ContentPage.BindingContext>

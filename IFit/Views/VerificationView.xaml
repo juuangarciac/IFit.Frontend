@@ -3,47 +3,68 @@
              xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:IFit.ViewModels"
-             Shell.NavBarIsVisible="False">
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{StaticResource BackgroundPrimaryDark}">
     <ContentPage.BindingContext>
       <vm:VerificationViewModel />
    </ContentPage.BindingContext>
         <!-- Main Grid -->
-    <Grid 
-        BackgroundColor="{StaticResource SecondaryColor}" 
-        VerticalOptions="Fill">
+    <Grid BackgroundColor="{StaticResource BackgroundPrimaryDark}" 
+          VerticalOptions="Center"
+          HorizontalOptions="Center">
 
-        <Image Source="verificationpageimg.jpg" 
-               Aspect="AspectFill"
-               Opacity="0.55" />
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
 
-            <!-- Text Grid -->
-        <Grid HorizontalOptions="Center"
+        <!-- Text Grid -->
+        <Grid Grid.Row="0"
+              HorizontalOptions="Center"
               VerticalOptions="Center" 
-              RowSpacing="80"
-              Style="{StaticResource BasicGrid}" >
+              RowSpacing="20"
+              Style="{StaticResource BasicGrid}" 
+              Margin="15" >
             
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             
-            <!-- Title -->
+            <!-- Cancel button  -->
             <Grid Grid.Row="0" >
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
+                <Button Grid.Column="1" 
+                        HorizontalOptions="Start"
+                        VerticalOptions="Start"
+                        BackgroundColor="Transparent"
+                        ImageSource="cancel.svg"
+                        Clicked="onCancelClicked" />
+            </Grid>
+            
+            <!-- Title / Subtitle  Grid -->
+            <Grid Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <!-- Title -->
                 <Label Grid.Column="0"
                        HorizontalTextAlignment="Center"
                        VerticalTextAlignment="Center">
                     <Label.FormattedText Grid.Column="0">
                         <FormattedString>
-                            <Span Text="Casi listo para entrenar con" 
+                            <Span Text="Ya estás casi listo para entrenar con" 
                                   TextColor="{StaticResource TextPrimaryColorLight}"
                                   FontFamily="Montserrat-Bold"
                                   FontSize="28"/>
+                            <Span Text="{StaticResource newline}" />
                             <Span Text=" IFit"
                                   TextColor="{StaticResource TertiaryColor}"
                                   FontFamily="Montserrat-Bold"
@@ -51,38 +72,69 @@
                         </FormattedString>
                     </Label.FormattedText>
                 </Label>
-                
+                <!-- Subtitle -->
+                <Label Grid.Row="1"
+                       HorizontalTextAlignment="Center"
+                       VerticalTextAlignment="Center">
+                    <Label.FormattedText>
+                        <FormattedString>
+                            <Span Text="Introduce el código que hemos enviado a &#10;" 
+                                   TextColor="{StaticResource TextPrimaryColorLight}"
+                                   FontFamily="Montserrat-Medium"
+                                   FontSize="20"/>
+                            <Span Text="{Binding Email}"
+                                   TextColor="{StaticResource TertiaryColor}"
+                                   FontFamily="Montserrat-SemiBold"
+                                   FontSize="20" />
+                        </FormattedString>
+                    </Label.FormattedText>
+                </Label>
 
-                <Button Grid.Column="1" 
-                        BackgroundColor="Transparent"
-                        ImageSource="cancel.svg"
-                        Clicked="onCancelClicked" />
             </Grid>
-            <!-- Subtitle -->
-            <Label Grid.Row="1"
-                   HorizontalTextAlignment="Center"
-                   VerticalTextAlignment="Center">
-                <Label.FormattedText>
-                    <FormattedString>
-                        <Span Text="Hemos enviado un correo a, " 
-                               TextColor="{StaticResource TextPrimaryColorLight}"
-                               FontFamily="Montserrat-SemiBold"
-                               FontSize="20"/>
-                        <Span Text="{Binding Email}"
-                               TextColor="{StaticResource TertiaryColor}"
-                               FontFamily="Montserrat-Bold"
-                               FontSize="20" />
-                    </FormattedString>
-                </Label.FormattedText>
-            </Label>
+            
+            <!-- Verification code entry -->
+                <Grid Grid.Row="2" >
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="1"
+                            Grid.ColumnSpan="1"
+                            Style="{StaticResource BorderRectangleWhite}"
+                            WidthRequest="200">
+                        
+                    <Entry  x:Name="verificationcode"
+                            BackgroundColor="{StaticResource BackgroundPrimaryLight}"
+                            TextColor="Black"
+                            HorizontalTextAlignment="Center"
+                            VerticalTextAlignment="Center"
+                            FontSize="26"
+                            FontFamily="Montserrat-SemiBold"
+                            MaxLength="6"
+                            Keyboard="Numeric" 
+                            Text="{Binding VerificationCode}"/>
+                </Border>
+              
+            </Grid>
+             
+         
             <!-- Text -->
-            <Label Grid.Row="2"
+            <Label Grid.Row="3"
                    HorizontalTextAlignment="Center"
                    VerticalTextAlignment="Center"
-                   Text="Por favor, revisa tu bandeja de entrada haz clic en el enlace de verificación."
+                   Text="Por favor, revisa tu bandeja de entrada."
                    TextColor="{StaticResource TextPrimaryColorLight}"
-                   FontFamily="Montserrat-SemiBold"
-                   FontSize="20"/>
+                   FontFamily="Montserrat-Light"
+                   FontSize="16"/>
         </Grid>
+        
+        <!-- Verification Button -->
+        <Button Grid.Row="1"
+                Margin="15" 
+                Text="Verificar"
+                Style="{StaticResource ButtonBold-XL-yellow}"
+                />
     </Grid>
 </ContentPage>

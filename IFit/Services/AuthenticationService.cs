@@ -6,16 +6,17 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace IFit.Services
 {
     public class AuthenticationService
     {
-        public async Task LoginAsync(string Username, string Password)
+        public async Task LoginAsync(string Email, string Password)
         {
             try
             {
-                var request = new SignInRequestDto { Username = Username, Password = Password };
+                var request = new SignInRequestDto { email = Email, password = Password };
                 var json = JsonSerializer.Serialize(request);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
@@ -50,19 +51,17 @@ namespace IFit.Services
                 }
             }
         }
- 
-
-     public async Task SignUpAsync(string Username, string Email, string Password)
+        public async Task SignUpAsync(string Name, string Email, string Password)
         {
             try
             {
-                var request = new AppUser { Username = Username, Email = Email, Password = Password };
+                var request = new SignUpRequestDto { name = Name, email = Email, password = Password };
                 var json = JsonSerializer.Serialize(request);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
                 var client = new HttpClient();
                 var response = await client.PostAsync(AppSettings.BaseAddress + "/auth/signup", content);
-
+                
                 if (response.IsSuccessStatusCode)
                 {
                     var responseBody = await response.Content.ReadAsStringAsync();
@@ -71,7 +70,7 @@ namespace IFit.Services
 
                     if (App.Current?.MainPage != null)
                     {
-                        await App.Current.MainPage.DisplayAlert("Bienvenido", loginResponse?.Name, "OK");
+                        await App.Current.MainPage.DisplayAlert("OK", "Usuario registrado", "OK");
                     }
                 }
                 else
@@ -86,10 +85,107 @@ namespace IFit.Services
             {
                 if (App.Current?.MainPage != null)
                 {
-                    await App.Current.MainPage.DisplayAlert("Error", ex.ToString(), "OK");
+                    Console.WriteLine("Error", ex.ToString(), "OK");
+                    await Shell.Current.GoToAsync("///ErrorView");
                 }
             }
         }
-    }
+        public async Task SendVerificationEmail(string Email)
+        {
+            try
+            {
+                var request = Email;
+                var json = JsonSerializer.Serialize(request);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
 
+                var client = new HttpClient();
+                var response = await client.PostAsync(AppSettings.BaseAddress + "/auth/sendVerificationEmail", content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    var serverResponse = JsonSerializer.Deserialize<String>(responseBody);
+
+
+                    if (App.Current?.MainPage != null)
+                    {
+                        await App.Current.MainPage.DisplayAlert("OK", serverResponse.ToString(), "OK");
+                    }
+                }
+                else
+                {
+                    if (App.Current?.MainPage != null)
+                    {
+                        await App.Current.MainPage.DisplayAlert("Error", "Credenciales inválidas", "OK");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                if (App.Current?.MainPage != null)
+                {
+                    Console.WriteLine("Error", ex.ToString(), "OK");
+                    await Shell.Current.GoToAsync("///ErrorView");
+                }
+            }
+        }
+
+        public async Task<EmailValidationResponseDto> VerifyEmail(string email, string verificationCode)
+        {
+            try
+            {
+                var request = new EmailValidationRequestDto
+                {
+                    Email = email,
+                    VerificationCode = verificationCode
+                };
+
+                var json = JsonSerializer.Serialize(request);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var client = new HttpClient();
+                var response = await client.PostAsync(AppSettings.BaseAddress + "/auth/verifyEmail", content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseBody = await response.Content.ReadAsStringAsync();
+                    var verificationResponse = JsonSerializer.Deserialize<EmailValidationResponseDto>(responseBody);
+
+                    if (verificationResponse != null)
+                    {
+                        return verificationResponse;
+                    }
+
+                    return new EmailValidationResponseDto
+                    {
+                        isVerified = false,
+                        ServerResponse = "No se ha podido realizar la verificación."
+                    };
+                }
+                else
+                {
+                    return new EmailValidationResponseDto
+                    {
+                        isVerified = false,
+                        ServerResponse = "No se ha podido realizar la verificación."
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error: " + ex);
+
+                if (App.Current?.MainPage != null)
+                {
+                    await Shell.Current.GoToAsync("///ErrorView");
+                }
+
+                return new EmailValidationResponseDto
+                {
+                    isVerified = false,
+                    ServerResponse = "Error inesperado: " + ex.Message
+                };
+            }
+        }
+    }
 }

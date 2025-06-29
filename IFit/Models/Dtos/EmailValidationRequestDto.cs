@@ -9,6 +9,7 @@ namespace IFit.Models.Dtos
     public class EmailValidationRequestDto
     {
         public String Email { get; set; } = string.Empty;
+        public String VerificationCode { get; set; } = string.Empty;
 
     }
 }

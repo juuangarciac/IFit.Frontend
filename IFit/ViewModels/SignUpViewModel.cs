@@ -74,9 +74,12 @@ namespace IFit.ViewModels
             Preferences.Set("UserPassword", ValidatablePassword.Value);
 
             await authenticationService.SignUpAsync(ValidatableName.Value, ValidatableEmail.Value, ValidatablePassword.Value);
-            Console.WriteLine("Username: " + Name + ", UserEmail: " + Email + " saved.");
 
-            // await Shell.Current.GoToAsync("///VerificationPage");
+            Console.WriteLine("Username: " + ValidatableName.Value + ", UserEmail: " + ValidatableEmail.Value + " saved.");
+
+            await authenticationService.SendVerificationEmail(Email);
+
+            await Shell.Current.GoToAsync("///VerificationView");
         }
 
         private StringBuilder Validate()
