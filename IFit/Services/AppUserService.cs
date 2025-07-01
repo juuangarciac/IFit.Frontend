@@ -14,7 +14,7 @@ namespace IFit.Services
 
         public async Task<AppUser> findUserByEmail(string email) 
         {
-            var request = new EmailValidationRequestDto { Email = email };
+            var request = new EmailValidationRequestDto { email = email };
             var json = System.Text.Json.JsonSerializer.Serialize(request);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 

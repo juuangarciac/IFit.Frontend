@@ -1,3 +1,4 @@
+using IFit.Models.Dtos;
 using IFit.Services;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -40,10 +41,13 @@ public class VerificationViewModel : INotifyPropertyChanged
 
     public VerificationViewModel()
 	{
-        LoadUserEmail();
-	}
+        authenticationService = new AuthenticationService();
 
-    private async Task LoadUserEmail()
+        LoadUserEmail();
+        VerifyEmailCommand = new Command(VerifyEmail);
+    }
+
+    private async void LoadUserEmail()
     {
         var defaultValue = "NOT_FOUND";
         Email = Preferences.Get("UserEmail", defaultValue);
@@ -57,9 +61,34 @@ public class VerificationViewModel : INotifyPropertyChanged
 
     public ICommand VerifyEmailCommand { get; }
 
-    private async Task VerifyEmail()
+    public async void VerifyEmail()
     {
-        await authenticationService.VerifyEmail(Email, VerificationCode);
+        if (string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(VerificationCode))
+        {
+            if(App.Current?.MainPage != null)
+            {
+                await App.Current.MainPage.DisplayAlert("Error", "Por favor, complete todos los campos.", "OK");
+
+            }
+            return;
+        }
+
+        EmailValidationResponseDto emailValidationResponse = await authenticationService.VerifyEmail(Email, VerificationCode);
+
+        if (emailValidationResponse == null || !emailValidationResponse.isVerified)
+        {
+            if (App.Current?.MainPage != null)
+            {
+                await App.Current.MainPage.DisplayAlert("Error", "Error al verificar el correo electrónico. Inténtalo de nuevo.", "OK");
+            }
+            return;
+        }
+
+        if (App.Current?.MainPage != null)
+        {
+            await App.Current.MainPage.DisplayAlert("Éxito", "Correo electrónico verificado correctamente.", "OK");
+            await Shell.Current.GoToAsync("///SignInView");
+        }
     }
 
 

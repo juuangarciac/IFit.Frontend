@@ -135,6 +135,7 @@
                 Margin="15" 
                 Text="Verificar"
                 Style="{StaticResource ButtonBold-XL-yellow}"
+                Command="{Binding VerifyEmailCommand}"
                 />
     </Grid>
 </ContentPage>

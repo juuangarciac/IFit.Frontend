@@ -109,7 +109,7 @@ namespace IFit.Services
 
                     if (App.Current?.MainPage != null)
                     {
-                        await App.Current.MainPage.DisplayAlert("OK", serverResponse.ToString(), "OK");
+                        await App.Current.MainPage.DisplayAlert("OK", serverResponse?.ToString(), "OK");
                     }
                 }
                 else
@@ -136,8 +136,8 @@ namespace IFit.Services
             {
                 var request = new EmailValidationRequestDto
                 {
-                    Email = email,
-                    VerificationCode = verificationCode
+                    email = email,
+                    verificationCode = verificationCode
                 };
 
                 var json = JsonSerializer.Serialize(request);
@@ -151,7 +151,7 @@ namespace IFit.Services
                     var responseBody = await response.Content.ReadAsStringAsync();
                     var verificationResponse = JsonSerializer.Deserialize<EmailValidationResponseDto>(responseBody);
 
-                    if (verificationResponse != null)
+                    if (verificationResponse != null )
                     {
                         return verificationResponse;
                     }
@@ -159,7 +159,8 @@ namespace IFit.Services
                     return new EmailValidationResponseDto
                     {
                         isVerified = false,
-                        ServerResponse = "No se ha podido realizar la verificación."
+                        message = "No se ha podido realizar la verificación.",
+                        email = email
                     };
                 }
                 else
@@ -167,7 +168,8 @@ namespace IFit.Services
                     return new EmailValidationResponseDto
                     {
                         isVerified = false,
-                        ServerResponse = "No se ha podido realizar la verificación."
+                        message = "No se ha podido realizar la verificación.",
+                        email = email
                     };
                 }
             }
@@ -183,7 +185,8 @@ namespace IFit.Services
                 return new EmailValidationResponseDto
                 {
                     isVerified = false,
-                    ServerResponse = "Error inesperado: " + ex.Message
+                    message = "Error inesperado: " + ex.Message,
+                    email = email
                 };
             }
         }
