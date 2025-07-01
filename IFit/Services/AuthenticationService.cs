@@ -12,7 +12,7 @@ namespace IFit.Services
 {
     public class AuthenticationService
     {
-        public async Task LoginAsync(string Email, string Password)
+        public async Task<SignInResponseDto> LoginAsync(string Email, string Password)
         {
             try
             {
@@ -28,27 +28,22 @@ namespace IFit.Services
                     var responseBody = await response.Content.ReadAsStringAsync();
                     var loginResponse = JsonSerializer.Deserialize<SignInResponseDto>(responseBody);
 
-
-                    if (App.Current?.MainPage != null)
+                    if(loginResponse == null)
                     {
-                        await App.Current.MainPage.DisplayAlert("Bienvenido", loginResponse?.Message, "OK");
+                        return null;
                     }
 
+                    return loginResponse;
                 }
                 else
                 {
-                    if (App.Current?.MainPage != null)
-                    {
-                        await App.Current.MainPage.DisplayAlert("Error", "Credenciales inválidas", "OK");
-                    }
+                    return null;
                 }
             }
             catch (Exception ex)
             {
-                if (App.Current?.MainPage != null)
-                {
-                    await App.Current.MainPage.DisplayAlert("Error", ex.ToString(), "OK");
-                }
+                await Shell.Current.GoToAsync("///ErrorView");
+                return null;
             }
         }
         public async Task SignUpAsync(string Name, string Email, string Password)
@@ -83,11 +78,8 @@ namespace IFit.Services
             }
             catch (Exception ex)
             {
-                if (App.Current?.MainPage != null)
-                {
-                    Console.WriteLine("Error", ex.ToString(), "OK");
-                    await Shell.Current.GoToAsync("///ErrorView");
-                }
+                Console.WriteLine("Error", ex.ToString(), "OK");
+                await Shell.Current.GoToAsync("///ErrorView");
             }
         }
         public async Task SendVerificationEmail(string Email)

@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace IFit.Models.Dtos
 {
-    internal class SignInResponseDto
+    public class SignInResponseDto
     {
-        public string Message { get; set; } = string.Empty;
-        public string Token { get; set; } = string.Empty;
+        public string authorities { get; set; } = string.Empty;
+        public string token { get; set; } = string.Empty;
 
-        public Boolean IsVerified { get; set; }
+        public string username { get; set; } = string.Empty;
     }
 }

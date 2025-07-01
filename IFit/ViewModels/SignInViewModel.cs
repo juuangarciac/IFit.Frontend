@@ -21,7 +21,37 @@ namespace IFit.ViewModels
         {
             // Initialize the AuthenticationService instance
             authenticationService = new AuthenticationService();
-            LoginCommand = new Command(async () => await authenticationService.LoginAsync(Email, Password));
+            LoginCommand = new Command(SignIn);
+        }
+
+        public async void SignIn()
+        {
+            if (string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(Password))
+            {
+                if(App.Current?.MainPage != null)
+                {
+                    await App.Current.MainPage.DisplayAlert("Error", "Por favor, ingrese su correo electrónico y contraseña.", "OK");
+                }
+                return;
+            }
+
+            SignInResponseDto signInResponseDto = await authenticationService.LoginAsync(Email, Password);
+            
+            if(signInResponseDto == null)
+            {
+                if(App.Current?.MainPage != null)
+                {
+                    await App.Current.MainPage.DisplayAlert("Error", "No se pudo iniciar sesión. Por favor, verifique sus credenciales.", "OK");
+                }
+                return;
+            }
+
+            Preferences.Set("UserEmail", Email);
+            Preferences.Set("UserToken", signInResponseDto.token);
+            Preferences.Set("UserAuthorities", signInResponseDto.authorities);
+            Console.WriteLine("UserEmail: " + Email + ", UserToken: " + signInResponseDto.token + " saved.");
+
+            await Shell.Current.GoToAsync("///HomeView");
         }
 
     }

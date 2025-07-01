@@ -13,6 +13,7 @@ namespace IFit
             Routing.RegisterRoute("SignUpView", typeof(SignUpView));
             Routing.RegisterRoute("SignInView", typeof(SignInView));
             Routing.RegisterRoute("VerificationView", typeof(VerificationView));
+            Routing.RegisterRoute("HomeView", typeof(HomeView));
         }
     }
 }

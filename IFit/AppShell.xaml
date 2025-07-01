@@ -29,6 +29,11 @@
         Route="VerificationView" />
 
     <ShellContent
+         Title="Home"
+         ContentTemplate="{DataTemplate views:HomeView}"
+         Route="HomeView" />
+
+    <ShellContent
         Title="Error"
         ContentTemplate="{DataTemplate views:ErrorView}"
         Route="ErrorView" />
