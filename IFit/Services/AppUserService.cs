@@ -12,7 +12,7 @@ namespace IFit.Services
     {
         public AppUserService()  { }
 
-        public async Task<AppUser> findUserByEmail(string email) 
+        public async Task<AppUser?> findUserByEmail(string email) 
         {
             var request = new EmailValidationRequestDto { email = email };
             var json = System.Text.Json.JsonSerializer.Serialize(request);

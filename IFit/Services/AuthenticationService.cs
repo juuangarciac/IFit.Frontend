@@ -12,175 +12,100 @@ namespace IFit.Services
 {
     public class AuthenticationService
     {
-        public async Task<SignInResponseDto> LoginAsync(string Email, string Password)
+        private readonly HttpClient _client = new HttpClient();
+
+        public async Task<SignInResponseDto?> LoginAsync(string email, string password)
         {
             try
             {
-                var request = new SignInRequestDto { email = Email, password = Password };
+                var request = new SignInRequestDto { email = email, password = password };
                 var json = JsonSerializer.Serialize(request);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var client = new HttpClient();
-                var response = await client.PostAsync(AppSettings.BaseAddress + "/login", content);
+                var response = await _client.PostAsync("/login", content);
 
-                if (response.IsSuccessStatusCode)
-                {
-                    var responseBody = await response.Content.ReadAsStringAsync();
-                    var loginResponse = JsonSerializer.Deserialize<SignInResponseDto>(responseBody);
-
-                    if(loginResponse == null)
-                    {
-                        return null;
-                    }
-
-                    return loginResponse;
-                }
-                else
-                {
+                if (!response.IsSuccessStatusCode)
                     return null;
-                }
+
+                var body = await response.Content.ReadAsStringAsync();
+                return JsonSerializer.Deserialize<SignInResponseDto>(body);
             }
             catch (Exception ex)
             {
+                // loggear el error, no solo navegar
+                Console.WriteLine(ex.Message);
+                await Shell.Current.GoToAsync("//ErrorView");
+                return null;
+            }
+        }
+
+        public async Task<AppUser?> SignUpAsync(string name, string email, string password)
+        {
+            try
+            {
+                var request = new SignUpRequestDto { name = name, email = email, password = password };
+                var json = JsonSerializer.Serialize(request);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await _client.PostAsync(AppSettings.BaseAddress + "/auth/signup", content);
+
+                if (!response.IsSuccessStatusCode)
+                    return null;
+
+                var body = await response.Content.ReadAsStringAsync();
+                return JsonSerializer.Deserialize<AppUser>(body);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
                 await Shell.Current.GoToAsync("///ErrorView");
                 return null;
             }
         }
-        public async Task SignUpAsync(string Name, string Email, string Password)
+        public async Task<EmailValidationResponseDto?> SendVerificationEmail(string email)
         {
             try
             {
-                var request = new SignUpRequestDto { name = Name, email = Email, password = Password };
-                var json = JsonSerializer.Serialize(request);
+                var json = JsonSerializer.Serialize(email);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var client = new HttpClient();
-                var response = await client.PostAsync(AppSettings.BaseAddress + "/auth/signup", content);
-                
-                if (response.IsSuccessStatusCode)
-                {
-                    var responseBody = await response.Content.ReadAsStringAsync();
-                    var loginResponse = JsonSerializer.Deserialize<AppUser>(responseBody);
+                var response = await _client.PostAsync(AppSettings.BaseAddress + "/auth/sendVerificationEmail", content);
 
+                if (!response.IsSuccessStatusCode)
+                    return null;
 
-                    if (App.Current?.MainPage != null)
-                    {
-                        await App.Current.MainPage.DisplayAlert("OK", "Usuario registrado", "OK");
-                    }
-                }
-                else
-                {
-                    if (App.Current?.MainPage != null)
-                    {
-                        await App.Current.MainPage.DisplayAlert("Error", "Credenciales inválidas", "OK");
-                    }
-                }
+                var body = await response.Content.ReadAsStringAsync();
+                return JsonSerializer.Deserialize<EmailValidationResponseDto>(body);
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error", ex.ToString(), "OK");
+                Console.WriteLine(ex.Message);
                 await Shell.Current.GoToAsync("///ErrorView");
+                return null;
             }
         }
-        public async Task SendVerificationEmail(string Email)
+
+        public async Task<EmailValidationResponseDto?> VerifyEmail(string email, string verificationCode)
         {
             try
             {
-                var request = Email;
+                var request = new EmailValidationRequestDto { email = email, verificationCode = verificationCode };
                 var json = JsonSerializer.Serialize(request);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
+                var response = await _client.PostAsync(AppSettings.BaseAddress + "/auth/verifyEmail", content);
 
-                var client = new HttpClient();
-                var response = await client.PostAsync(AppSettings.BaseAddress + "/auth/sendVerificationEmail", content);
+                if (!response.IsSuccessStatusCode)
+                    return null;
 
-                if (response.IsSuccessStatusCode)
-                {
-                    var responseBody = await response.Content.ReadAsStringAsync();
-                    var serverResponse = JsonSerializer.Deserialize<String>(responseBody);
-
-
-                    if (App.Current?.MainPage != null)
-                    {
-                        await App.Current.MainPage.DisplayAlert("OK", serverResponse?.ToString(), "OK");
-                    }
-                }
-                else
-                {
-                    if (App.Current?.MainPage != null)
-                    {
-                        await App.Current.MainPage.DisplayAlert("Error", "Credenciales inválidas", "OK");
-                    }
-                }
+                var body = await response.Content.ReadAsStringAsync();
+                return JsonSerializer.Deserialize<EmailValidationResponseDto>(body);
             }
             catch (Exception ex)
             {
-                if (App.Current?.MainPage != null)
-                {
-                    Console.WriteLine("Error", ex.ToString(), "OK");
-                    await Shell.Current.GoToAsync("///ErrorView");
-                }
+                Console.WriteLine(ex.Message);
+                await Shell.Current.GoToAsync("///ErrorView");
+                return null;
             }
-        }
-
-        public async Task<EmailValidationResponseDto> VerifyEmail(string email, string verificationCode)
-        {
-            try
-            {
-                var request = new EmailValidationRequestDto
-                {
-                    email = email,
-                    verificationCode = verificationCode
-                };
-
-                var json = JsonSerializer.Serialize(request);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-                var client = new HttpClient();
-                var response = await client.PostAsync(AppSettings.BaseAddress + "/auth/verifyEmail", content);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var responseBody = await response.Content.ReadAsStringAsync();
-                    var verificationResponse = JsonSerializer.Deserialize<EmailValidationResponseDto>(responseBody);
-
-                    if (verificationResponse != null )
-                    {
-                        return verificationResponse;
-                    }
-
-                    return new EmailValidationResponseDto
-                    {
-                        isVerified = false,
-                        message = "No se ha podido realizar la verificación.",
-                        email = email
-                    };
-                }
-                else
-                {
-                    return new EmailValidationResponseDto
-                    {
-                        isVerified = false,
-                        message = "No se ha podido realizar la verificación.",
-                        email = email
-                    };
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Error: " + ex);
-
-                if (App.Current?.MainPage != null)
-                {
-                    await Shell.Current.GoToAsync("///ErrorView");
-                }
-
-                return new EmailValidationResponseDto
-                {
-                    isVerified = false,
-                    message = "Error inesperado: " + ex.Message,
-                    email = email
-                };
-            }
-        }
+        }   
     }
 }

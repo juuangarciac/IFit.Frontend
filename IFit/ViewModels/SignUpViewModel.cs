@@ -51,33 +51,36 @@ namespace IFit.ViewModels
 
             // Validate the user input
             this.AddValidations();
+            string validationMessages = this.Validate().ToString();
 
-            StringBuilder validationMessages = this.Validate();
-            if (!string.IsNullOrEmpty(validationMessages.ToString()))
+            if (!string.IsNullOrEmpty(validationMessages))
             {
-                Application.Current?.MainPage?.DisplayAlert("Error de validación", validationMessages.ToString(), "OK");
-                return;
-            }
-
-            if (await EmailAlreadyExists(ValidatableEmail.Value))
-            {
-                if (App.Current?.MainPage != null) 
+                if (App.Current?.MainPage != null)
                 {
-                    await App.Current.MainPage.DisplayAlert("Error", "El correo electrónico ya está en uso.", "OK");
+                    await App.Current.MainPage.DisplayAlert("Error", validationMessages, "OK");
                 }
                 return;
             }
-
-            // Save in Preferences User credentials
-            Preferences.Set("UserName", ValidatableName.Value);
-            Preferences.Set("UserEmail", ValidatableEmail.Value);
-            Preferences.Set("UserPassword", ValidatablePassword.Value);
-
-            await authenticationService.SignUpAsync(ValidatableName.Value, ValidatableEmail.Value, ValidatablePassword.Value);
-
-            Console.WriteLine("Username: " + ValidatableName.Value + ", UserEmail: " + ValidatableEmail.Value + " saved.");
-
-            await authenticationService.SendVerificationEmail(Email);
+            
+            AppUser user = await authenticationService.SignUpAsync(ValidatableName.Value, ValidatableEmail.Value, ValidatablePassword.Value);
+            if(user == null)
+            {
+                if (App.Current?.MainPage != null)
+                {
+                    await App.Current.MainPage.DisplayAlert("Error", "No se pudo crear la cuenta. Por favor, intente nuevamente.", "OK");
+                }
+                return;
+            }
+            
+            EmailValidationResponseDto emailValidationResponse = await authenticationService.SendVerificationEmail(Email);
+            if (emailValidationResponse == null)
+            {
+                if (App.Current?.MainPage != null)
+                {
+                    await App.Current.MainPage.DisplayAlert("Error", "No se pudo enviar el correo de verificación. Por favor, intente nuevamente.", "OK");
+                }
+                return;
+            }
 
             await Shell.Current.GoToAsync("///VerificationView");
         }
