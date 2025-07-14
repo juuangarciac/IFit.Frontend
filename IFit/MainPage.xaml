@@ -69,7 +69,7 @@
                     <!-- Registrarme -->
                     <Button Grid.Row="0"
                             Text="Registrarme"
-                            Style="{StaticResource ButtonBold-XL-dark}"
+                            Style="{StaticResource ButtonBold-XL-dark-white}"
                             Clicked="OnSignUpClicked"
                         ></Button>
                     

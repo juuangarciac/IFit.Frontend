@@ -37,4 +37,9 @@
         Title="Error"
         ContentTemplate="{DataTemplate views:ErrorView}"
         Route="ErrorView" />
+
+    <ShellContent 
+        Title="GetStarted"
+        ContentTemplate="{DataTemplate views:GetStartedView}"
+        Route="GetStartedView" />
 </Shell>

@@ -18,14 +18,19 @@
         <Setter Property="FontFamily" Value="Montserrat-Bold" />
     </Style>
 
-    <Style x:Key="ButtonBold-XL-dark" TargetType="Button" BasedOn="{StaticResource ButtonBold-XL}">
+    <Style x:Key="ButtonBold-XL-dark-white" TargetType="Button" BasedOn="{StaticResource ButtonBold-XL}">
         <Setter Property="BackgroundColor" Value="{StaticResource BackgroundSecondaryDark}" />
         <Setter Property="TextColor" Value="{StaticResource TextPrimaryColorLight}" />
     </Style>
 
-    <Style x:Key="ButtonBold-XL-yellow" TargetType="Button" BasedOn="{StaticResource ButtonBold-XL}">
+    <Style x:Key="ButtonBold-XL-dark-yellow" TargetType="Button" BasedOn="{StaticResource ButtonBold-XL}">
         <Setter Property="BackgroundColor" Value="{StaticResource BackgroundSecondaryDark}" />
         <Setter Property="TextColor" Value="{StaticResource TertiaryColor}" />
+    </Style>
+
+    <Style x:Key="ButtonBold-XL-yellow" TargetType="Button" BasedOn="{StaticResource ButtonBold-XL}">
+        <Setter Property="BackgroundColor" Value="{StaticResource TertiaryColor}" />
+        <Setter Property="TextColor" Value="{StaticResource TextSecondaryColorDark}" />
     </Style>
 
     <Style x:Key="ButtonBold-XL-light" TargetType="Button" BasedOn="{StaticResource ButtonBold-XL}">
@@ -59,7 +64,11 @@
         <Setter Property="Stroke"  Value="{DynamicResource BackgroundPrimaryLight}" />
         <Setter Property="Padding" Value="5" />
     </Style>
-    
+
+    <Style x:Key="BorderBackgroundLightGray" TargetType="Border">
+        <Setter Property="BackgroundColor" Value="#73b5b5b5" />
+    </Style>
+
     <!-- Default values -->
     <Style TargetType="ActivityIndicator">
         <Setter Property="Color" Value="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />

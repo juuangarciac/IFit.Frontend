@@ -124,7 +124,7 @@
 
                 <Button Grid.Row="4"
                      Text="Iniciar sesión"
-                     Style="{StaticResource ButtonBold-XL-yellow}"
+                     Style="{StaticResource ButtonBold-XL-dark-yellow}"
                      CornerRadius="{StaticResource CornerRadiusRectangle}" 
                         Command="{Binding LoginCommand}"/>
 

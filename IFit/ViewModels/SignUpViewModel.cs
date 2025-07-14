@@ -62,7 +62,7 @@ namespace IFit.ViewModels
                 return;
             }
             
-            AppUser user = await authenticationService.SignUpAsync(ValidatableName.Value, ValidatableEmail.Value, ValidatablePassword.Value);
+            AppUser? user = await authenticationService.SignUpAsync(ValidatableName.Value, ValidatableEmail.Value, ValidatablePassword.Value);
             if(user == null)
             {
                 if (App.Current?.MainPage != null)
@@ -72,7 +72,7 @@ namespace IFit.ViewModels
                 return;
             }
             
-            EmailValidationResponseDto emailValidationResponse = await authenticationService.SendVerificationEmail(Email);
+            EmailValidationResponseDto? emailValidationResponse = await authenticationService.SendVerificationEmail(Email);
             if (emailValidationResponse == null)
             {
                 if (App.Current?.MainPage != null)
@@ -81,6 +81,9 @@ namespace IFit.ViewModels
                 }
                 return;
             }
+
+            Preferences.Set("UserEmail", Email); // Store the email for later use
+            Preferences.Set("UserName", Name); // Store the name for later use
 
             await Shell.Current.GoToAsync("///VerificationView");
         }

@@ -87,7 +87,7 @@ public class VerificationViewModel : INotifyPropertyChanged
         if (App.Current?.MainPage != null)
         {
             await App.Current.MainPage.DisplayAlert("Éxito", "Correo electrónico verificado correctamente.", "OK");
-            await Shell.Current.GoToAsync("///SignInView");
+            await Shell.Current.GoToAsync("///GetStartedView");
         }
     }
 
