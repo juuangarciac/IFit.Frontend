@@ -8,6 +8,7 @@ namespace IFit
 {
     class AppSettings
     {
-        public static string BaseAddress = DeviceInfo.Platform == DevicePlatform.Android ? "http://192.168.1.23:8080" : "http://192.168.1.23:8080";
+        public static string BaseAddress = DeviceInfo.Platform == DevicePlatform.Android ? "http://192.168.1.59:8080" : "http://192.168.1.59:8080";
+        public static readonly HttpClient _HttpClient = new HttpClient();
     }
 }

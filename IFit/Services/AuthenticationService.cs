@@ -12,8 +12,6 @@ namespace IFit.Services
 {
     public class AuthenticationService
     {
-        private readonly HttpClient _client = new HttpClient();
-
         public async Task<SignInResponseDto?> LoginAsync(string email, string password)
         {
             try
@@ -22,7 +20,7 @@ namespace IFit.Services
                 var json = JsonSerializer.Serialize(request);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var response = await _client.PostAsync("/login", content);
+                var response = await AppSettings._HttpClient.PostAsync(AppSettings.BaseAddress + "/login", content);
 
                 if (!response.IsSuccessStatusCode)
                     return null;
@@ -47,7 +45,7 @@ namespace IFit.Services
                 var json = JsonSerializer.Serialize(request);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var response = await _client.PostAsync(AppSettings.BaseAddress + "/auth/signup", content);
+                var response = await AppSettings._HttpClient.PostAsync(AppSettings.BaseAddress + "/auth/signup", content);
 
                 if (!response.IsSuccessStatusCode)
                     return null;
@@ -69,7 +67,7 @@ namespace IFit.Services
                 var json = JsonSerializer.Serialize(email);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var response = await _client.PostAsync(AppSettings.BaseAddress + "/auth/sendVerificationEmail", content);
+                var response = await AppSettings._HttpClient.PostAsync(AppSettings.BaseAddress + "/auth/sendVerificationEmail", content);
 
                 if (!response.IsSuccessStatusCode)
                     return null;
@@ -92,7 +90,7 @@ namespace IFit.Services
                 var request = new EmailValidationRequestDto { email = email, verificationCode = verificationCode };
                 var json = JsonSerializer.Serialize(request);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
-                var response = await _client.PostAsync(AppSettings.BaseAddress + "/auth/verifyEmail", content);
+                var response = await AppSettings._HttpClient.PostAsync(AppSettings.BaseAddress + "/auth/verifyEmail", content);
 
                 if (!response.IsSuccessStatusCode)
                     return null;

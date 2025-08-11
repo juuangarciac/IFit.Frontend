@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"  
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"  
+             xmlns:vm="clr-namespace:IFit.ViewModels"  
+             x:Class="IFit.Views.CoachModelTypeSelectionView"  
+             Title="CoachModelTypeSelectionView"  
+             Shell.NavBarIsVisible="False"  
+             BackgroundColor="{StaticResource BackgroundPrimaryDark}">  
+    <ContentPage.BindingContext>  
+        <vm:CoachModelTypeSelectionViewModel/>  
+    </ContentPage.BindingContext>  
+    <Grid BackgroundColor="{StaticResource BackgroundPrimaryDark}"  
+          Margin="15"  
+          RowSpacing="15">  
+        <Grid.RowDefinitions>  
+            <RowDefinition Height="Auto" />  
+            <RowDefinition Height="Auto" />  
+            <RowDefinition Height="Auto" />  
+        </Grid.RowDefinitions>  
+           
+        <!-- Header -->  
+        <Grid Grid.Row="0">  
+            
+            <Grid.ColumnDefinitions>  
+                <ColumnDefinition Width="Auto" />  
+                <ColumnDefinition Width="*" />  
+                <ColumnDefinition Width="Auto" />  
+            </Grid.ColumnDefinitions>  
+
+            <!-- Go Back -->  
+            <Button Grid.Column="0"   
+                    HorizontalOptions="Center"  
+                    VerticalOptions="Center"  
+                    BackgroundColor="Transparent"  
+                    ImageSource="arrow.png"  
+                    Clicked="onCancelClicked" />  
+            
+            <!-- Center line -->  
+            <Border Grid.Column="1"  
+                    BackgroundColor="{StaticResource TextSecondaryColorLight}"  
+                    VerticalOptions="Center"  
+                    WidthRequest="120"   
+                    StrokeThickness="1"/>  
+
+            <!-- Cancel button  -->  
+            <Button Grid.Column="2"   
+                    HorizontalOptions="Center"  
+                    VerticalOptions="Center"  
+                    BackgroundColor="Transparent"  
+                    ImageSource="cancel.svg"  
+                    Clicked="onCancelClicked" />  
+        </Grid>  
+        
+        <!-- Title -->  
+        <Label Grid.Row="1"  
+               Text="Selecciona un entrenador: "  
+               Style="{StaticResource label-h1-white}" />  
+        
+        <!-- CoachModelTypes -->  
+        <ListView Grid.Row="2"  
+                  ItemsSource="{Binding CoachModelTypes}">  
+            <ListView.ItemTemplate>  
+                <DataTemplate>  
+                    <Grid RowSpacing="5">  
+                        <!-- CoachModelTypeCard -->  
+                        <Border StrokeThickness="2"  
+                                Stroke="{StaticResource BackgroundPrimaryLight}"  
+                                BackgroundColor="{StaticResource PrimaryColorLightOpacity}">  
+
+                            <Border.StrokeShape>  
+                                <RoundRectangle CornerRadius="{StaticResource CornerRadiusRectangle}"/>  
+                            </Border.StrokeShape>  
+
+                            <VerticalStackLayout Margin="5">  
+                                <Label Text="{Binding Name}"  
+                                       Style="{DynamicResource label-h1-white}" />  
+                                
+                                <Label Text="{Binding Description}" 
+                                       Style="{DynamicResource label-p-white}"/>  
+                            </VerticalStackLayout>  
+                        </Border>  
+                    </Grid>  
+                </DataTemplate>   
+            </ListView.ItemTemplate>  
+        </ListView>  
+    </Grid>  
+</ContentPage>

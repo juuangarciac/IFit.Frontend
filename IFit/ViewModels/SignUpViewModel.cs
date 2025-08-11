@@ -121,7 +121,7 @@ namespace IFit.ViewModels
         private async Task<Boolean> EmailAlreadyExists(string email)
         {
             var validationResponse = await appUserService.findUserByEmail(email);
-            if (validationResponse != null && validationResponse.isPresent())
+            if (AppUser.isPresent(validationResponse))
             {
                 return true; // Email already exists
             }

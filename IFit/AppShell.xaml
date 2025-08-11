@@ -42,4 +42,9 @@
         Title="GetStarted"
         ContentTemplate="{DataTemplate views:GetStartedView}"
         Route="GetStartedView" />
+
+    <ShellContent
+        Title="CoachModelTypeSelection"
+        ContentTemplate="{DataTemplate views:CoachModelTypeSelectionView}"
+        Route="CoachModelTypeSelectionView" />
 </Shell>

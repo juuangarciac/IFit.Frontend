@@ -59,4 +59,6 @@
     <Color x:Key="BackgroundSecondaryDark">#393E46</Color>
     <Color x:Key="BackgroundPrimaryLight">#EEEEEE</Color>
     <Color x:Key="BackgroundSecondaryLight">#F5F5F5</Color>
+
+    <Color x:Key="PrimaryColorLightOpacity">#66222831</Color>
 </ResourceDictionary>

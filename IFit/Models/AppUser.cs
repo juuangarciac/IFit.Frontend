@@ -14,10 +14,16 @@ namespace IFit.Models
         public String Email { get; set; } = string.Empty;
         public String Password { get; set; } = string.Empty;
 
+        public Boolean IsVerified { get; set; } = false;
+        public CoachModelType CoachModelType { get; set; } = new CoachModelType();
 
-        public Boolean isPresent()
+        public static Boolean isPresent(AppUser? appUser)
         {
-            return !String.IsNullOrEmpty(Name) && !String.IsNullOrEmpty(Username) && !String.IsNullOrEmpty(Email) && !String.IsNullOrEmpty(Password);
+            return appUser != null
+                && !String.IsNullOrEmpty(appUser.Name) 
+                && !String.IsNullOrEmpty(appUser.Username) 
+                && !String.IsNullOrEmpty(appUser.Email) 
+                && !String.IsNullOrEmpty(appUser.Password);
         }
     }
 }

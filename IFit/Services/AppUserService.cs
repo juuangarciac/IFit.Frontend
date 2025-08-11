@@ -14,12 +14,8 @@ namespace IFit.Services
 
         public async Task<AppUser?> findUserByEmail(string email) 
         {
-            var request = new EmailValidationRequestDto { email = email };
-            var json = System.Text.Json.JsonSerializer.Serialize(request);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-            var client = new HttpClient();
-            var response = await client.PostAsync(AppSettings.BaseAddress + "/appuser/findByEmail", content);
+            var urlAddress = AppSettings.BaseAddress + "/appuser/findByEmail?email=" + Uri.EscapeDataString(email);
+            var response = await AppSettings._HttpClient.GetAsync(urlAddress);
 
             if (response.IsSuccessStatusCode)
             {
@@ -28,6 +24,17 @@ namespace IFit.Services
                 {
                     return System.Text.Json.JsonSerializer.Deserialize<AppUser>(responseData);
                 }
+            }
+            return null;
+        }
+
+        public async Task<CoachModelType?> GetSelectedCoachModelTypeByEmail(string email)
+        {
+            AppUser? appUser = await this.findUserByEmail(email);
+
+            if (AppUser.isPresent(appUser))
+            {
+                return appUser?.CoachModelType;
             }
             return null;
         }

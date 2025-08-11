@@ -74,6 +74,7 @@
                                FontSize="16"
                                BackgroundColor="Transparent"
                                Text="{Binding Name}"
+                               TextColor="Black"
                        />
                     </Border.Content>
                 </Border>
@@ -93,7 +94,8 @@
                                 FontFamily="Montserrat-Regular"
                                 FontSize="16"
                                 BackgroundColor="Transparent" 
-                               Text="{Binding Email}" 
+                                Text="{Binding Email}" 
+                                TextColor="Black"
                                />
                     </Border.Content>
                 </Border>
@@ -114,7 +116,8 @@
                                 FontSize="16"
                                 IsPassword="True"
                                 BackgroundColor="Transparent" 
-                               Text="{Binding Password}"/>
+                                Text="{Binding Password}"
+                                TextColor="Black"/>
                     </Border.Content>
                 </Border>
                 <!-- Terms and condition -->

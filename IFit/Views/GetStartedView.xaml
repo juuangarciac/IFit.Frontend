@@ -55,6 +55,27 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
+
+                <!-- Title Shadow -->
+                <Label Grid.Row="0"
+                       HorizontalTextAlignment="Center"
+                       TranslationX="2"
+                       TranslationY="2"
+                       Opacity="0.5">
+                    <Label.FormattedText>
+                        <FormattedString>
+                            <Span Text="Bienvenido al club, "
+                                  TextColor="Black"
+                                  FontFamily="Montserrat-Bold"
+                                  FontSize="32" />
+                            <Span Text="{StaticResource newline}" />
+                            <Span Text="{Binding Name}"
+                                  TextColor="Black"
+                                  FontFamily="Montserrat-Bold"
+                                  FontSize="32" />
+                        </FormattedString>
+                    </Label.FormattedText>
+                </Label>
                 
                 <!-- Title -->
                 <Label Grid.Row="0"
@@ -74,7 +95,46 @@
                     </Label.FormattedText>
                 </Label>
 
-
+                <!-- Subtitle Shadow -->
+                <Label Grid.Row="1"
+                       HorizontalTextAlignment="Center"
+                       LineHeight="1.5"
+                       TranslationX="2"
+                       TranslationY="2"
+                       Opacity="0.5">
+                    <Label.FormattedText>
+                        <FormattedString>
+                            <Span Text="Ya formas parte de IFit. "
+                                 TextColor="Black"
+                                 FontFamily="Montserrat-SemiBold"
+                                 FontSize="22" />
+                            <Span Text="&#10;" />
+                            <Span Text="Miles de "
+                                    TextColor="Black"
+                                    FontFamily="Montserrat-SemiBold"
+                                    FontSize="22" />
+                            <Span Text="IFitters"
+                                   TextColor="Black"
+                                   FontFamily="Montserrat-SemiBold"
+                                   FontSize="22" />
+                            <Span Text=" entrenan cada día con una sola meta:"
+                                   TextColor="Black"
+                                   FontFamily="Montserrat-SemiBold"
+                                   FontSize="22" />
+                            <Span Text="&#10;&#10;" />
+                            <Span Text="Ser mejores que ayer "
+                                   TextColor="Black"
+                                   FontFamily="Montserrat-Bold"
+                                   FontSize="22" />
+                            <Span Text="&#10;&#10;" />
+                            <Span Text="¿Estás listo?"
+                                  TextColor="Black"
+                                  FontFamily="Montserrat-SemiBold"
+                                  FontSize="22" />
+                        </FormattedString>
+                    </Label.FormattedText>
+                </Label>
+                
                 <!-- Subtitle -->
                 <Label Grid.Row="1"
                        HorizontalTextAlignment="Center"
@@ -158,7 +218,8 @@
                 <Button Grid.Row="1"
                         Text="Empieza ahora"
                         Style="{StaticResource ButtonBold-XL-yellow}"
-                        CornerRadius="{StaticResource CornerRadiusRectangle}"/>
+                        CornerRadius="{StaticResource CornerRadiusRectangle}"
+                        Clicked="onContinueClicked"/>
             </Grid>
           
         </Grid>
