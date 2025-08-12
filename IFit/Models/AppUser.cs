@@ -3,18 +3,28 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace IFit.Models
 {
     public class AppUser
     {
+        [JsonPropertyName("name")]
         public String Name { get; set; } = string.Empty;
+
+        [JsonPropertyName("username")]
         public String Username { get; set; } = string.Empty;
+        [JsonPropertyName("email")]
         public String Email { get; set; } = string.Empty;
+
+        [JsonPropertyName("password")]
         public String Password { get; set; } = string.Empty;
 
+        [JsonPropertyName("verified")]
         public Boolean IsVerified { get; set; } = false;
+
+        [JsonPropertyName("coachmodeltype")]
         public CoachModelType CoachModelType { get; set; } = new CoachModelType();
 
         public static Boolean isPresent(AppUser? appUser)

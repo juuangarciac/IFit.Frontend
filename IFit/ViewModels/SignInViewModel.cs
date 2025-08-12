@@ -82,7 +82,7 @@ namespace IFit.ViewModels
         {
             if (!appUser.IsVerified)
             {
-                ShowError("Parece que se le olvido algo la última vez!", "Por favor, verifique su correo electrónico antes de continuar.");
+                // ShowError("Parece que se le olvido algo la última vez!", "Por favor, verifique su correo electrónico antes de continuar.");
                 await authenticationService.SendVerificationEmail(Email);
                 await Shell.Current.GoToAsync("///VerificationView");
                 return false;
@@ -96,8 +96,8 @@ namespace IFit.ViewModels
         {
             if (appUser.CoachModelType == null || string.IsNullOrEmpty(appUser.CoachModelType.Name))
             {
-                ShowError("Parece que se le olvido algo la última vez!", "Por favor, seleccione un tipo de modelo de entrenador antes de continuar.");
-                await Shell.Current.GoToAsync("///CoachModelTypeSelectionView");
+                // ShowError("Parece que se le olvido algo la última vez!", "Por favor, seleccione un tipo de modelo de entrenador antes de continuar.");
+                await Shell.Current.GoToAsync("///GetStartedView");
                 return;
             }
 

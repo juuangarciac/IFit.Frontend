@@ -31,13 +31,8 @@ public class CoachModelTypeSelectionViewModel : INotifyPropertyChanged
 
 	public async void LoadCoachModelTypes()
 	{
-        List<CoachModelTypeDto>? coachModelTypeDtos = await _coachModelTypeService.GetCoachModelTypes();
-        CoachModelTypes = coachModelTypeDtos?.Select(dto => new CoachModelType
-        {
-            Name = dto.name,
-            Description = dto.description
-        }).ToList();
-        
+        CoachModelTypes = await _coachModelTypeService.GetCoachModelTypes();
+ 
         if (CoachModelTypes == null || !CoachModelTypes.Any())
         {
             if(App.Current?.MainPage != null)

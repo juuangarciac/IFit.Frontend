@@ -58,6 +58,12 @@
         <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource TextPrimaryColorLight}, Dark={StaticResource TextPrimaryColorDark}}" />
     </Style>
 
+    <Style x:Key="label-h1-yellow" TargetType="Label">
+        <Setter Property="FontFamily" Value="Montserrat-Bold" />
+        <Setter Property="FontSize" Value="18" />
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource TertiaryColor}, Dark={StaticResource SecondaryColor}}" />
+    </Style>
+
     <Style x:Key="label-p-white" TargetType="Label">
         <Setter Property="FontFamily" Value="Montserrat-Medium" />
         <Setter Property="FontSize" Value="14" />

@@ -61,7 +61,7 @@
                        HorizontalTextAlignment="Center"
                        TranslationX="2"
                        TranslationY="2"
-                       Opacity="0.5">
+                       Opacity="0.2">
                     <Label.FormattedText>
                         <FormattedString>
                             <Span Text="Bienvenido al club, "
@@ -101,7 +101,7 @@
                        LineHeight="1.5"
                        TranslationX="2"
                        TranslationY="2"
-                       Opacity="0.5">
+                       Opacity="0.2">
                     <Label.FormattedText>
                         <FormattedString>
                             <Span Text="Ya formas parte de IFit. "
@@ -196,14 +196,14 @@
                         </Grid.ColumnDefinitions>
 
                         <CheckBox Grid.Column="0"
-                                  VerticalOptions="Center"
+                                  VerticalOptions="Start"
                                   HorizontalOptions="Center"
                                   Color="White"/>
 
                         <Label Grid.Column="1"
                                Text="Recibe en tu email anuncios exclusivos, ofertas especiales, publicaciones inspiradoras y tutoriales para exprimir al máximo tu app móvil"
                                HorizontalOptions="Start"
-                               VerticalOptions="Center"
+                               VerticalOptions="Start"
                                HorizontalTextAlignment="Start"
                                LineBreakMode="WordWrap"
                                TextColor="{StaticResource TextPrimaryColorLight}"

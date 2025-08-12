@@ -1,4 +1,5 @@
-﻿using IFit.Models.Dtos;
+﻿using IFit.Models;
+using IFit.Models.Dtos;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,11 +12,11 @@ namespace IFit.Services
 {
     public class CoachModelTypeService
     {
-        public async Task<List<CoachModelTypeDto>?> GetCoachModelTypes()
+        public async Task<List<CoachModelType>?> GetCoachModelTypes()
         {
             try
             {
-                var response = await AppSettings._HttpClient.GetAsync(AppSettings.BaseAddress + "/coachmodeltype/findAll");
+                var response = await AppSettings._HttpClient.GetAsync(AppSettings.BaseAddress + "/coachmodeltype/findEnabled");
                 if(!response.IsSuccessStatusCode)
                 {
                     Console.WriteLine("Error fetching coach model types: " + response.ReasonPhrase);
@@ -23,7 +24,7 @@ namespace IFit.Services
                 }
 
                 var body = await response.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<List<CoachModelTypeDto>>(body);
+                return JsonSerializer.Deserialize<List<CoachModelType>>(body);
             }
             catch(Exception ex)
             {

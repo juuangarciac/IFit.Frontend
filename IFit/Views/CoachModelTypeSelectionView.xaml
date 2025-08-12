@@ -2,6 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"  
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"  
              xmlns:vm="clr-namespace:IFit.ViewModels"  
+             xmlns:models="clr-namespace:IFit.Models"
              x:Class="IFit.Views.CoachModelTypeSelectionView"  
              Title="CoachModelTypeSelectionView"  
              Shell.NavBarIsVisible="False"  
@@ -15,10 +16,10 @@
         <Grid.RowDefinitions>  
             <RowDefinition Height="Auto" />  
             <RowDefinition Height="Auto" />  
-            <RowDefinition Height="Auto" />  
+            <RowDefinition Height="*" />  
         </Grid.RowDefinitions>  
            
-        <!-- Header -->  
+        <!-- Header-->  
         <Grid Grid.Row="0">  
             
             <Grid.ColumnDefinitions>  
@@ -51,35 +52,76 @@
                     Clicked="onCancelClicked" />  
         </Grid>  
         
-        <!-- Title -->  
-        <Label Grid.Row="1"  
-               Text="Selecciona un entrenador: "  
-               Style="{StaticResource label-h1-white}" />  
-        
+        <!-- Title -->
+        <Label Grid.Row="1">
+            <Label.FormattedText>
+                <FormattedString>
+                    <Span Text="Selecciona un " 
+                           Style="{StaticResource label-h1-white}" />
+                    <Span Text="entrenador:" 
+                          Style="{StaticResource label-h1-yellow}" />
+                </FormattedString>
+            </Label.FormattedText>
+        </Label>
+
+
         <!-- CoachModelTypes -->  
         <ListView Grid.Row="2"  
-                  ItemsSource="{Binding CoachModelTypes}">  
-            <ListView.ItemTemplate>  
-                <DataTemplate>  
-                    <Grid RowSpacing="5">  
-                        <!-- CoachModelTypeCard -->  
+                  ItemsSource="{Binding CoachModelTypes}"
+                  HasUnevenRows="True"
+                  SeparatorColor="Transparent">  
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="models:CoachModelType">
+                    <!-- CoachModelTypeCard -->
+                    <ViewCell>
                         <Border StrokeThickness="2"  
-                                Stroke="{StaticResource BackgroundPrimaryLight}"  
-                                BackgroundColor="{StaticResource PrimaryColorLightOpacity}">  
+                                Stroke="{DynamicResource BackgroundPrimaryLight}"  
+                                BackgroundColor="{DynamicResource PrimaryColorLightOpacity}"
+                                Margin="0,0,0,15">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="{DynamicResource CornerRadiusRectangle}"/>
+                            </Border.StrokeShape>
+                            <Border.Shadow>
+                                <Shadow Brush="{DynamicResource BackgroundPrimaryLight}"
+                                        Opacity="0.35"
+                                        Radius="{DynamicResource CornerRadiusRectangle}" />
+                            </Border.Shadow>
+                            <!-- Card -->
+                            <Grid Margin="10"
+                                  RowSpacing="5"
+                                  BackgroundColor="Transparent">
 
-                            <Border.StrokeShape>  
-                                <RoundRectangle CornerRadius="{StaticResource CornerRadiusRectangle}"/>  
-                            </Border.StrokeShape>  
-
-                            <VerticalStackLayout Margin="5">  
-                                <Label Text="{Binding Name}"  
-                                       Style="{DynamicResource label-h1-white}" />  
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
                                 
-                                <Label Text="{Binding Description}" 
-                                       Style="{DynamicResource label-p-white}"/>  
-                            </VerticalStackLayout>  
-                        </Border>  
-                    </Grid>  
+                                <!-- Header -->
+                                <Grid Grid.Row="0"
+                                      ColumnSpacing="5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    
+                                    <!-- Coach name -->
+                                    <Label Grid.Column="0"
+                                           Text="{Binding Name}"  
+                                           Style="{DynamicResource label-h1-white}"/>
+                                    
+                                    <!-- Coach Emoji -->
+                                    <Label Grid.Column="1"
+                                           FontSize="16"
+                                           Text="{Binding EmojiCharacter}" />
+                                </Grid>
+                                
+                                <!-- Body -->
+                                <Label  Grid.Row="1"  
+                                        Text="{Binding Description}" 
+                                        Style="{DynamicResource label-p-white}"/>
+                            </Grid>
+                        </Border>
+                    </ViewCell>
                 </DataTemplate>   
             </ListView.ItemTemplate>  
         </ListView>  
