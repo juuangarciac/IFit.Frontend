@@ -17,5 +17,7 @@
 
             MainPage = new AppShell();
         }
+
+        public static T? GetService<T>() => ((App)App.Current).Services.GetService<T>() ?? throw new InvalidOperationException("DatabaseService is not initialized.");
     }
 }

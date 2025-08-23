@@ -47,4 +47,9 @@
         Title="CoachModelTypeSelection"
         ContentTemplate="{DataTemplate views:CoachModelTypeSelectionView}"
         Route="CoachModelTypeSelectionView" />
+
+    <ShellContent
+        Title="ExperienceLevelSelection"
+        ContentTemplate="{DataTemplate views:ExperienceLevelSelectionView}"
+        Route="ExperienceLevelSelectionView" />
 </Shell>

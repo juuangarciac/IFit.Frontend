@@ -65,65 +65,68 @@
         </Label>
 
 
-        <!-- CoachModelTypes -->  
-        <ListView Grid.Row="2"  
-                  ItemsSource="{Binding CoachModelTypes}"
-                  HasUnevenRows="True"
-                  SeparatorColor="Transparent">  
-            <ListView.ItemTemplate>
-                <DataTemplate x:DataType="models:CoachModelType">
-                    <!-- CoachModelTypeCard -->
-                    <ViewCell>
-                        <Border StrokeThickness="2"  
-                                Stroke="{DynamicResource BackgroundPrimaryLight}"  
-                                BackgroundColor="{DynamicResource PrimaryColorLightOpacity}"
-                                Margin="0,0,0,15">
-                            <Border.StrokeShape>
-                                <RoundRectangle CornerRadius="{DynamicResource CornerRadiusRectangle}"/>
-                            </Border.StrokeShape>
-                            <Border.Shadow>
-                                <Shadow Brush="{DynamicResource BackgroundPrimaryLight}"
-                                        Opacity="0.35"
-                                        Radius="{DynamicResource CornerRadiusRectangle}" />
-                            </Border.Shadow>
-                            <!-- Card -->
-                            <Grid Margin="10"
-                                  RowSpacing="5"
-                                  BackgroundColor="Transparent">
+        <!-- CoachModelTypes -->
+        <CollectionView Grid.Row="2"
+                ItemsSource="{Binding CoachModelTypes}"
+                SelectionMode="Single"
+                SelectedItem="{Binding SelectedCoachModelType, Mode=TwoWay}"
+                Margin="0,0,0,15">
 
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="Auto" />
-                                </Grid.RowDefinitions>
-                                
-                                <!-- Header -->
-                                <Grid Grid.Row="0"
-                                      ColumnSpacing="5">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    
-                                    <!-- Coach name -->
-                                    <Label Grid.Column="0"
-                                           Text="{Binding Name}"  
-                                           Style="{DynamicResource label-h1-white}"/>
-                                    
-                                    <!-- Coach Emoji -->
-                                    <Label Grid.Column="1"
-                                           FontSize="16"
-                                           Text="{Binding EmojiCharacter}" />
-                                </Grid>
-                                
-                                <!-- Body -->
-                                <Label  Grid.Row="1"  
-                                        Text="{Binding Description}" 
-                                        Style="{DynamicResource label-p-white}"/>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:CoachModelType">
+                    <Border StrokeThickness="2"
+                    Stroke="{DynamicResource BackgroundPrimaryLight}"
+                    BackgroundColor="{DynamicResource PrimaryColorLightOpacity}"
+                    Margin="0,0,0,15">
+
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="{DynamicResource CornerRadiusRectangle}" />
+                        </Border.StrokeShape>
+
+                        <Border.Shadow>
+                            <Shadow Brush="{DynamicResource BackgroundPrimaryLight}"
+                            Opacity="0.35"
+                            Radius="{DynamicResource CornerRadiusRectangle}" />
+                        </Border.Shadow>
+
+                        <!-- Card -->
+                        <Grid Margin="10"
+                      RowSpacing="5"
+                      BackgroundColor="Transparent">
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <!-- Header -->
+                            <Grid Grid.Row="0"
+                          ColumnSpacing="5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Coach name -->
+                                <Label Grid.Column="0"
+                               Text="{Binding Name}"
+                               Style="{DynamicResource label-h1-white}" />
+
+                                <!-- Coach Emoji -->
+                                <Label Grid.Column="1"
+                               FontSize="16"
+                               Text="{Binding EmojiCharacter}" />
                             </Grid>
-                        </Border>
-                    </ViewCell>
-                </DataTemplate>   
-            </ListView.ItemTemplate>  
-        </ListView>  
+
+                            <!-- Body -->
+                            <Label Grid.Row="1"
+                           Text="{Binding Description}"
+                           Style="{DynamicResource label-p-white}" />
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
     </Grid>  
 </ContentPage>

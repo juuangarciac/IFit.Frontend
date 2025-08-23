@@ -1,6 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">@android:color/transparent</color>
-    <color name="colorPrimaryDark">@android:color/transparent</color>
-    <color name="colorAccent">@android:color/transparent</color>
+	<!-- Colores Android adaptados a tu paleta -->
+	<color name="colorPrimary">#222831</color>
+	<!-- Igual que PrimaryColor -->
+	<color name="colorPrimaryDark">#222831</color>
+	<!-- Igual que SecondaryColor -->
+	<color name="colorAccent">#393E46</color>
+	<!-- Igual que TertiaryColor -->
 </resources>

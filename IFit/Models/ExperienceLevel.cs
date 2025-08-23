@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace IFit.Models
 {
-    public class CoachModelType
+    public class ExperienceLevel
     {
         [JsonPropertyName("id"), PrimaryKey]
         public long Id { get; set; }
@@ -18,8 +18,5 @@ namespace IFit.Models
 
         [JsonPropertyName("description")]
         public String Description { get; set; } = string.Empty;
-
-        [JsonPropertyName("emojiCharacter")]
-        public String EmojiCharacter { get; set; } = string.Empty;
     }
 }

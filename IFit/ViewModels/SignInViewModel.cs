@@ -2,6 +2,7 @@ using IFit;
 using IFit.Models;
 using IFit.Models.Dtos;
 using IFit.Services;
+using System.Diagnostics;
 using System.Windows.Input;
 
 namespace IFit.ViewModels
@@ -13,6 +14,7 @@ namespace IFit.ViewModels
 
         private readonly AuthenticationService authenticationService;
         private readonly AppUserService appUserService;
+        private DatabaseService? databaseService;
 
         public ICommand LoginCommand { get; }
 
@@ -20,6 +22,8 @@ namespace IFit.ViewModels
         {
             authenticationService = new AuthenticationService();
             appUserService = new AppUserService();
+            databaseService = App.GetService<DatabaseService>();
+
             LoginCommand = new Command(async () => await SignInAsync());
         }
 
@@ -34,6 +38,8 @@ namespace IFit.ViewModels
 
             var appUser = await LoadUserDataAsync();
             if (appUser == null) return;
+
+            await InsertUserToDatabase(appUser);
 
             if (!await HandleVerificationAsync(appUser)) return;
 
@@ -55,7 +61,7 @@ namespace IFit.ViewModels
             var response = await authenticationService.LoginAsync(Email, Password);
             if (response == null)
             {
-                ShowError("Ups!" ,"No se pudo iniciar sesión. Por favor, verifique sus credenciales.");
+                ShowError("Ups!", "No se pudo iniciar sesión. Por favor, verifique sus credenciales.");
             }
             return response;
         }
@@ -75,6 +81,8 @@ namespace IFit.ViewModels
                 ShowError("Ups!", "No se pudo recuperar la información del usuario. Por favor, intente nuevamente.");
                 await Shell.Current.GoToAsync("///ErrorView");
             }
+            Preferences.Set("UserId", user?.Id ?? 0);
+
             return user;
         }
 
@@ -94,14 +102,14 @@ namespace IFit.ViewModels
 
         private async Task HandleCoachSelectionAsync(AppUser appUser)
         {
-            if (appUser.CoachModelType == null || string.IsNullOrEmpty(appUser.CoachModelType.Name))
+            if (string.IsNullOrEmpty(appUser.CoachModelTypeId))
             {
                 // ShowError("Parece que se le olvido algo la última vez!", "Por favor, seleccione un tipo de modelo de entrenador antes de continuar.");
                 await Shell.Current.GoToAsync("///GetStartedView");
                 return;
             }
 
-            Preferences.Set("CoachModelType", appUser.CoachModelType.Name);
+            Preferences.Set("CoachModelTypeId", appUser.CoachModelTypeId);
             await Shell.Current.GoToAsync("///HomeView");
         }
 
@@ -110,6 +118,28 @@ namespace IFit.ViewModels
             if (App.Current?.MainPage != null)
             {
                 await App.Current.MainPage.DisplayAlert(header, message, "OK");
+            }
+        }
+
+        private async Task InsertUserToDatabase(AppUser appUser)
+        {
+            try
+            {
+                if (databaseService == null)
+                {
+                    await Shell.Current.GoToAsync("///ErrorView");
+                    return;
+                }
+
+                await databaseService.InsertAppUserAsync(appUser);
+                Debug.WriteLine("User saved to database successfully.");
+
+                return;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error saving user to database: {ex.Message}");
+                await Shell.Current.GoToAsync("///ErrorView");
             }
         }
     }

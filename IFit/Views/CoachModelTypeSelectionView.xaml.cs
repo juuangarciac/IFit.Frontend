@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace IFit.Views;
 
 public partial class CoachModelTypeSelectionView : ContentPage

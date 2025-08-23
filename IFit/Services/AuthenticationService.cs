@@ -1,6 +1,7 @@
 ﻿using IFit.Models;
 using IFit.Models.Dtos;
 using System;
+using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -31,7 +32,7 @@ namespace IFit.Services
             catch (Exception ex)
             {
                 // loggear el error, no solo navegar
-                Console.WriteLine(ex.Message);
+                Debug.WriteLine(ex.Message);
                 await Shell.Current.GoToAsync("//ErrorView");
                 return null;
             }

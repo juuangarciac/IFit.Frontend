@@ -1,12 +1,67 @@
+using IFit.Helper;
 using IFit.Models;
 using IFit.Models.Dtos;
 using IFit.Services;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
 namespace IFit.ViewModels;
 public class CoachModelTypeSelectionViewModel : INotifyPropertyChanged
 {
+    private DatabaseService? databaseService = App.GetService<DatabaseService>();
+    private AppUserService? appUserService = App.GetService<AppUserService>();
+
+    private CoachModelType? selectedCoachModelType = null;
+    public CoachModelType? SelectedCoachModelType
+    {
+        get => selectedCoachModelType;
+        set
+        {
+            if (selectedCoachModelType != value)
+            {
+                selectedCoachModelType = value;
+
+                OnPropertyChanged(nameof(SelectedCoachModelType));
+                OnSelectedCoachChanged(selectedCoachModelType);
+            }
+        }
+    }
+
+    private async void OnSelectedCoachChanged(CoachModelType? selectedCoachModelType)
+    {
+        if (selectedCoachModelType == null || databaseService == null || appUserService == null)
+        {
+            await ErrorHandler.HandleErrorAsync("Selected coach model type is null or services are not initialized.", "//ErrorView");
+            return;
+        }
+
+        selectedCoachModelType = CoachModelTypes?.FirstOrDefault(c => c.Name == selectedCoachModelType.Name);
+        if (selectedCoachModelType == null)
+        {
+            await ErrorHandler.HandleErrorAsync("Selected coach model type not found in the list.", "//ErrorView");
+            return;
+        }
+
+        AppUser? user = await databaseService.GetCurrentUserAsync();
+        if (user == null)
+        {
+            await ErrorHandler.HandleErrorAsync("No user found in the database.", "//ErrorView");
+            return;
+        }
+
+        AppUser? result = await appUserService.SetCoachModelType(user.Id, selectedCoachModelType.Id);
+        if (result == null)
+        {
+            await ErrorHandler.HandleErrorAsync("Failed to set coach model type.", "//ErrorView",
+                "Error",
+                "No se pudo establecer el tipo de modelo de entrenador. Por favor, inténtelo más tarde.");
+        }
+
+        await databaseService.SaveAppUserAsync(result);
+        await Shell.Current.GoToAsync("//ExperienceLevelSelectionView");
+    }
+
 
     private List<CoachModelType>? coachModelTypes = new List<CoachModelType>();
     public List<CoachModelType>? CoachModelTypes

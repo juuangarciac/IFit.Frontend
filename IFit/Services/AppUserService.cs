@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,6 +11,7 @@ namespace IFit.Services
 {
     public class AppUserService
     {
+        private CoachModelTypeService? CoachModelTypeService = App.GetService<CoachModelTypeService>();
         public AppUserService()  { }
 
         public async Task<AppUser?> findUserByEmail(string email) 
@@ -32,10 +34,34 @@ namespace IFit.Services
         {
             AppUser? appUser = await this.findUserByEmail(email);
 
-            if (AppUser.isPresent(appUser))
+            if (appUser != null && AppUser.isPresent(appUser))
             {
-                return appUser?.CoachModelType;
+                if (CoachModelTypeService != null && appUser.CoachModelTypeId != null)
+                {
+                    return await CoachModelTypeService.GetCoachModelTypeById(appUser.CoachModelTypeId);
+                }
             }
+            return null;
+        }
+
+        public async Task<AppUser?> SetCoachModelType(long? userId, long? coachId)
+        {
+            if (userId == null || coachId == null || userId <= 0 || coachId <= 0)
+            {
+                Debug.WriteLine("User ID or Coach ID is invalid");
+                return null;
+            }
+
+            var urlAddress = AppSettings.BaseAddress + "/appuser/setCoachModelType?userId=" + userId + "&coachId=" + coachId;
+            var content = new StringContent("", Encoding.UTF8, "application/json");
+            var response = await AppSettings._HttpClient.PostAsync(urlAddress, content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var responseData = await response.Content.ReadAsStringAsync();
+                return System.Text.Json.JsonSerializer.Deserialize<AppUser>(responseData);
+            }
+
             return null;
         }
     }

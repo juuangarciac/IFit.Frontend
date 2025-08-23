@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using IFit.Services;
+using Microsoft.Extensions.Logging;
 
 namespace IFit;
 public static class MauiProgram
@@ -14,6 +15,10 @@ public static class MauiProgram
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
             });
 
+        // Register services
+        builder.Services.AddSingleton<DatabaseService>();
+        builder.Services.AddSingleton<AppUserService>();
+        builder.Services.AddSingleton<CoachModelTypeService>();
 
         return builder.Build();
     }

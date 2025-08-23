@@ -33,5 +33,32 @@ namespace IFit.Services
                 return null;
             }
         }
+
+        public async Task<CoachModelType?> GetCoachModelTypeById(string? id)
+        {
+            try
+            {
+                if(string.IsNullOrEmpty(id))
+                {
+                    Console.WriteLine("Error: ID is null or empty.");
+                    return null;
+                }   
+
+                var response = await AppSettings._HttpClient.GetAsync(AppSettings.BaseAddress + "/coachmodeltype/findById?id=" + id);
+                if(!response.IsSuccessStatusCode)
+                {
+                    Console.WriteLine("Error fetching coach model type by ID: " + response.ReasonPhrase);
+                    return null;
+                }
+                var body = await response.Content.ReadAsStringAsync();
+                return JsonSerializer.Deserialize<CoachModelType>(body);
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                await Shell.Current.GoToAsync("//ErrorView");
+                return null;
+            }
+        }
     }
 }
