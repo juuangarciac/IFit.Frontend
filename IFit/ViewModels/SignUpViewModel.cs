@@ -26,23 +26,32 @@ namespace IFit.ViewModels
         public Validatable<string> ValidatableName { get; set; } = new Validatable<string>();
         public Validatable<string> ValidatableEmail { get; set; } = new Validatable<string>();
         public Validatable<string> ValidatablePassword { get; set; } = new Validatable<string>();
-
-        public AppUserService appUserService;
-        public AuthenticationService authenticationService;
+            
+        public AppUserService? appUserService = App.GetService<AppUserService>();
+        public AuthenticationService? authenticationService = App.GetService<AuthenticationService>();
+        public DatabaseService? databaseService = App.GetService<DatabaseService>();
 
         public ICommand RegisterCommand { get; }
 
         public SignUpViewModel()
         {
-            appUserService = new AppUserService();
-            authenticationService = new AuthenticationService();
-
             RegisterCommand = new Command(CreateAccount);
         }
 
         public async void CreateAccount()
         {
             Console.WriteLine("Username: " + Name + ", UserEmail: " + Email);
+
+            // Check if services are initialized
+            if (appUserService == null || authenticationService == null || databaseService == null)
+            {
+                if (App.Current?.MainPage != null)
+                {
+                    await App.Current.MainPage.DisplayAlert("Error", "Los servicios no están inicializados. Por favor, intente nuevamente más tarde.", "OK");
+                    await Shell.Current.GoToAsync("//ErrorView");
+                }
+                return;
+            }
 
             // Setter values
             ValidatableName.Value = Name;
@@ -86,6 +95,7 @@ namespace IFit.ViewModels
             Preferences.Set("UserName", Name); // Store the name for later use
 
             await Shell.Current.GoToAsync("///VerificationView");
+            await databaseService.SaveAppUserAsync(user);
         }
 
         private StringBuilder Validate()
@@ -116,16 +126,6 @@ namespace IFit.ViewModels
 
             // Password validation
             ValidatablePassword.Validations.Add(new IsValidPasswordRule<string> { ValidationMessage = "La contraseña debe tener al menos 8 caracteres e incluir: una letra mayúscula, una letra minúscula, un número y un símbolo especial (como @, #, $, %, etc.)." });
-        }
-
-        private async Task<Boolean> EmailAlreadyExists(string email)
-        {
-            var validationResponse = await appUserService.findUserByEmail(email);
-            if (AppUser.isPresent(validationResponse))
-            {
-                return true; // Email already exists
-            }
-            return false;
         }
     }
 }

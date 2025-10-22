@@ -36,9 +36,9 @@ namespace IFit.Services
 
             if (appUser != null && AppUser.isPresent(appUser))
             {
-                if (CoachModelTypeService != null && appUser.CoachModelTypeId != null)
+                if (CoachModelTypeService != null && appUser.CoachModelTypeId > 0)
                 {
-                    return await CoachModelTypeService.GetCoachModelTypeById(appUser.CoachModelTypeId);
+                    return await CoachModelTypeService.GetCoachModelTypeById(appUser.CoachModelTypeId.ToString());
                 }
             }
             return null;
@@ -62,6 +62,47 @@ namespace IFit.Services
                 return System.Text.Json.JsonSerializer.Deserialize<AppUser>(responseData);
             }
 
+            return null;
+        }
+
+        public async Task<AppUser?> SetExperienceLevel(long? userId, long? experienceLevel)
+        {
+            if (userId == null || experienceLevel == null || userId <= 0 || experienceLevel <= 0)
+            {
+                Debug.WriteLine("User ID or Coach ID is invalid");
+                return null;
+            }
+
+            var urlAddress = AppSettings.BaseAddress + "/appuser/setExperienceLevel?userId=" + userId + "&experienceLevelId=" + experienceLevel;
+            var content = new StringContent("", Encoding.UTF8, "application/json");
+            var response = await AppSettings._HttpClient.PostAsync(urlAddress, content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var responseData = await response.Content.ReadAsStringAsync();
+                return System.Text.Json.JsonSerializer.Deserialize<AppUser>(responseData);
+            }
+
+            return null;
+        }
+
+        public async Task<AppQuestionnaire?> GetQuestionnaireForUserAsync(AppUser user)
+        {
+            if (user.Id <= 0)
+            {
+                Debug.WriteLine("User ID is invalid");
+                return null;
+            }
+            var urlAddress = AppSettings.BaseAddress + "/questionnaire/findByExperienceLevelAndCoachModelType?experienceLevelId=" + user.ExperienceLevelId + "&coachModelTypeId=" + user.CoachModelTypeId;
+            var response = await AppSettings._HttpClient.GetAsync(urlAddress);
+            if (response.IsSuccessStatusCode)
+            {
+                var responseData = await response.Content.ReadAsStringAsync();
+                if (!string.IsNullOrEmpty(responseData))
+                {
+                    return System.Text.Json.JsonSerializer.Deserialize<AppQuestionnaire>(responseData);
+                }
+            }
             return null;
         }
     }

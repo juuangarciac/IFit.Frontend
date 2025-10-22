@@ -17,6 +17,7 @@ namespace IFit
             Routing.RegisterRoute("GetStartedView", typeof(GetStartedView));
             Routing.RegisterRoute("CoachModelTypeSelectionView", typeof(CoachModelTypeSelectionView));
             Routing.RegisterRoute("ExperienceLevelSelectionView", typeof(ExperienceLevelSelectionView));
+            Routing.RegisterRoute("AppUserQuestionnaireView", typeof(AppUserQuestionnaireView));
         }
     }
 }

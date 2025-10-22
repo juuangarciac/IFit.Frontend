@@ -42,7 +42,7 @@ namespace IFit.Services
         {
             try
             {
-                var request = new SignUpRequestDto { name = name, email = email, password = password };
+                   var request = new SignUpRequestDto { name = name, email = email, password = password };
                 var json = JsonSerializer.Serialize(request);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 

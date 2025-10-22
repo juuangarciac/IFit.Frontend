@@ -1,6 +1,7 @@
 ﻿using SQLite;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Numerics;
 using System.Text;
@@ -28,11 +29,11 @@ namespace IFit.Models
         [JsonPropertyName("verified")]
         public Boolean IsVerified { get; set; } = false;
 
-        [JsonPropertyName("coachmodeltypeId")]
-        public String CoachModelTypeId { get; set; } = string.Empty;
+        [JsonPropertyName("coachModelTypeId"), DefaultValue(0)]
+        public long? CoachModelTypeId { get; set; }
 
-        [JsonPropertyName("experiencelevelId")]
-        public String ExperienceLevelId { get; set; } = string.Empty;
+        [JsonPropertyName("experienceLevelId"), DefaultValue(0)]
+        public long? ExperienceLevelId { get; set; }
         public static Boolean isPresent(AppUser? appUser)
         {
             return appUser != null

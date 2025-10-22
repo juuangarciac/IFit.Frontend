@@ -42,7 +42,7 @@ public class CoachModelTypeSelectionViewModel : INotifyPropertyChanged
             await ErrorHandler.HandleErrorAsync("Selected coach model type not found in the list.", "//ErrorView");
             return;
         }
-
+         
         AppUser? user = await databaseService.GetCurrentUserAsync();
         if (user == null)
         {
@@ -56,6 +56,7 @@ public class CoachModelTypeSelectionViewModel : INotifyPropertyChanged
             await ErrorHandler.HandleErrorAsync("Failed to set coach model type.", "//ErrorView",
                 "Error",
                 "No se pudo establecer el tipo de modelo de entrenador. Por favor, inténtelo más tarde.");
+            return;
         }
 
         await databaseService.SaveAppUserAsync(result);

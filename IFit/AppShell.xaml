@@ -52,4 +52,9 @@
         Title="ExperienceLevelSelection"
         ContentTemplate="{DataTemplate views:ExperienceLevelSelectionView}"
         Route="ExperienceLevelSelectionView" />
+
+    <ShellContent
+        Title="ExperienceLevelSelection"
+        ContentTemplate="{DataTemplate views:AppUserQuestionnaireView}"
+        Route="AppUserQuestionnaireView" />
 </Shell>

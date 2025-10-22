@@ -1,4 +1,5 @@
 using IFit;
+using IFit.Helper;
 using IFit.Models;
 using IFit.Models.Dtos;
 using IFit.Services;
@@ -12,17 +13,21 @@ namespace IFit.ViewModels
         public string Email { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
 
-        private readonly AuthenticationService authenticationService;
-        private readonly AppUserService appUserService;
+        private readonly AuthenticationService? authenticationService;
+        private readonly AppUserService? appUserService;
         private DatabaseService? databaseService;
+        private AppUserAnswerService? appUserAnswerService;
+        private AppUserQuestionnaireService? appUserQuestionnaireService;
 
         public ICommand LoginCommand { get; }
 
         public SignInViewModel()
         {
-            authenticationService = new AuthenticationService();
-            appUserService = new AppUserService();
+            authenticationService = App.GetService<AuthenticationService>();
+            appUserService = App.GetService<AppUserService>();
             databaseService = App.GetService<DatabaseService>();
+            appUserAnswerService = App.GetService<AppUserAnswerService>();
+            appUserQuestionnaireService = App.GetService<AppUserQuestionnaireService>();
 
             LoginCommand = new Command(async () => await SignInAsync());
         }
@@ -41,16 +46,21 @@ namespace IFit.ViewModels
 
             await InsertUserToDatabase(appUser);
 
-            if (!await HandleVerificationAsync(appUser)) return;
-
-            await HandleCoachSelectionAsync(appUser);
+            // If the username is null or empty, it indicates that the user has not completed the initial setup
+            if (string.IsNullOrEmpty(appUser.Username))
+            {
+                if (!await HandleVerificationAsync(appUser)) return; // Verify email first
+                if (!await HandleCoachSelectionAsync(appUser)) return; // Then select coach model type
+                if (!await HandleExperienceLevelSelectionAsync(appUser)) return; // Then select experience level
+                if (!await HandleAppUserQuestionnaireAndQuestionsAnswered(appUser)) return; // Then complete questionnaire
+            } 
         }
 
         private bool ValidateInputs()
         {
             if (string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(Password))
             {
-                ShowError("Ups!", "Por favor, ingrese su correo electrónico y contraseña.");
+                _ = ErrorHandler.HandleErrorAsync("Ups!", "Por favor, ingrese su correo electrónico y contraseña.");
                 return false;
             }
             return true;
@@ -58,10 +68,16 @@ namespace IFit.ViewModels
 
         private async Task<SignInResponseDto?> TryLoginAsync()
         {
+            if(authenticationService == null)
+            {
+                await ErrorHandler.HandleErrorAsync("Ups!", "No se pudo iniciar sesión. Por favor, intente nuevamente más tarde.");
+                return null;
+            }
+
             var response = await authenticationService.LoginAsync(Email, Password);
             if (response == null)
             {
-                ShowError("Ups!", "No se pudo iniciar sesión. Por favor, verifique sus credenciales.");
+                await ErrorHandler.HandleErrorAsync("Ups!", "No se pudo iniciar sesión. Por favor, verifique sus credenciales.");
             }
             return response;
         }
@@ -75,10 +91,17 @@ namespace IFit.ViewModels
 
         private async Task<AppUser?> LoadUserDataAsync()
         {
+            if(appUserService == null)
+            {
+                await ErrorHandler.HandleErrorAsync("Ups!", "No se pudo recuperar la información del usuario. Por favor, intente nuevamente.");
+                await Shell.Current.GoToAsync("///ErrorView");
+                return null;
+            }
+
             var user = await appUserService.findUserByEmail(Email);
             if (user == null)
             {
-                ShowError("Ups!", "No se pudo recuperar la información del usuario. Por favor, intente nuevamente.");
+                await ErrorHandler.HandleErrorAsync("Ups!", "No se pudo recuperar la información del usuario. Por favor, intente nuevamente.");
                 await Shell.Current.GoToAsync("///ErrorView");
             }
             Preferences.Set("UserId", user?.Id ?? 0);
@@ -88,9 +111,16 @@ namespace IFit.ViewModels
 
         private async Task<bool> HandleVerificationAsync(AppUser appUser)
         {
+
+            if(authenticationService == null) {
+                await ErrorHandler.HandleErrorAsync("Ups!", "No se pudo verificar el estado del usuario. Por favor, intente nuevamente más tarde.");
+                await Shell.Current.GoToAsync("///ErrorView");
+                return false;
+            }
+
             if (!appUser.IsVerified)
             {
-                // ShowError("Parece que se le olvido algo la última vez!", "Por favor, verifique su correo electrónico antes de continuar.");
+                // ErrorHandler.HandleErrorAsync("Parece que se le olvido algo la última vez!", "Por favor, verifique su correo electrónico antes de continuar.");
                 await authenticationService.SendVerificationEmail(Email);
                 await Shell.Current.GoToAsync("///VerificationView");
                 return false;
@@ -100,25 +130,49 @@ namespace IFit.ViewModels
             return true;
         }
 
-        private async Task HandleCoachSelectionAsync(AppUser appUser)
+        private async Task<bool> HandleCoachSelectionAsync(AppUser appUser)
         {
-            if (string.IsNullOrEmpty(appUser.CoachModelTypeId))
+            if (appUser.CoachModelTypeId == null || appUser.CoachModelTypeId <= 0)
             {
-                // ShowError("Parece que se le olvido algo la última vez!", "Por favor, seleccione un tipo de modelo de entrenador antes de continuar.");
+                // ErrorHandler.HandleErrorAsync("Parece que se le olvido algo la última vez!", "Por favor, seleccione un tipo de modelo de entrenador antes de continuar.");
                 await Shell.Current.GoToAsync("///GetStartedView");
-                return;
+                return false;
             }
 
-            Preferences.Set("CoachModelTypeId", appUser.CoachModelTypeId);
-            await Shell.Current.GoToAsync("///HomeView");
+            Preferences.Set("CoachModelTypeId", appUser.CoachModelTypeId.ToString());
+            return true;
         }
 
-        private async void ShowError(string header, string message)
+        private async Task<bool> HandleExperienceLevelSelectionAsync(AppUser appUser)
         {
-            if (App.Current?.MainPage != null)
+            if (appUser.ExperienceLevelId == null || appUser.ExperienceLevelId <= 0)
             {
-                await App.Current.MainPage.DisplayAlert(header, message, "OK");
+                // ErrorHandler.HandleErrorAsync("Parece que se le olvido algo la última vez!", "Por favor, seleccione un tipo de modelo de entrenador antes de continuar.");
+                await Shell.Current.GoToAsync("///GetStartedView");
+                return false;
             }
+
+            Preferences.Set("ExperienceLevelId", appUser.ExperienceLevelId.ToString());
+            return true;
+        }
+
+        private async Task<bool> HandleAppUserQuestionnaireAndQuestionsAnswered(AppUser appUser)
+        {
+            if (appUserQuestionnaireService == null || appUserAnswerService == null)
+            {
+                await Shell.Current.GoToAsync("///ErrorView");
+                return false;
+            }
+
+            // If the user has not completed the questionnaire, navigate to QuestionnaireView
+            var userQuestionnaire = await appUserQuestionnaireService.GetUserQuestionnaireByUserIdAsync(appUser.Id);
+            if (userQuestionnaire == null)
+            {
+                await Shell.Current.GoToAsync("///QuestionnaireView");
+                return false;
+            }
+
+            return true;
         }
 
         private async Task InsertUserToDatabase(AppUser appUser)

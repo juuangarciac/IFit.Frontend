@@ -1,15 +1,14 @@
 namespace IFit.Views;
 
-public partial class ExperienceLevelSelectionView : ContentPage
+public partial class AppUserQuestionnaireView : ContentPage
 {
-	public ExperienceLevelSelectionView()
+	public AppUserQuestionnaireView()
 	{
 		InitializeComponent();
 	}
-
     public async void onCancelClicked(object sender, EventArgs e)
     {
         Console.WriteLine("Cancel clicked. Going back...");
-        await Shell.Current.GoToAsync("///CoachModelTypeSelectionView");
+        await Shell.Current.GoToAsync("///MainPage");
     }
 }

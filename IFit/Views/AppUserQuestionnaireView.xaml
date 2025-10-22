@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:IFit.ViewModels"  
+             xmlns:models="clr-namespace:IFit.Models"
+             x:Class="IFit.Views.AppUserQuestionnaireView"
+             Title="AppUserQuestionnaireView"
+             Shell.NavBarIsVisible="False" 
+             BackgroundColor="{StaticResource BackgroundPrimaryDark}">
+    <ContentPage.BindingContext>
+        <vm:AppUserQuestionnaireViewModel/>
+    </ContentPage.BindingContext>
+    <Grid BackgroundColor="{StaticResource BackgroundPrimaryDark}"
+          Margin="15"
+          RowSpacing="15">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Header-->
+        <Grid Grid.Row="0"
+              RowSpacing="15">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Go Back -->
+            <Button Grid.Column="0"   
+             HorizontalOptions="Center"  
+             VerticalOptions="Center"  
+             BackgroundColor="Transparent"  
+             ImageSource="arrow.png"  
+             Clicked="onCancelClicked" />
+
+            <!-- Center line -->
+            <Border Grid.Column="1"  
+             BackgroundColor="{StaticResource TextSecondaryColorLight}"  
+             VerticalOptions="Center"  
+             WidthRequest="120"   
+             StrokeThickness="1"/>
+
+            <!-- Cancel button  -->
+            <Button Grid.Column="2"   
+             HorizontalOptions="Center"  
+             VerticalOptions="Center"  
+             BackgroundColor="Transparent"  
+             ImageSource="cancel.svg"  
+             Clicked="onCancelClicked" />
+        </Grid>
+
+        <!-- Title -->
+        <Label Grid.Row="1"
+               Text="{Binding QuestionTitle}"
+               Style="{StaticResource label-h1-white}" />
+
+        <!-- AppAnswers -->
+        <CollectionView Grid.Row="2"
+                         ItemsSource="{Binding QuestionAnswers}"
+                         SelectionMode="Single"
+                         SelectedItem="{Binding SelectedAnswer, Mode=TwoWay}"
+                         Margin="0,0,0,15">
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:AppAnswer">
+                    <Border StrokeThickness="2"
+                             Stroke="{DynamicResource BackgroundPrimaryLight}"
+                             BackgroundColor="{DynamicResource PrimaryColorLightOpacity}"
+                             Margin="0,0,0,15">
+
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="{DynamicResource CornerRadiusRectangle}" />
+                        </Border.StrokeShape>
+
+                        <Border.Shadow>
+                            <Shadow Brush="{DynamicResource BackgroundPrimaryLight}"
+                                     Opacity="0.35"
+                                     Radius="{DynamicResource CornerRadiusRectangle}" />
+                        </Border.Shadow>
+
+                        <!-- Card -->
+                        <Grid Margin="10"
+                               RowSpacing="5"
+                               BackgroundColor="Transparent">
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <!-- Answer -->
+                            <Label Grid.Column="0"
+                                    Text="{Binding AnswerText}"
+                                    Style="{DynamicResource label-h1-white}" />
+
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>
