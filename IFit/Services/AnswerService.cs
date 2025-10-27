@@ -12,6 +12,25 @@ namespace IFit.Services
 
         public AnswerService() { }
 
+        public async Task<AppAnswer?> findAnswerById(long answerId)
+        {
+            if (answerId <= 0)
+            {
+                return null;
+            }
+            var urlAddress = AppSettings.BaseAddress + "/appanswer/findAnswerById?answerId=" + answerId;
+            var response = await AppSettings._HttpClient.GetAsync(urlAddress);
+            if (response.IsSuccessStatusCode)
+            {
+                var responseData = await response.Content.ReadAsStringAsync();
+                if (!string.IsNullOrEmpty(responseData))
+                {
+                    return System.Text.Json.JsonSerializer.Deserialize<AppAnswer>(responseData);
+                }
+            }
+            return null;
+        }
+
         public async Task<List<AppAnswer>?> findAnswersByQuestionId(long questionId)
         {
             if (questionId <= 0)

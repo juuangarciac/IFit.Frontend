@@ -2,7 +2,8 @@
 <?xaml-comp compile="true" ?>
 <ResourceDictionary 
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:cal="clr-namespace:Plugin.Maui.Calendar.Controls;assembly=Plugin.Maui.Calendar">
     <!-- Buttons -->
     <!-- Commons -->
     <Style x:Key="BasicButton" TargetType="Button">
@@ -91,6 +92,69 @@
 
     <Style x:Key="BorderBackgroundLightGray" TargetType="Border">
         <Setter Property="BackgroundColor" Value="#73b5b5b5" />
+    </Style>
+    
+    
+    <!-- Calendar Styles -->
+    <Color x:Key="TextPrimaryColorLight70">#B3FFFFFF</Color>
+
+    <Style x:Key="calendar_title_days" TargetType="Label">
+        <Setter Property="FontFamily" Value="Montserrat-Medium" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="TextColor" Value="{StaticResource TextPrimaryColorLight70}" />
+    </Style>
+
+    <Style x:Key="calendar_label_days" TargetType="Label">
+        <Setter Property="FontFamily" Value="Montserrat-Medium" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="TextColor" Value="{StaticResource BackgroundPrimaryLight}" />
+    </Style>
+
+    <Style x:Key="calendar_ifit_style" TargetType="cal:Calendar">
+        <Setter Property="DaysTitleLabelStyle" 
+        Value="{DynamicResource calendar_title_days}" />
+        <Setter Property="WeekendTitleStyle" 
+        Value="{DynamicResource calendar_title_days}" />
+        <Setter Property="DaysLabelStyle" 
+        Value="{DynamicResource calendar_label_days}" />
+        <Setter Property="DeselectedDayTextColor" 
+        Value="{DynamicResource BackgroundPrimaryLight}" />
+        <Setter Property="WeekendDayColor" 
+        Value="{DynamicResource BackgroundPrimaryLight}" />
+        <Setter Property="SelectedTodayTextColor" 
+        Value="{DynamicResource BackgroundPrimaryLight}" />
+        <Setter Property="SelectedDayTextColor" 
+        Value="{DynamicResource BackgroundPrimaryLight}" />
+        <Setter Property="TodayTextColor" 
+        Value="{DynamicResource BackgroundPrimaryLight}" />
+        <Setter Property="TodayOutlineColor" 
+        Value="{DynamicResource TertiaryColor}" />
+        <Setter Property="ShowMonthPicker"
+            Value="False" />
+        <Setter Property="ShowYearPicker"
+            Value="False" />
+        <Setter Property="FooterSectionVisible"
+            Value="False" />
+        <Setter Property="FooterArrowVisible"
+            Value="False" />
+    </Style>
+
+    <Style x:Key="calendar_weekly_ifit_style" TargetType="cal:Calendar" BasedOn="{StaticResource calendar_ifit_style}">
+        <Setter Property="CalendarLayout"
+                Value="Week"/>
+    </Style>
+
+    <Style x:Key="calendar_monthly_ifit_style" TargetType="cal:Calendar" BasedOn="{StaticResource calendar_ifit_style}">
+        <Setter Property="CalendarLayout"
+            Value="Month"/>
+    </Style>
+
+    <!-- Navbar Style -->
+    <Style x:Key="navbar_image" TargetType="Image">
+        <Setter Property="HeightRequest" Value="20" />
+        <Setter Property="WidthRequest" Value="20" />
+        <Setter Property="VerticalOptions" Value="Center" />
+        <Setter Property="HorizontalOptions" Value="Center" />
     </Style>
 
     <!-- Default values -->

@@ -47,13 +47,15 @@ namespace IFit.ViewModels
             await InsertUserToDatabase(appUser);
 
             // If the username is null or empty, it indicates that the user has not completed the initial setup
-            if (string.IsNullOrEmpty(appUser.Username))
+            if (!appUser.IsRegistrationComplete)
             {
                 if (!await HandleVerificationAsync(appUser)) return; // Verify email first
                 if (!await HandleCoachSelectionAsync(appUser)) return; // Then select coach model type
                 if (!await HandleExperienceLevelSelectionAsync(appUser)) return; // Then select experience level
                 if (!await HandleAppUserQuestionnaireAndQuestionsAnswered(appUser)) return; // Then complete questionnaire
-            } 
+            }
+
+            await Shell.Current.GoToAsync("///HomeView");
         }
 
         private bool ValidateInputs()
@@ -168,7 +170,7 @@ namespace IFit.ViewModels
             var userQuestionnaire = await appUserQuestionnaireService.GetUserQuestionnaireByUserIdAsync(appUser.Id);
             if (userQuestionnaire == null)
             {
-                await Shell.Current.GoToAsync("///QuestionnaireView");
+                await Shell.Current.GoToAsync("///AppUserQuestionnaireView");
                 return false;
             }
 

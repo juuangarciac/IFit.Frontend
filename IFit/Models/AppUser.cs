@@ -18,8 +18,6 @@ namespace IFit.Models
         [JsonPropertyName("name")]
         public String Name { get; set; } = string.Empty;
 
-        [JsonPropertyName("username")]
-        public String Username { get; set; } = string.Empty;
         [JsonPropertyName("email")]
         public String Email { get; set; } = string.Empty;
 
@@ -28,6 +26,9 @@ namespace IFit.Models
 
         [JsonPropertyName("verified")]
         public Boolean IsVerified { get; set; } = false;
+
+        [JsonPropertyName("registrationComplete")]
+        public Boolean IsRegistrationComplete { get; set; } = false;
 
         [JsonPropertyName("coachModelTypeId"), DefaultValue(0)]
         public long? CoachModelTypeId { get; set; }
@@ -38,7 +39,6 @@ namespace IFit.Models
         {
             return appUser != null
                 && !String.IsNullOrEmpty(appUser.Name) 
-                && !String.IsNullOrEmpty(appUser.Username) 
                 && !String.IsNullOrEmpty(appUser.Email) 
                 && !String.IsNullOrEmpty(appUser.Password);
         }

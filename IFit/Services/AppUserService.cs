@@ -14,6 +14,21 @@ namespace IFit.Services
         private CoachModelTypeService? CoachModelTypeService = App.GetService<CoachModelTypeService>();
         public AppUserService()  { }
 
+        public async Task<AppUser?> findUserById(long id) 
+        {
+            var urlAddress = AppSettings.BaseAddress + "/appuser/findById?id=" + id;
+            var response = await AppSettings._HttpClient.GetAsync(urlAddress);
+            if (response.IsSuccessStatusCode)
+            {
+                var responseData = await response.Content.ReadAsStringAsync();
+                if(!string.IsNullOrEmpty(responseData))
+                {
+                    return System.Text.Json.JsonSerializer.Deserialize<AppUser>(responseData);
+                }
+            }
+            return null;
+        }
+
         public async Task<AppUser?> findUserByEmail(string email) 
         {
             var urlAddress = AppSettings.BaseAddress + "/appuser/findByEmail?email=" + Uri.EscapeDataString(email);
@@ -102,6 +117,24 @@ namespace IFit.Services
                 {
                     return System.Text.Json.JsonSerializer.Deserialize<AppQuestionnaire>(responseData);
                 }
+            }
+            return null;
+        }
+
+        public async Task<AppUser?> MarkRegistrationComplete(long? userId)
+        {
+            if (userId == null || userId <= 0)
+            {
+                Debug.WriteLine("User ID is invalid");
+                return null;
+            }
+            var urlAddress = AppSettings.BaseAddress + "/appuser/markRegistrationComplete?userId=" + userId;
+            var content = new StringContent("", Encoding.UTF8, "application/json");
+            var response = await AppSettings._HttpClient.PostAsync(urlAddress, content);
+            if (response.IsSuccessStatusCode)
+            {
+                var responseData = await response.Content.ReadAsStringAsync();
+                return System.Text.Json.JsonSerializer.Deserialize<AppUser>(responseData);
             }
             return null;
         }

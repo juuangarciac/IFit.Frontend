@@ -35,7 +35,7 @@
              VerticalOptions="Center"  
              BackgroundColor="Transparent"  
              ImageSource="arrow.png"  
-             Clicked="onCancelClicked" />
+             Command="{Binding PreviousQuestionCommand}" />
 
             <!-- Center line -->
             <Border Grid.Column="1"  

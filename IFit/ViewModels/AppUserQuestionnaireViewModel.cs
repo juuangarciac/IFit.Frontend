@@ -8,6 +8,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace IFit.ViewModels
 {
@@ -75,12 +76,12 @@ namespace IFit.ViewModels
             {
                 selectedAnswer = value;
                 OnPropertyChanged(nameof(SelectedAnswer));
-                OnSelectedAnswer();
+                _ = OnSelectedAnswer();
             }
         }
 
         private List<AppUserAnswer> userAnswers = new List<AppUserAnswer>();
-        private void OnSelectedAnswer()
+        private async Task OnSelectedAnswer()
         {
             userAnswers.Add(new AppUserAnswer
             {
@@ -99,13 +100,13 @@ namespace IFit.ViewModels
             else
             {
                 // All questions answered, save answers
-                _ = SaveUserAnswersAsync();
+                if( await SaveUserAnswersAsync() ) await Shell.Current.GoToAsync("//HomeView");
             }
         }
 
         private async Task<Boolean> SaveUserAnswersAsync()
         {
-            if (databaseService == null || appUserQuestionnaireService == null || appUserAnswerService == null)
+            if (appUserService == null || databaseService == null || appUserQuestionnaireService == null || appUserAnswerService == null)
             {
                 await ErrorHandler.HandleErrorAsync("Services are not initialized.", "//ErrorView");
                 return false;
@@ -142,9 +143,12 @@ namespace IFit.ViewModels
                 }
             }
 
+            user.IsRegistrationComplete = true;
+            await appUserService.MarkRegistrationComplete(user.Id); // Update on server
+            await databaseService.SaveAppUserAsync(user);   // Update locally
+
             return true;
         }
-
         #endregion
 
         public AppUserQuestionnaireViewModel()
@@ -253,6 +257,24 @@ namespace IFit.ViewModels
         }
 
         #endregion
+
+        #region ICommand
+
+        public ICommand PreviousQuestionCommand { get { return new Command(PreviousQuestion); } }
+
+        private void PreviousQuestion()
+        {
+            if (currentQuestionIndex > 0)
+            {
+                userAnswers.RemoveAt(currentQuestionIndex - 1); // Remove last answer
+                currentQuestionIndex--;
+                // Update to previous question
+                QuestionTitle = AppQuestions[currentQuestionIndex].QuestionText;
+                QuestionAnswers = AppQuestions[currentQuestionIndex].Answers ?? new List<AppAnswer>();
+            }
+        }
+
+        #endregion 
 
         public event PropertyChangedEventHandler? PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string propertyName = "")
