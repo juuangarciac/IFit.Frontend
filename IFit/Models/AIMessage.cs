@@ -10,8 +10,14 @@ namespace IFit.Models
 {
     public class AIMessage
     {
-        [JsonPropertyName("id"), PrimaryKey]
-        public long Id { get; set; }
+        public AIMessage(int MemoryId, string Message)
+        {
+            this.MemoryId = MemoryId;
+            this.Message = Message;
+        }
+
+        [JsonPropertyName("memoryId"), PrimaryKey]
+        public int MemoryId { get; set; }
 
         [JsonPropertyName("message")]
         public string Message { get; set; } = string.Empty;

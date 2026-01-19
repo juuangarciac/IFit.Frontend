@@ -47,7 +47,7 @@ namespace IFit.ViewModels
             await InsertUserToDatabase(appUser);
 
             // If the username is null or empty, it indicates that the user has not completed the initial setup
-            if (!appUser.IsRegistrationComplete)
+            if (!appUser.RegistrationComplete)
             {
                 if (!await HandleVerificationAsync(appUser)) return; // Verify email first
                 if (!await HandleCoachSelectionAsync(appUser)) return; // Then select coach model type
@@ -120,7 +120,7 @@ namespace IFit.ViewModels
                 return false;
             }
 
-            if (!appUser.IsVerified)
+            if (!appUser.Verified)
             {
                 // ErrorHandler.HandleErrorAsync("Parece que se le olvido algo la última vez!", "Por favor, verifique su correo electrónico antes de continuar.");
                 await authenticationService.SendVerificationEmail(Email);
@@ -128,33 +128,33 @@ namespace IFit.ViewModels
                 return false;
             }
 
-            Preferences.Set("IsVerified", appUser.IsVerified);
+            Preferences.Set("IsVerified", appUser.Verified);
             return true;
         }
 
         private async Task<bool> HandleCoachSelectionAsync(AppUser appUser)
         {
-            if (appUser.CoachModelTypeId == null || appUser.CoachModelTypeId <= 0)
+            if (!string.IsNullOrEmpty(appUser.CoachModelTypeName))
             {
                 // ErrorHandler.HandleErrorAsync("Parece que se le olvido algo la última vez!", "Por favor, seleccione un tipo de modelo de entrenador antes de continuar.");
                 await Shell.Current.GoToAsync("///GetStartedView");
                 return false;
             }
 
-            Preferences.Set("CoachModelTypeId", appUser.CoachModelTypeId.ToString());
+            Preferences.Set("CoachModelTypeName", appUser.CoachModelTypeName);
             return true;
         }
 
         private async Task<bool> HandleExperienceLevelSelectionAsync(AppUser appUser)
         {
-            if (appUser.ExperienceLevelId == null || appUser.ExperienceLevelId <= 0)
+            if (!string.IsNullOrEmpty(appUser.ExperienceLevelName))
             {
                 // ErrorHandler.HandleErrorAsync("Parece que se le olvido algo la última vez!", "Por favor, seleccione un tipo de modelo de entrenador antes de continuar.");
                 await Shell.Current.GoToAsync("///GetStartedView");
                 return false;
             }
 
-            Preferences.Set("ExperienceLevelId", appUser.ExperienceLevelId.ToString());
+            Preferences.Set("ExperienceLevelName", appUser.ExperienceLevelName);
             return true;
         }
 

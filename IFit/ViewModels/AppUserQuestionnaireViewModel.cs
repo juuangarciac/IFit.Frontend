@@ -100,54 +100,67 @@ namespace IFit.ViewModels
             else
             {
                 // All questions answered, save answers
-                if( await SaveUserAnswersAsync() ) await Shell.Current.GoToAsync("//HomeView");
+                if( await SaveUserAnswersAsync() )
+                {
+                       await Shell.Current.GoToAsync("//AIGenerationRoutineView");
+                }     
             }
         }
 
         private async Task<Boolean> SaveUserAnswersAsync()
         {
-            if (appUserService == null || databaseService == null || appUserQuestionnaireService == null || appUserAnswerService == null)
+            try
             {
-                await ErrorHandler.HandleErrorAsync("Services are not initialized.", "//ErrorView");
-                return false;
-            }
-
-
-            AppUser? user = await databaseService.GetCurrentUserAsync();
-            if (user == null)
-            {
-                await ErrorHandler.HandleErrorAsync("No user found in the database.", "//ErrorView");
-                return false;
-            }
-
-            // Save questionnaire for user
-            var result = await appUserQuestionnaireService.SaveAppUserQuestionnaire(user.Id, appQuestionnaire.Id);
-            if (result == null)
-            {
-                await ErrorHandler.HandleErrorAsync("Failed to set questionnaire for user.", "//ErrorView",
-                    "Error",
-                    "No se pudo establecer el cuestionario para el usuario. Por favor, inténtelo más tarde.");
-                return false;
-            }
-
-            // Save user answers
-            foreach (var userAnswer in userAnswers)
-            {
-                var answerResult = await appUserAnswerService.SaveUserAnswer(user.Id, userAnswer.QuestionId, AppQuestionnaire.Id, userAnswer.AnswerId);
-                if (answerResult == null)
+                if (appUserService == null || databaseService == null || appUserQuestionnaireService == null || appUserAnswerService == null)
                 {
-                    await ErrorHandler.HandleErrorAsync("Failed to save user answer.", "//ErrorView",
-                        "Error",
-                        "No se pudo guardar la respuesta del usuario. Por favor, inténtelo más tarde.");
+                    await ErrorHandler.HandleErrorAsync("Services are not initialized.", "//ErrorView");
                     return false;
                 }
+
+
+                AppUser? user = await databaseService.GetCurrentUserAsync();
+                if (user == null)
+                {
+                    await ErrorHandler.HandleErrorAsync("No user found in the database.", "//ErrorView");
+                    return false;
+                }
+
+                // Save questionnaire for user
+                var result = await appUserQuestionnaireService.SaveAppUserQuestionnaire(user.Id, appQuestionnaire.Id);
+                if (result == null)
+                {
+                    await ErrorHandler.HandleErrorAsync("Failed to set questionnaire for user.", "//ErrorView",
+                        "Error",
+                        "No se pudo establecer el cuestionario para el usuario. Por favor, inténtelo más tarde.");
+                    return false;
+                }
+
+                // Save user answers
+                foreach (var userAnswer in userAnswers)
+                {
+                    var answerResult = await appUserAnswerService.SaveUserAnswer(user.Id, userAnswer.QuestionId, AppQuestionnaire.Id, userAnswer.AnswerId);
+                    if (answerResult == null)
+                    {
+                        await ErrorHandler.HandleErrorAsync("Failed to save user answer.", "//ErrorView",
+                            "Error",
+                            "No se pudo guardar la respuesta del usuario. Por favor, inténtelo más tarde.");
+                        return false;
+                    }
+                }
+
+                user.RegistrationComplete = true;
+                await appUserService.MarkRegistrationComplete(user.Id); // Update on server
+                await databaseService.SaveAppUserAsync(user);   // Update locally
+
+                return true;
+
+            } catch(Exception ex)
+            {
+                await ErrorHandler.HandleErrorAsync($"Exception in SaveUserAnswersAsync: {ex.Message}", "//ErrorView",
+                    "Error",
+                    "Ha ocurrido un error al guardar las respuestas del usuario. Por favor, inténtelo más tarde.");
+                return false;
             }
-
-            user.IsRegistrationComplete = true;
-            await appUserService.MarkRegistrationComplete(user.Id); // Update on server
-            await databaseService.SaveAppUserAsync(user);   // Update locally
-
-            return true;
         }
         #endregion
 

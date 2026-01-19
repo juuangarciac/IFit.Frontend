@@ -8,6 +8,7 @@
     <!-- Commons -->
     <Style x:Key="BasicButton" TargetType="Button">
         <Setter Property="CornerRadius" Value="40" />
+        <Setter Property="FontFamily" Value="Montserrat-Medium"     />
     </Style>
 
     <x:Int32 x:Key="CornerRadiusRectangle">8</x:Int32>
@@ -70,6 +71,13 @@
         <Setter Property="FontSize" Value="14" />
         <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource TextPrimaryColorLight}, Dark={StaticResource TextPrimaryColorDark}}" />
     </Style>
+
+    <Style x:Key="navbar-p-white" TargetType="Label">
+        <Setter Property="FontFamily" Value="Montserrat-Medium" />
+        <Setter Property="FontSize" Value="10" />
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource TextPrimaryColorLight}, Dark={StaticResource TextPrimaryColorDark}}" />
+    </Style>
+
 
     <Style x:Key="label-p-yellow" TargetType="Label">
         <Setter Property="FontFamily" Value="Montserrat-Medium" />
@@ -151,11 +159,32 @@
 
     <!-- Navbar Style -->
     <Style x:Key="navbar_image" TargetType="Image">
-        <Setter Property="HeightRequest" Value="20" />
-        <Setter Property="WidthRequest" Value="20" />
+        <Setter Property="HeightRequest" Value="25" />
+        <Setter Property="WidthRequest" Value="25" />
         <Setter Property="VerticalOptions" Value="Center" />
         <Setter Property="HorizontalOptions" Value="Center" />
     </Style>
+    
+    <!-- Colors -->
+    <!-- Premium refinement -->
+    <Color x:Key="FirtGradientColor">#D91F8AD8</Color>
+    <Color x:Key="SecondGradientColor">#F2153A5B</Color>
+    <Color x:Key="ThirdGradientColor">#FF303840</Color>
+
+    <!-- Modern premium LinearGradientBrush (vertical) -->
+    <LinearGradientBrush x:Key="PremiumGradient" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="{StaticResource FirtGradientColor}" Offset="0.1" />
+        <GradientStop Color="{StaticResource SecondGradientColor}" Offset="0.45" />
+        <GradientStop Color="{StaticResource ThirdGradientColor}" Offset="1.0" />
+    </LinearGradientBrush>
+
+
+    <!-- Dark surface background (slightly lighter than black for legibility) -->
+    <SolidColorBrush x:Key="SurfaceDark" Color="#141516" />
+
+    <!-- Overlay used by menus -->
+    <SolidColorBrush x:Key="OverlayBrush" Color="#80000000" />
+    <!-- 50% black -->
 
     <!-- Default values -->
     <Style TargetType="ActivityIndicator">

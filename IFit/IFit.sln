@@ -5,6 +5,8 @@ VisualStudioVersion = 17.9.34607.119
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IFit", "IFit.csproj", "{C5592D8C-FA1D-49C2-A775-7D74B35769F2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IFit.XUnit", "..\IFit.XUnit\IFit.XUnit.csproj", "{3A2E71EF-B1F0-41AB-BF8E-8C1556360843}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,6 +19,10 @@ Global
 		{C5592D8C-FA1D-49C2-A775-7D74B35769F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C5592D8C-FA1D-49C2-A775-7D74B35769F2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C5592D8C-FA1D-49C2-A775-7D74B35769F2}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{3A2E71EF-B1F0-41AB-BF8E-8C1556360843}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A2E71EF-B1F0-41AB-BF8E-8C1556360843}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A2E71EF-B1F0-41AB-BF8E-8C1556360843}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A2E71EF-B1F0-41AB-BF8E-8C1556360843}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

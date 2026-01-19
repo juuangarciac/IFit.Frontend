@@ -20,6 +20,6 @@ namespace IFit.Models
         public long QuestionnaireId { get; set; }
 
         [JsonPropertyName("isEnabled")]
-        public bool IsEnabled { get; set; }
+        public bool? IsEnabled { get; set; }
     }
 }

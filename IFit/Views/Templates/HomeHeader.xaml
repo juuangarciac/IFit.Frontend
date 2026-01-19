@@ -24,56 +24,63 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-
             <!-- Profile/Notif/Icon/Calendar -->
             <Grid Grid.Row="0"
                     Margin="10, 15, 15, 0"
                     ColumnSpacing="20">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <!-- Profile Icon -->
-                <Image Grid.Column="0"
-                   Source="profile_icon_white.png"
-                   Style="{DynamicResource navbar_image}"/>
+                <!-- Left side: Profile + Notif -->
+                <StackLayout Grid.Column="0" 
+                 Orientation="Horizontal" 
+                 Spacing="20"
+                 HorizontalOptions="Start">
+                    <!-- Profile Icon -->
+                    <Image Source="profile_icon_white.png"
+                           Style="{DynamicResource navbar_image}"/>
+                    <!-- Notif Icon -->
+                    <Image Source="notification_icon_white.png"
+                           Style="{DynamicResource navbar_image}"/>
+                            </StackLayout>
 
-                <!-- Notif Icon -->
+                <!-- Center: ifit logo -->
                 <Image Grid.Column="1"
-                   Source="notification_icon_white.png"
-                   Style="{DynamicResource navbar_image}"/>
+                       Source="ifit_logo_white.png"
+                       HeightRequest="20"
+                       WidthRequest="120"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center" />
 
-                <!-- ifit logo -->
+                <!-- Right side: Calendar -->
                 <Image Grid.Column="2"
-                   Source="ifit_logo_white.png"
-                   HeightRequest="20"
-                   WidthRequest="120"
-                   HorizontalOptions="Center"
-                   VerticalOptions="Center" />
-
-                <!-- Calendar Icon -->
-                <Image Grid.Column="3"
-                   Source="calendar_icon_white.png"
-                   Style="{DynamicResource navbar_image}"/>
+                       Source="calendar_icon_white.png"
+                       Style="{DynamicResource navbar_image}"
+                       HorizontalOptions="End"/>
             </Grid>
 
             <!-- Calendar -->
             <cal:Calendar Grid.Row="1"
-                   Style="{Binding SelectedCalendarStyle}" >
+                   Style="{StaticResource calendar_ifit_style}" 
+                   CalendarLayout="{Binding SelectedLayout}">
             </cal:Calendar>
-            
+
             <!--Expand Calendar Scroll -->
-            <Image Grid.Row="2"
-                   Source="arrow_icon_white.png"
-                   Style="{DynamicResource navbar_image}">
-                <Image.GestureRecognizers>
+            <BoxView Grid.Row="2"
+                     Color="{DynamicResource BackgroundPrimaryLight}"
+                     HeightRequest="2"
+                     WidthRequest="40"
+                     CornerRadius="1"
+                     HorizontalOptions="Center"
+                     VerticalOptions="Center">
+                <BoxView.GestureRecognizers>
                     <TapGestureRecognizer Command="{Binding ExpandCalendarCommand}" />
-                </Image.GestureRecognizers>
-            </Image>
-            
+                </BoxView.GestureRecognizers>
+            </BoxView>
+
         </Grid>
     </Border>
 </ContentView>

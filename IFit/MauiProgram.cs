@@ -27,6 +27,15 @@ public static class MauiProgram
         builder.Services.AddSingleton<AnswerService>();
         builder.Services.AddSingleton<AppUserQuestionnaireService>();
         builder.Services.AddSingleton<AppUserAnswerService>();
+        builder.Services.AddSingleton<AIRoutineService>();
+
+
+        // Register WebService with necessary parameters from AppSettings
+        builder.Services.AddSingleton<ISecureStorageService, SecureStorageService>();
+
+        builder.Services.AddSingleton<WebService>(sp =>
+            new WebService(AppSettings._HttpClient, AppSettings.ApiGatewayBaseUrl, AppSettings.RefreshTokenEndpoint)
+        );
 
         return builder.Build();
     }

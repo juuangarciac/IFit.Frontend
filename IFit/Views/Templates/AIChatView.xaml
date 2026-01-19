@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="IFit.Views.Templates.AIChatView">
+    <Grid BackgroundColor="Transparent">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" /> <!-- Horizontal Scroll Menu -->
+            <RowDefinition Height="Auto" /> <!-- Chat With Ai -->
+            <RowDefinition Height="Auto" /> <!-- My Data -->
+            <RowDefinition Height="Auto" /> <!-- Advise of the day -->
+            <RowDefinition Height="Auto" /> <!-- Registrar training -->
+        </Grid.RowDefinitions> 
+        
+    </Grid>
+</ContentView>

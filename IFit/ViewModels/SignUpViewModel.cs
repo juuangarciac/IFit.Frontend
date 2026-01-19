@@ -94,8 +94,8 @@ namespace IFit.ViewModels
             Preferences.Set("UserEmail", Email); // Store the email for later use
             Preferences.Set("UserName", Name); // Store the name for later use
 
-            await Shell.Current.GoToAsync("///VerificationView");
             await databaseService.SaveAppUserAsync(user);
+            await Shell.Current.GoToAsync("///VerificationView");
         }
 
         private StringBuilder Validate()

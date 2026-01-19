@@ -18,7 +18,7 @@ namespace IFit.Services
             {
                 return null;
             }
-            var urlAddress = AppSettings.BaseAddress + "/appquestion/findQuestionById?questionId=" + questionId;
+            var urlAddress = AppSettings.BaseAddress + "/question/findById?questionId=" + questionId;
             var response = await AppSettings._HttpClient.GetAsync(urlAddress);
             if (response.IsSuccessStatusCode)
             {

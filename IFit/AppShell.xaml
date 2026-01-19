@@ -57,4 +57,10 @@
         Title="ExperienceLevelSelection"
         ContentTemplate="{DataTemplate views:AppUserQuestionnaireView}"
         Route="AppUserQuestionnaireView" />
+
+    <ShellContent
+        Title="AIGenerationRoutine"
+        ContentTemplate="{DataTemplate views:AIGenerationRoutineView}"
+        Route="AIGenerationRoutineView" />
+
 </Shell>

@@ -1,32 +1,33 @@
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Windows.Input;
+using Plugin.Maui.Calendar.Controls;
+using Plugin.Maui.Calendar.Enums;
 
 namespace IFit.ViewModels.Templates;
 
-public class HomeHeaderViewModel : ContentView
+public class HomeHeaderViewModel : INotifyPropertyChanged
 {
+    private const WeekLayout defaultCalendarLayout = WeekLayout.Week;
 
-    private Style? selectedCalendarStyle;
+    private WeekLayout selectedLayout;
 
-    public Style? SelectedCalendarStyle
+    public WeekLayout SelectedLayout
     {
-        get { return selectedCalendarStyle; }
+        get { return selectedLayout; }
         set
         {
-            if (selectedCalendarStyle != value)
+            if (selectedLayout != value)
             {
-                selectedCalendarStyle = value;
-                OnPropertyChanged(nameof(SelectedCalendarStyle));
+                selectedLayout = value;
+                OnPropertyChanged(nameof(SelectedLayout));
             }
         }
     }
 
-    public HomeHeaderViewModel()
-	{	
-        if(Application.Current != null && Application.Current.Resources != null)
-        {
-            SelectedCalendarStyle = Application.Current.Resources["calendar_weekly_ifit_style"] as Style;
-        }
-	}
+    public HomeHeaderViewModel() {
+        SelectedLayout = defaultCalendarLayout;
+    }
 
     #region ICommand
 
@@ -34,23 +35,18 @@ public class HomeHeaderViewModel : ContentView
 
     private void OnExpandCalendarSelected()
     {
-        if (Application.Current != null && Application.Current.Resources != null)
+        if(selectedLayout == WeekLayout.Week)
         {
-            return;
-        }
-            // Toggle between weekly and monthly calendar styles
-            if (SelectedCalendarStyle.BaseResourceKey == "calendar_weekly_ifit_style")
-        {
-            SelectedCalendarStyle = Application.Current.Resources["calendar_monthly_ifit_style"] as Style;
+            SelectedLayout = WeekLayout.Month;
             return;
         }
 
-        if (SelectedCalendarStyle.BaseResourceKey == "calendar_monthly_ifit_style")
-        {
-            SelectedCalendarStyle = Application.Current.Resources["calendar_weekly_ifit_style"] as Style;
-            return;
-        }
+        SelectedLayout = WeekLayout.Week;
     }
 
     #endregion
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+    protected void OnPropertyChanged([CallerMemberName] string propertyName = "")
+        => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 }

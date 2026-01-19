@@ -51,9 +51,10 @@ namespace IFit.Services
 
             if (appUser != null && AppUser.isPresent(appUser))
             {
-                if (CoachModelTypeService != null && appUser.CoachModelTypeId > 0)
+                if (CoachModelTypeService != null /* && appUser.CoachModelTypeId > 0 */)
                 {
-                    return await CoachModelTypeService.GetCoachModelTypeById(appUser.CoachModelTypeId.ToString());
+                    /* return await CoachModelTypeService.GetCoachModelTypeById(appUser.CoachModelTypeId.ToString()); */
+                    return new CoachModelType();
                 }
             }
             return null;
@@ -108,7 +109,8 @@ namespace IFit.Services
                 Debug.WriteLine("User ID is invalid");
                 return null;
             }
-            var urlAddress = AppSettings.BaseAddress + "/questionnaire/findByExperienceLevelAndCoachModelType?experienceLevelId=" + user.ExperienceLevelId + "&coachModelTypeId=" + user.CoachModelTypeId;
+            /* var urlAddress = AppSettings.BaseAddress + "/questionnaire/findByExperienceLevelAndCoachModelType?experienceLevelId=" + user.ExperienceLevelId + "&coachModelTypeId=" + user.CoachModelTypeId ;*/
+            var urlAddress = "";
             var response = await AppSettings._HttpClient.GetAsync(urlAddress);
             if (response.IsSuccessStatusCode)
             {

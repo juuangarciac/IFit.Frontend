@@ -10,37 +10,47 @@ using System.Threading.Tasks;
 
 namespace IFit.Models
 {
-    public class AppUser
-    {
-        [JsonPropertyName("id"), PrimaryKey]
-        public long Id { get; set; }
 
-        [JsonPropertyName("name")]
-        public String Name { get; set; } = string.Empty;
+        /// <summary>
+        /// Modelo que representa el usuario de la aplicación
+        /// </summary>
+        public class AppUser
+        {
+            [JsonPropertyName("id")]
+            public int Id { get; set; }
 
-        [JsonPropertyName("email")]
-        public String Email { get; set; } = string.Empty;
+            [JsonPropertyName("name")]
+            public string Name { get; set; } = string.Empty;
 
-        [JsonPropertyName("password")]
-        public String Password { get; set; } = string.Empty;
+            [JsonPropertyName("email")]
+            public string Email { get; set; } = string.Empty;
 
-        [JsonPropertyName("verified")]
-        public Boolean IsVerified { get; set; } = false;
+            [JsonPropertyName("createdAt")]
+            public DateTime CreatedAt { get; set; }
 
-        [JsonPropertyName("registrationComplete")]
-        public Boolean IsRegistrationComplete { get; set; } = false;
+            [JsonPropertyName("updatedAt")]
+            public DateTime? UpdatedAt { get; set; }
 
-        [JsonPropertyName("coachModelTypeId"), DefaultValue(0)]
-        public long? CoachModelTypeId { get; set; }
+            [JsonPropertyName("roleName")]
+            public string RoleName { get; set; } = string.Empty;
 
-        [JsonPropertyName("experienceLevelId"), DefaultValue(0)]
-        public long? ExperienceLevelId { get; set; }
+            [JsonPropertyName("coachModelTypeName")]
+            public string? CoachModelTypeName { get; set; }
+
+            [JsonPropertyName("experienceLevelName")]
+            public string? ExperienceLevelName { get; set; }
+
+            [JsonPropertyName("registrationComplete")]
+            public bool RegistrationComplete { get; set; }
+
+            [JsonPropertyName("verified")]
+            public bool Verified { get; set; }
+        
         public static Boolean isPresent(AppUser? appUser)
         {
             return appUser != null
                 && !String.IsNullOrEmpty(appUser.Name) 
-                && !String.IsNullOrEmpty(appUser.Email) 
-                && !String.IsNullOrEmpty(appUser.Password);
+                && !String.IsNullOrEmpty(appUser.Email);
         }
     }
 }

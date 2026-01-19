@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:IFit.ViewModels"
+             x:Class="IFit.Views.AIGenerationRoutineView"
+             Title="AIGenerationRoutineView"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{DynamicResource BackgroundPrimaryDark}">
+    <ContentPage.BindingContext>
+        <vm:AIGenerationRoutineViewModel />
+    </ContentPage.BindingContext>
+
+    <Grid HorizontalOptions="Center"
+          VerticalOptions="Center"
+          Margin="15">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Estado inicial: Botón para iniciar generación -->
+        <Grid Grid.Row="0" 
+              IsVisible="{Binding ShowStartButton}"
+              VerticalOptions="Center">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Label Text="Genera tu rutina personalizada"
+                   Style="{StaticResource label-h1-white}"
+                   FontSize="28"
+                   HorizontalOptions="Center"
+                   HorizontalTextAlignment="Center"
+                   Margin="0,0,0,20"
+                   Grid.Row="0" />
+
+            <Label Text="Crearemos una rutina de ejercicios adaptada a tus objetivos y nivel"
+                   Style="{StaticResource label-p-white}"
+                   HorizontalTextAlignment="Center"
+                   Margin="0,0,0,30"
+                   Grid.Row="1" />
+
+            <Button Text="Generar Rutina"
+                    Command="{Binding StartGenerationCommand}"
+                    HorizontalOptions="Fill"
+                    Style="{StaticResource ButtonBold-XL-yellow}"
+                    CornerRadius="{StaticResource CornerRadiusRectangle}" 
+                    Grid.Row="2" />
+        </Grid>
+
+        <!-- Estado de generación: Loading spinner -->
+        <Grid Grid.Row="0" 
+              IsVisible="{Binding IsGenerating}"
+              VerticalOptions="Center">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Label Text="Estamos creando tu rutina"
+                   Style="{StaticResource label-h1-white}"
+                   HorizontalOptions="Center"
+                   Margin="0,0,0,10"
+                   Grid.Row="0" />
+
+            <Label Text="Esto puede tardar unos minutos, por favor espera..."
+                   Style="{StaticResource label-p-white}"
+                   HorizontalTextAlignment="Center"
+                   Margin="0,0,0,30"
+                   Grid.Row="1" />
+
+            <Image Source="loading_spinner.gif"
+                   WidthRequest="100"
+                   HeightRequest="100"
+                   HorizontalOptions="Center"
+                   Grid.Row="2" 
+                   IsAnimationPlaying="True"/>
+        </Grid>
+
+        <!-- Estado final: Rutina completada -->
+        <Grid Grid.Row="0" 
+              IsVisible="{Binding IsCompleted}"
+              VerticalOptions="Center">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Label Text="✓"
+                   FontSize="80"
+                   TextColor="#4CAF50"
+                   HorizontalOptions="Center"
+                   Margin="0,0,0,20"
+                   Grid.Row="0" />
+
+            <Label Text="¡Rutina creada con éxito!"
+                   Style="{StaticResource label-h1-white}"
+                   HorizontalOptions="Center"
+                   Margin="0,0,0,10"
+                   Grid.Row="1" />
+
+            <Label Text="Tu rutina personalizada está lista para comenzar"
+                   Style="{StaticResource label-p-white}"
+                   HorizontalTextAlignment="Center"
+                   Margin="0,0,0,30"
+                   Grid.Row="2" />
+
+            <Button Text="!Vamos allá!"
+                    Command="{Binding ViewRoutineCommand}"
+                    HorizontalOptions="Center"
+                    WidthRequest="200"
+                    Grid.Row="3" />
+        </Grid>
+
+    </Grid>
+</ContentPage>
