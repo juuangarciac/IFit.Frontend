@@ -41,7 +41,7 @@ public class VerificationViewModel : INotifyPropertyChanged
 
     public VerificationViewModel()
 	{
-        authenticationService = new AuthenticationService();
+        /* authenticationService = new AuthenticationService(); */
 
         LoadUserEmail();
         VerifyEmailCommand = new Command(VerifyEmail);
@@ -73,7 +73,7 @@ public class VerificationViewModel : INotifyPropertyChanged
             return;
         }
 
-        EmailValidationResponseDto emailValidationResponse = await authenticationService.VerifyEmail(Email, VerificationCode);
+        EmailValidationResponseDto emailValidationResponse = /* await authenticationService.VerifyEmail(Email, VerificationCode) */ new EmailValidationResponseDto();
 
         if (emailValidationResponse == null || !emailValidationResponse.isVerified)
         {

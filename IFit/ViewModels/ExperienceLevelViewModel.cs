@@ -91,7 +91,7 @@ namespace IFit.ViewModels
                 return;
             }
 
-            AppUser? result = await appUserService.SetExperienceLevel(user.Id, selectedExperienceLevel.Id);
+            AppUser? result = /* await appUserService.SetExperienceLevel(user.Id, selectedExperienceLevel.Id) */ null;
             if (result == null)
             {
                 await ErrorHandler.HandleErrorAsync("Failed to set experience level type.", "//ErrorView",

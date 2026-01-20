@@ -1,4 +1,5 @@
 ﻿using IFit.Models;
+using IFit.Models.Dtos.Auth;
 using IFit.Services;
 using IFit.XUnit.Utils;
 using Newtonsoft.Json;
@@ -9,7 +10,7 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace IFit.Tests.Integration
+namespace IFit.XUnit.Integration.Services
 {
     /// <summary>
     /// Pruebas de integración contra API real de iFit
@@ -31,7 +32,7 @@ namespace IFit.Tests.Integration
         private const string REFRESH_ENDPOINT = "/auth/refresh";
 
         // Datos del usuario de prueba
-        private const string TEST_USER_EMAIL = "newuser414@example.com";
+        private const string TEST_USER_EMAIL = "newuser249 surname249@example.com";
         private const string TEST_USER_PASSWORD = "P@ssword";
         private const int TEST_USER_ID = 1;
 
@@ -140,7 +141,7 @@ namespace IFit.Tests.Integration
 
             var updateData = new
             {
-                name = "newuser414 ACTUALIZADO"
+                name = "newuser249 surname249 ACTUALIZADO"
             };
 
             var response = await _webService.PutAsync<object, AppUser>(
@@ -280,7 +281,7 @@ namespace IFit.Tests.Integration
                     selectedOptionId = selectedOption.Id,
                     additionalText = selectedOption.RequiresTextInput
                         ? "Texto de prueba adicional"
-                        : (string?)null
+                        : null
                 };
 
                 var answerResponse = await _webService.PostAsync<object, QuestionnaireResponseDTO>(

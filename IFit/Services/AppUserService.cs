@@ -1,144 +1,288 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using IFit.Models;
+using IFit.Models.Dtos.AppUser.IFit.Models.Dtos.User;
+using IFit.Models.Dtos.IFit.Models.Dtos;
+using IFit.Models.Dtos.AppUser;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using IFit.Models;
-using IFit.Models.Dtos;
 
 namespace IFit.Services
 {
+    /// <summary>
+    /// Servicio para gestión de usuarios de la aplicación
+    /// Utiliza WebService para todas las peticiones HTTP con autenticación automática
+    /// </summary>
     public class AppUserService
     {
-        private CoachModelTypeService? CoachModelTypeService = App.GetService<CoachModelTypeService>();
-        public AppUserService()  { }
+        private readonly WebService _webService;
 
-        public async Task<AppUser?> findUserById(long id) 
+        public AppUserService(WebService webService)
         {
-            var urlAddress = AppSettings.BaseAddress + "/appuser/findById?id=" + id;
-            var response = await AppSettings._HttpClient.GetAsync(urlAddress);
-            if (response.IsSuccessStatusCode)
-            {
-                var responseData = await response.Content.ReadAsStringAsync();
-                if(!string.IsNullOrEmpty(responseData))
-                {
-                    return System.Text.Json.JsonSerializer.Deserialize<AppUser>(responseData);
-                }
-            }
-            return null;
+            _webService = webService ?? throw new ArgumentNullException(nameof(webService));
         }
 
-        public async Task<AppUser?> findUserByEmail(string email) 
-        {
-            var urlAddress = AppSettings.BaseAddress + "/appuser/findByEmail?email=" + Uri.EscapeDataString(email);
-            var response = await AppSettings._HttpClient.GetAsync(urlAddress);
+        #region Métodos Originales Refactorizados
 
-            if (response.IsSuccessStatusCode)
+        /// <summary>
+        /// Busca un usuario por su ID
+        /// </summary>
+        public async Task<AppUserResponseDto?> findUserById(long id)
+        {
+            if (id <= 0)
             {
-                var responseData = await response.Content.ReadAsStringAsync();
-                if(!string.IsNullOrEmpty(responseData))
-                {
-                    return System.Text.Json.JsonSerializer.Deserialize<AppUser>(responseData);
-                }
+                Debug.WriteLine("ID de usuario inválido");
+                return null;
             }
-            return null;
+
+            var response = await _webService.GetAsync<AppUserResponseDto>($"/users/{id}");
+
+            if (!response.Success)
+            {
+                Debug.WriteLine($"Error obteniendo usuario {id}: {response.ErrorMessage}");
+                return null;
+            }
+
+            return response.Data;
         }
 
-        public async Task<CoachModelType?> GetSelectedCoachModelTypeByEmail(string email)
+        /// <summary>
+        /// Busca un usuario por su email
+        /// </summary>
+        public async Task<AppUserResponseDto?> findUserByEmail(string email)
         {
-            AppUser? appUser = await this.findUserByEmail(email);
-
-            if (appUser != null && AppUser.isPresent(appUser))
+            if (string.IsNullOrWhiteSpace(email))
             {
-                if (CoachModelTypeService != null /* && appUser.CoachModelTypeId > 0 */)
-                {
-                    /* return await CoachModelTypeService.GetCoachModelTypeById(appUser.CoachModelTypeId.ToString()); */
-                    return new CoachModelType();
-                }
+                Debug.WriteLine("Email inválido");
+                return null;
             }
-            return null;
+
+            var encodedEmail = Uri.EscapeDataString(email);
+            var response = await _webService.GetAsync<AppUserResponseDto>($"/users/email/{encodedEmail}");
+
+            if (!response.Success)
+            {
+                Debug.WriteLine($"Error obteniendo usuario por email: {response.ErrorMessage}");
+                return null;
+            }
+
+            return response.Data;
         }
 
-        public async Task<AppUser?> SetCoachModelType(long? userId, long? coachId)
+        /// <summary>
+        /// Asigna un tipo de coach a un usuario
+        /// </summary>
+        public async Task<AppUserResponseDto?> SetCoachModelType(long? userId, long? coachId)
         {
             if (userId == null || coachId == null || userId <= 0 || coachId <= 0)
             {
-                Debug.WriteLine("User ID or Coach ID is invalid");
+                Debug.WriteLine("User ID o Coach ID inválido");
                 return null;
             }
 
-            var urlAddress = AppSettings.BaseAddress + "/appuser/setCoachModelType?userId=" + userId + "&coachId=" + coachId;
-            var content = new StringContent("", Encoding.UTF8, "application/json");
-            var response = await AppSettings._HttpClient.PostAsync(urlAddress, content);
+            var response = await _webService.PatchAsync<object, AppUserResponseDto>(
+                $"/users/{userId}/assign-coach/{coachId}",
+                new { }
+            );
 
-            if (response.IsSuccessStatusCode)
+            if (!response.Success)
             {
-                var responseData = await response.Content.ReadAsStringAsync();
-                return System.Text.Json.JsonSerializer.Deserialize<AppUser>(responseData);
+                Debug.WriteLine($"Error asignando coach: {response.ErrorMessage}");
+                return null;
             }
 
-            return null;
+            return response.Data;
         }
 
-        public async Task<AppUser?> SetExperienceLevel(long? userId, long? experienceLevel)
+        /// <summary>
+        /// Asigna un nivel de experiencia a un usuario
+        /// </summary>
+        public async Task<AppUserResponseDto?> SetExperienceLevel(long? userId, long? experienceLevel)
         {
             if (userId == null || experienceLevel == null || userId <= 0 || experienceLevel <= 0)
             {
-                Debug.WriteLine("User ID or Coach ID is invalid");
+                Debug.WriteLine("User ID o Experience Level ID inválido");
                 return null;
             }
 
-            var urlAddress = AppSettings.BaseAddress + "/appuser/setExperienceLevel?userId=" + userId + "&experienceLevelId=" + experienceLevel;
-            var content = new StringContent("", Encoding.UTF8, "application/json");
-            var response = await AppSettings._HttpClient.PostAsync(urlAddress, content);
+            var response = await _webService.PatchAsync<object, AppUserResponseDto>(
+                $"/users/{userId}/assign-experience/{experienceLevel}",
+                new { }
+            );
 
-            if (response.IsSuccessStatusCode)
+            if (!response.Success)
             {
-                var responseData = await response.Content.ReadAsStringAsync();
-                return System.Text.Json.JsonSerializer.Deserialize<AppUser>(responseData);
-            }
-
-            return null;
-        }
-
-        public async Task<AppQuestionnaire?> GetQuestionnaireForUserAsync(AppUser user)
-        {
-            if (user.Id <= 0)
-            {
-                Debug.WriteLine("User ID is invalid");
+                Debug.WriteLine($"Error asignando nivel de experiencia: {response.ErrorMessage}");
                 return null;
             }
-            /* var urlAddress = AppSettings.BaseAddress + "/questionnaire/findByExperienceLevelAndCoachModelType?experienceLevelId=" + user.ExperienceLevelId + "&coachModelTypeId=" + user.CoachModelTypeId ;*/
-            var urlAddress = "";
-            var response = await AppSettings._HttpClient.GetAsync(urlAddress);
-            if (response.IsSuccessStatusCode)
-            {
-                var responseData = await response.Content.ReadAsStringAsync();
-                if (!string.IsNullOrEmpty(responseData))
-                {
-                    return System.Text.Json.JsonSerializer.Deserialize<AppQuestionnaire>(responseData);
-                }
-            }
-            return null;
+
+            return response.Data;
         }
 
-        public async Task<AppUser?> MarkRegistrationComplete(long? userId)
+        /// <summary>
+        /// Marca el registro de un usuario como completado
+        /// </summary>
+        public async Task<AppUserResponseDto?> MarkRegistrationComplete(long? userId)
         {
             if (userId == null || userId <= 0)
             {
-                Debug.WriteLine("User ID is invalid");
+                Debug.WriteLine("User ID inválido");
                 return null;
             }
-            var urlAddress = AppSettings.BaseAddress + "/appuser/markRegistrationComplete?userId=" + userId;
-            var content = new StringContent("", Encoding.UTF8, "application/json");
-            var response = await AppSettings._HttpClient.PostAsync(urlAddress, content);
-            if (response.IsSuccessStatusCode)
+
+            var response = await _webService.PatchAsync<object, AppUserResponseDto>(
+                $"/users/{userId}/complete-registration",
+                new { }
+            );
+
+            if (!response.Success)
             {
-                var responseData = await response.Content.ReadAsStringAsync();
-                return System.Text.Json.JsonSerializer.Deserialize<AppUser>(responseData);
+                Debug.WriteLine($"Error completando registro: {response.ErrorMessage}");
+                return null;
             }
-            return null;
+
+            return response.Data;
         }
+
+        #endregion
+
+        #region Métodos CRUD Adicionales
+
+        /// <summary>
+        /// Obtiene todos los usuarios del sistema
+        /// </summary>
+        public async Task<List<AppUserResponseDto>?> GetAllUsers()
+        {
+            var response = await _webService.GetAsync<List<AppUserResponseDto>>("/users");
+
+            if (!response.Success)
+            {
+                Debug.WriteLine($"Error obteniendo usuarios: {response.ErrorMessage}");
+                return null;
+            }
+
+            return response.Data;
+        }
+
+        /// <summary>
+        /// Obtiene usuarios con paginación
+        /// </summary>
+        public async Task<PagedResponse<AppUserResponseDto>?> GetUsersPaginated(
+            int page = 0,
+            int size = 20,
+            string sortBy = "createdAt",
+            string sortDir = "desc")
+        {
+            var endpoint = $"/users/paginated?page={page}&size={size}&sortBy={sortBy}&sortDir={sortDir}";
+            var response = await _webService.GetAsync<PagedResponse<AppUserResponseDto>>(endpoint);
+
+            if (!response.Success)
+            {
+                Debug.WriteLine($"Error obteniendo usuarios paginados: {response.ErrorMessage}");
+                return null;
+            }
+
+            return response.Data;
+        }
+
+        /// <summary>
+        /// Crea un nuevo usuario
+        /// </summary>
+        public async Task<AppUserResponseDto?> CreateUser(CreateAppUserRequestDto createDto)
+        {
+            if (createDto == null)
+            {
+                Debug.WriteLine("DTO de creación es nulo");
+                return null;
+            }
+
+            var response = await _webService.PostAsync<CreateAppUserRequestDto, AppUserResponseDto>(
+                "/users",
+                createDto
+            );
+
+            if (!response.Success)
+            {
+                Debug.WriteLine($"Error creando usuario: {response.ErrorMessage}");
+                return null;
+            }
+
+            return response.Data;
+        }
+
+        /// <summary>
+        /// Actualiza un usuario existente
+        /// </summary>
+        public async Task<AppUserResponseDto?> UpdateUser(long id, UpdateAppUserRequestDto updateDto)
+        {
+            if (id <= 0)
+            {
+                Debug.WriteLine("ID de usuario inválido");
+                return null;
+            }
+
+            if (updateDto == null)
+            {
+                Debug.WriteLine("DTO de actualización es nulo");
+                return null;
+            }
+
+            var response = await _webService.PutAsync<UpdateAppUserRequestDto, AppUserResponseDto>(
+                $"/users/{id}",
+                updateDto
+            );
+
+            if (!response.Success)
+            {
+                Debug.WriteLine($"Error actualizando usuario {id}: {response.ErrorMessage}");
+                return null;
+            }
+
+            return response.Data;
+        }
+
+        /// <summary>
+        /// Elimina un usuario del sistema
+        /// </summary>
+        public async Task<bool> DeleteUser(long id)
+        {
+            if (id <= 0)
+            {
+                Debug.WriteLine("ID de usuario inválido");
+                return false;
+            }
+
+            var response = await _webService.DeleteAsync<object>($"/users/{id}");
+
+            if (!response.Success)
+            {
+                Debug.WriteLine($"Error eliminando usuario {id}: {response.ErrorMessage}");
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Verifica si existe un usuario con el email especificado
+        /// </summary>
+        public async Task<bool> EmailExists(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                Debug.WriteLine("Email inválido");
+                return false;
+            }
+
+            var encodedEmail = Uri.EscapeDataString(email);
+            var response = await _webService.GetAsync<bool>($"/users/exists/email/{encodedEmail}");
+
+            if (!response.Success)
+            {
+                Debug.WriteLine($"Error verificando existencia de email: {response.ErrorMessage}");
+                return false;
+            }
+
+            return response.Data;
+        }
+
+        #endregion
     }
 }

@@ -1,4 +1,5 @@
 ﻿using IFit.Models;
+using IFit.Models.Dtos.Auth;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
@@ -186,6 +187,14 @@ namespace IFit.Services
         public async Task<AppUser?> GetCurrentUserAsync()
         {
             return await _tokenManager.GetUserDataAsync();
+        }
+
+        /// <summary>
+        /// Obtiene el refresh token almacenado (para uso en AuthenticationService)
+        /// </summary>
+        public async Task<string?> GetRefreshTokenAsync()
+        {
+            return await _tokenManager.GetRefreshTokenAsync();
         }
 
         #endregion

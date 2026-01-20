@@ -4,8 +4,9 @@ using IFit.Services;
 using IFit.Models;
 using System;
 using System.Threading.Tasks;
+using IFit.Models.Dtos.Auth;
 
-namespace IFit.Tests.Services
+namespace IFit.XUnit.Unit.Services
 {
     /// <summary>
     /// Pruebas unitarias para TokenManager
@@ -60,7 +61,7 @@ namespace IFit.Tests.Services
                 RefreshToken = "test_refresh_token_456",
                 ExpiresIn = 300,
                 TokenType = "Bearer",
-                AppUser = new AppUser
+                AppUser = new AppUserResponseDto
                 {
                     Id = 1,
                     Name = "Juan Test",
@@ -306,7 +307,7 @@ namespace IFit.Tests.Services
                 RefreshToken = "refresh",
                 ExpiresIn = 300,
                 TokenType = "Bearer",
-                AppUser = new AppUser
+                AppUser = new AppUserResponseDto
                 {
                     Id = 1,
                     Name = "Test",
@@ -394,7 +395,7 @@ namespace IFit.Tests.Services
         public async Task GetUserDataAsync_DebeDeserializarCorrectamente()
         {
             // Arrange
-            var expectedUser = new AppUser
+            var expectedUser = new AppUserResponseDto
             {
                 Id = 123,
                 Name = "Juan García",
@@ -463,7 +464,7 @@ namespace IFit.Tests.Services
         public async Task SaveAuthDataAsync_ConCaracteresEspeciales_DebeGuardarCorrectamente()
         {
             // Arrange
-            var specialCharsUser = new AppUser
+            var specialCharsUser = new AppUserResponseDto
             {
                 Id = 1,
                 Name = "José María Ñoño",

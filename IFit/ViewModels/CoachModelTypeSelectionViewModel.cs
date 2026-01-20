@@ -50,7 +50,7 @@ public class CoachModelTypeSelectionViewModel : INotifyPropertyChanged
             return;
         }
 
-        AppUser? result = await appUserService.SetCoachModelType(user.Id, selectedCoachModelType.Id);
+        AppUser? result = /*await appUserService.SetCoachModelType(user.Id, selectedCoachModelType.Id)*/ null;
         if (result == null)
         {
             await ErrorHandler.HandleErrorAsync("Failed to set coach model type.", "//ErrorView",

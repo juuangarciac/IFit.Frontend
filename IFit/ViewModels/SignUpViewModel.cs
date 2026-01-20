@@ -1,6 +1,7 @@
 ﻿
 using IFit.Models;
 using IFit.Models.Dtos;
+using IFit.Models.Dtos.Auth;
 using IFit.Services;
 using IFit.Validations.Rules;
 using Plugin.ValidationRules;
@@ -71,8 +72,8 @@ namespace IFit.ViewModels
                 return;
             }
             
-            AppUser? user = await authenticationService.SignUpAsync(ValidatableName.Value, ValidatableEmail.Value, ValidatablePassword.Value);
-            if(user == null)
+            AuthResponse? response = await authenticationService.LoginAsync(ValidatableEmail.Value, ValidatablePassword.Value);
+            if(response == null)
             {
                 if (App.Current?.MainPage != null)
                 {
@@ -81,7 +82,7 @@ namespace IFit.ViewModels
                 return;
             }
             
-            EmailValidationResponseDto? emailValidationResponse = await authenticationService.SendVerificationEmail(Email);
+            EmailValidationResponseDto? emailValidationResponse = /* await authenticationService.SendVerificationEmail(Email) */ new EmailValidationResponseDto();
             if (emailValidationResponse == null)
             {
                 if (App.Current?.MainPage != null)
@@ -94,7 +95,7 @@ namespace IFit.ViewModels
             Preferences.Set("UserEmail", Email); // Store the email for later use
             Preferences.Set("UserName", Name); // Store the name for later use
 
-            await databaseService.SaveAppUserAsync(user);
+            // await databaseService.SaveAppUserAsync(response.AppUser);
             await Shell.Current.GoToAsync("///VerificationView");
         }
 

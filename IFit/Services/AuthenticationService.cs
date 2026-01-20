@@ -1,156 +1,265 @@
 ﻿using IFit.Models;
-using IFit.Models.Dtos;
-using System;
+using IFit.Models.Dtos.AppUser.IFit.Models.Dtos.User;
+using IFit.Models.Dtos.Auth;
 using System.Diagnostics;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace IFit.Services
 {
+    /// <summary>
+    /// Servicio para operaciones de autenticación (login, register, logout, refresh)
+    /// Maneja la comunicación con el backend de autenticación y gestiona tokens localmente
+    /// </summary>
     public class AuthenticationService
     {
+        private readonly WebService _webService;
 
-       //  private WebService? WebService = App.GetService<WebService>();
+        public AuthenticationService(WebService webService)
+        {
+            _webService = webService ?? throw new ArgumentNullException(nameof(webService));
+        }
 
-        public async Task<SignInResponseDto?> LoginAsync(string email, string password)
+        #region Métodos Principales de Autenticación
+
+        /// <summary>
+        /// Realiza el login del usuario con email y contraseña
+        /// Guarda automáticamente los tokens en SecureStorage
+        /// </summary>
+        public async Task<AuthResponse?> LoginAsync(string email, string password)
         {
             try
             {
-                var request = new SignInRequestDto { email = email, password = password };
-                var json = JsonSerializer.Serialize(request);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-                var response = await AppSettings._HttpClient.PostAsync(AppSettings.BaseAddress + "/login", content);
-
-                if (!response.IsSuccessStatusCode)
+                if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+                {
+                    Debug.WriteLine("Email o password vacíos");
                     return null;
+                }
 
-                var body = await response.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<SignInResponseDto>(body);
+                var request = new AuthRequestDto
+                {
+                    Username = email,
+                    Password = password
+                };
+
+                var response = await _webService.PostAsync<AuthRequestDto, AuthResponse>(
+                    "/auth/login",
+                    request,
+                    requiresAuth: false
+                );
+
+                if (!response.Success)
+                {
+                    Debug.WriteLine($"Error en login: {response.ErrorMessage}");
+                    return null;
+                }
+
+                // Guardar los tokens automáticamente
+                if (response.Data != null)
+                {
+                    await _webService.SaveAuthenticationAsync(response.Data);
+                }
+
+                return response.Data;
             }
             catch (Exception ex)
             {
-                // loggear el error, no solo navegar
-                Debug.WriteLine(ex.Message);
-                await Shell.Current.GoToAsync("//ErrorView");
+                Debug.WriteLine($"Excepción en LoginAsync: {ex.Message}");
                 return null;
             }
         }
 
-        public async Task<AppUser?> SignUpAsync(string name, string email, string password)
+        /// <summary>
+        /// Registra un nuevo usuario en el sistema
+        /// Realiza login automático después del registro exitoso
+        /// </summary>
+        public async Task<AuthResponse?> RegisterAsync(string name, string email, string password)
         {
             try
             {
-                   var request = new SignUpRequestDto { name = name, email = email, password = password };
-                var json = JsonSerializer.Serialize(request);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-                var response = await AppSettings._HttpClient.PostAsync(AppSettings.BaseAddress + "/auth/signup", content);
-
-                if (!response.IsSuccessStatusCode)
+                if (string.IsNullOrWhiteSpace(name) ||
+                    string.IsNullOrWhiteSpace(email) ||
+                    string.IsNullOrWhiteSpace(password))
+                {
+                    Debug.WriteLine("Datos de registro incompletos");
                     return null;
+                }
 
-                var body = await response.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<AppUser>(body);
+                var request = new RegisterRequestDto
+                {
+                    Name = name,
+                    Email = email,
+                    Password = password
+                };
+
+                var response = await _webService.PostAsync<RegisterRequestDto, AuthResponse>(
+                    "/auth/register",
+                    request,
+                    requiresAuth: false
+                );
+
+                if (!response.Success)
+                {
+                    Debug.WriteLine($"Error en registro: {response.ErrorMessage}");
+                    return null;
+                }
+
+                // Guardar los tokens automáticamente
+                if (response.Data != null)
+                {
+                    await _webService.SaveAuthenticationAsync(response.Data);
+                }
+
+                return response.Data;
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
-                await Shell.Current.GoToAsync("///ErrorView");
-                return null;
-            }
-        }
-        public async Task<EmailValidationResponseDto?> SendVerificationEmail(string email)
-        {
-            try
-            {
-                var json = JsonSerializer.Serialize(email);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-                var response = await AppSettings._HttpClient.PostAsync(AppSettings.BaseAddress + "/auth/sendVerificationEmail", content);
-
-                if (!response.IsSuccessStatusCode)
-                    return null;
-
-                var body = await response.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<EmailValidationResponseDto>(body);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                await Shell.Current.GoToAsync("///ErrorView");
-                return null;
-            }
-        }
-
-        public async Task<EmailValidationResponseDto?> VerifyEmail(string email, string verificationCode)
-        {
-            try
-            {
-                var request = new EmailValidationRequestDto { email = email, verificationCode = verificationCode };
-                var json = JsonSerializer.Serialize(request);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-                var response = await AppSettings._HttpClient.PostAsync(AppSettings.BaseAddress + "/auth/verifyEmail", content);
-
-                if (!response.IsSuccessStatusCode)
-                    return null;
-
-                var body = await response.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<EmailValidationResponseDto>(body);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                await Shell.Current.GoToAsync("///ErrorView");
+                Debug.WriteLine($"Excepción en RegisterAsync: {ex.Message}");
                 return null;
             }
         }
 
-        /**
-         * 
-         * Get access token from preferences or by logging in again
-         
-        internal async Task<string> GetAccessTokenAsync()
+        /// <summary>
+        /// Refresca los tokens de autenticación usando el refresh token actual
+        /// </summary>
+        public async Task<bool> RefreshTokenAsync()
         {
-            var token = Preferences.Get("AccessToken", null);
-            if (!string.IsNullOrEmpty(token))
-                return token;
+            try
+            {
+                var refreshToken = await GetRefreshTokenAsync();
 
-            if (WebService == null)
-                return string.Empty;
+                if (string.IsNullOrEmpty(refreshToken))
+                {
+                    Debug.WriteLine("No hay refresh token disponible");
+                    return false;
+                }
 
-            string? email = Preferences.Get("UserEmail", null);
-            string? password = Preferences.Get("UserPassword", null);
+                var request = new RefreshTokenRequestDto
+                {
+                    RefreshToken = refreshToken
+                };
 
-            if (email == null || password == null)
-                return string.Empty;
+                var response = await _webService.PostAsync<RefreshTokenRequestDto, AuthResponse>(
+                    "/auth/refresh",
+                    request,
+                    requiresAuth: false
+                );
 
-            var request = new SignInRequestDto { email = email, password = password };
-            var json = JsonSerializer.Serialize(request);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
-            var response = await AppSettings._HttpClient.PostAsync(AppSettings.BaseAddress + "/auth/login", content);
+                if (!response.Success)
+                {
+                    Debug.WriteLine($"Error refrescando token: {response.ErrorMessage}");
+                    return false;
+                }
 
-            if (!response.IsSuccessStatusCode)
-                return string.Empty;
+                // Guardar los nuevos tokens
+                if (response.Data != null)
+                {
+                    await _webService.SaveAuthenticationAsync(response.Data);
+                    return true;
+                }
 
-            var body = await response.Content.ReadAsStringAsync();
-            var tokenResponse = JsonSerializer.Deserialize<TokenDTO>(body);
-
-            Preferences.Set("AccessToken", tokenResponse?.AccessToken ?? string.Empty);
-            Preferences.Set("RefreshToken", tokenResponse?.RefreshToken ?? string.Empty);
-            
-            return tokenResponse?.AccessToken ?? string.Empty;
+                return false;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Excepción en RefreshTokenAsync: {ex.Message}");
+                return false;
+            }
         }
 
-        internal async Task<string> RefreshTokenAsync()
+        /// <summary>
+        /// Cierra la sesión del usuario
+        /// Invalida el refresh token en el servidor y limpia tokens locales
+        /// </summary>
+        public async Task<bool> LogoutAsync()
         {
-            throw new NotImplementedException();
+            try
+            {
+                var refreshToken = await GetRefreshTokenAsync();
+
+                if (string.IsNullOrEmpty(refreshToken))
+                {
+                    Debug.WriteLine("No hay refresh token para invalidar");
+                    await _webService.LogoutAsync();
+                    return true;
+                }
+
+                var request = new RefreshTokenRequestDto
+                {
+                    RefreshToken = refreshToken
+                };
+
+                var response = await _webService.PostAsync<RefreshTokenRequestDto, LogoutResponseDto>(
+                    "/auth/logout",
+                    request,
+                    requiresAuth: true
+                );
+
+                // Independientemente del resultado, limpiamos tokens locales
+                await _webService.LogoutAsync();
+
+                if (!response.Success)
+                {
+                    Debug.WriteLine($"Error en logout del servidor: {response.ErrorMessage}");
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Excepción en LogoutAsync: {ex.Message}");
+                await _webService.LogoutAsync();
+                return false;
+            }
         }
 
-        */
+        #endregion
+
+        #region Métodos de Utilidad
+
+        /// <summary>
+        /// Verifica si hay una sesión activa
+        /// </summary>
+        public async Task<bool> IsAuthenticatedAsync()
+        {
+            return await _webService.IsAuthenticatedAsync();
+        }
+
+        /// <summary>
+        /// Obtiene los datos del usuario actualmente autenticado
+        /// </summary>
+        public async Task<AppUserResponseDto?> GetCurrentUserAsync()
+        {
+            var user = await _webService.GetCurrentUserAsync();
+            // Convertir AppUser a AppUserResponseDto si es necesario
+            // O cambiar WebService para que devuelva AppUserResponseDto directamente
+            return user != null ? ConvertToResponseDto(user) : null;
+        }
+
+        /// <summary>
+        /// Obtiene el refresh token actual
+        /// </summary>
+        private async Task<string?> GetRefreshTokenAsync()
+        {
+            return await _webService.GetRefreshTokenAsync();
+        }
+
+        /// <summary>
+        /// Convierte AppUser a AppUserResponseDto
+        /// </summary>
+        private AppUserResponseDto ConvertToResponseDto(AppUser user)
+        {
+            return new AppUserResponseDto
+            {
+                Id = user.Id,
+                Name = user.Name,
+                Email = user.Email,
+                CoachModelTypeName = user.CoachModelTypeName,
+                ExperienceLevelName = user.ExperienceLevelName,
+                RegistrationComplete = user.RegistrationComplete,
+                CreatedAt = user.CreatedAt,
+                UpdatedAt = user.UpdatedAt
+            };
+        }
+
+        #endregion
     }
 }

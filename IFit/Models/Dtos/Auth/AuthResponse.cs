@@ -1,11 +1,12 @@
-﻿using System;
+﻿using IFit.Models.Dtos.AppUser.IFit.Models.Dtos.User;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace IFit.Models
+namespace IFit.Models.Dtos.Auth
 {
     /// <summary>
     /// Modelo que representa la respuesta completa de login/register
@@ -25,6 +26,6 @@ namespace IFit.Models
         public string TokenType { get; set; } = string.Empty;
 
         [JsonPropertyName("appUser")]
-        public AppUser? AppUser { get; set; }
+        public AppUserResponseDto? AppUser { get; set; }
     }
 }

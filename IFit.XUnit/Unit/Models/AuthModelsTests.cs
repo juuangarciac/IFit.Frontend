@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IFit.XUnit.Models
+namespace IFit.XUnit.Unit.Models
 {
     internal class AuthModelsTests
     {

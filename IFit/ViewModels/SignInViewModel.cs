@@ -81,7 +81,8 @@ namespace IFit.ViewModels
             {
                 await ErrorHandler.HandleErrorAsync("Ups!", "No se pudo iniciar sesión. Por favor, verifique sus credenciales.");
             }
-            return response;
+            // return response;
+            return null;
         }
 
         private void SaveLoginData(SignInResponseDto dto)
@@ -108,7 +109,8 @@ namespace IFit.ViewModels
             }
             Preferences.Set("UserId", user?.Id ?? 0);
 
-            return user;
+            // return user;
+            return null;
         }
 
         private async Task<bool> HandleVerificationAsync(AppUser appUser)
@@ -123,7 +125,7 @@ namespace IFit.ViewModels
             if (!appUser.Verified)
             {
                 // ErrorHandler.HandleErrorAsync("Parece que se le olvido algo la última vez!", "Por favor, verifique su correo electrónico antes de continuar.");
-                await authenticationService.SendVerificationEmail(Email);
+               //  await authenticationService.SendVerificationEmail(Email);
                 await Shell.Current.GoToAsync("///VerificationView");
                 return false;
             }

@@ -1,6 +1,7 @@
 ﻿using IFit.Models;
 using System.Text.Json;
 using System.Globalization;
+using IFit.Models.Dtos.Auth;
 
 namespace IFit.Services
 {

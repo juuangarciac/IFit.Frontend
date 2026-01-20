@@ -200,7 +200,7 @@ namespace IFit.ViewModels
                 return false;
             }
 
-            AppQuestionnaire? questionnaire = await appUserService.GetQuestionnaireForUserAsync(user);
+            AppQuestionnaire? questionnaire = /*await appUserService.GetQuestionnaireForUserAsync(user)*/ null;
             if (questionnaire == null)
             {
                 await ErrorHandler.HandleErrorAsync("No questionnaire found for the current user.", "//ErrorView",
