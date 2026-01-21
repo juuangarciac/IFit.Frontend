@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace IFit.Models
 {
-    public class CoachModelType
+    public class CoachModelTypeDto
     {
         [JsonPropertyName("id"), PrimaryKey]
         public long Id { get; set; }

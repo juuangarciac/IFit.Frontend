@@ -85,7 +85,7 @@ namespace IFit.Services
 
 
             // Get Coach Model Type
-            CoachModelType? model = new CoachModelType(); // TO-DO: Obtener el coach model type del usuario.
+            CoachModelTypeDto? model = new CoachModelTypeDto(); // TO-DO: Obtener el coach model type del usuario.
 
             if (model == null)
             {
@@ -105,7 +105,7 @@ namespace IFit.Services
             return await chat(model, maxMemoryId.Id, prompt);
         }
 
-        public async Task<AIMessage?> chat(CoachModelType model, int memoryId, string prompt)
+        public async Task<AIMessage?> chat(CoachModelTypeDto model, int memoryId, string prompt)
         {
             var urlAddress = AppSettings.BaseAddress + "/chat/" + model.Name;
 

@@ -1,5 +1,6 @@
 ﻿using IFit.Helper;
 using IFit.Models;
+using IFit.Models.Dtos.ExperienceLevel;
 using IFit.Services;
 using System;
 using System.Collections.Generic;
@@ -22,8 +23,8 @@ namespace IFit.ViewModels
             LoadExperienceLevels();
         }
 
-        private List<ExperienceLevel>? experienceLevels = new List<ExperienceLevel>();
-        public List<ExperienceLevel>? ExperienceLevels
+        private List<ExperienceLevelDto>? experienceLevels = new List<ExperienceLevelDto>();
+        public List<ExperienceLevelDto>? ExperienceLevels
         {
             get { return experienceLevels; }
             set
@@ -54,8 +55,8 @@ namespace IFit.ViewModels
             }
         }
 
-        private ExperienceLevel? selectedExperienceLevel;
-        public ExperienceLevel? SelectedExperienceLevel
+        private ExperienceLevelDto? selectedExperienceLevel;
+        public ExperienceLevelDto? SelectedExperienceLevel
         {
             get { return selectedExperienceLevel; }
             set
@@ -69,7 +70,7 @@ namespace IFit.ViewModels
             }
         }
 
-        private async void OnSelectedExperienceLevelChanged(ExperienceLevel? selectedExperienceLevel)
+        private async void OnSelectedExperienceLevelChanged(ExperienceLevelDto? selectedExperienceLevel)
         {
             if (selectedExperienceLevel == null || databaseService == null || appUserService == null)
             {

@@ -23,7 +23,7 @@ namespace IFit.Services
         {
             // Create database tables
             await _db.CreateTableAsync<AppUser>();
-            await _db.CreateTableAsync<CoachModelType>();
+            await _db.CreateTableAsync<CoachModelTypeDto>();
             _initialized = true;
         }
 

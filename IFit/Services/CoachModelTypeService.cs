@@ -17,6 +17,10 @@ namespace IFit.Services
             _webService = webService ?? throw new ArgumentNullException(nameof(webService));
         }
 
+        public CoachModelTypeService()
+        {
+        }
+
         #region Métodos Originales Refactorizados
 
         /// <summary>

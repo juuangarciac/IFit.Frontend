@@ -28,6 +28,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<AppUserQuestionnaireService>();
         builder.Services.AddSingleton<AppUserAnswerService>();
         builder.Services.AddSingleton<AIRoutineService>();
+        builder.Services.AddSingleton<QuestionnaireService>();
 
 
         // Register WebService with necessary parameters from AppSettings

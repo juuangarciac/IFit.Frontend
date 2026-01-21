@@ -66,14 +66,14 @@
 
 
         <!-- CoachModelTypes -->
-        <CollectionView Grid.Row="2"
+        <!-- <CollectionView Grid.Row="2"
                 ItemsSource="{Binding CoachModelTypes}"
                 SelectionMode="Single"
                 SelectedItem="{Binding SelectedCoachModelType, Mode=TwoWay}"
                 Margin="0,0,0,15">
 
             <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="models:CoachModelType">
+                <DataTemplate x:DataType="models:CoachModelTypeResponseDto">
                     <Border StrokeThickness="2"
                     Stroke="{DynamicResource BackgroundPrimaryLight}"
                     BackgroundColor="{DynamicResource PrimaryColorLightOpacity}"
@@ -89,7 +89,6 @@
                             Radius="{DynamicResource CornerRadiusRectangle}" />
                         </Border.Shadow>
 
-                        <!-- Card -->
                         <Grid Margin="10"
                       RowSpacing="5"
                       BackgroundColor="Transparent">
@@ -99,7 +98,6 @@
                                 <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
 
-                            <!-- Header -->
                             <Grid Grid.Row="0"
                           ColumnSpacing="5">
                                 <Grid.ColumnDefinitions>
@@ -107,18 +105,15 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
 
-                                <!-- Coach name -->
                                 <Label Grid.Column="0"
                                Text="{Binding Name}"
                                Style="{DynamicResource label-h1-white}" />
 
-                                <!-- Coach Emoji -->
                                 <Label Grid.Column="1"
                                FontSize="16"
                                Text="{Binding EmojiCharacter}" />
                             </Grid>
 
-                            <!-- Body -->
                             <Label Grid.Row="1"
                            Text="{Binding Description}"
                            Style="{DynamicResource label-p-white}" />
@@ -126,7 +121,7 @@
                     </Border>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
-        </CollectionView>
+        </CollectionView> -->
 
     </Grid>  
 </ContentPage>

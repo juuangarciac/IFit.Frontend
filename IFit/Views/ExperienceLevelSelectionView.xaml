@@ -63,7 +63,7 @@
 
 
         <!-- Experience Levels -->
-        <CollectionView Grid.Row="2"
+        <!-- <CollectionView Grid.Row="2"
             ItemsSource="{Binding ExperienceLevels}"
             SelectionMode="Single"
             SelectedItem="{Binding SelectedExperienceLevel, Mode=TwoWay}"
@@ -86,7 +86,6 @@
                         Radius="{DynamicResource CornerRadiusRectangle}" />
                         </Border.Shadow>
 
-                        <!-- Card -->
                         <Grid Margin="10"
                   RowSpacing="5"
                   BackgroundColor="Transparent">
@@ -96,12 +95,10 @@
                                 <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
 
-                            <!-- ExperienceLevel name -->
                             <Label Grid.Column="0"
                            Text="{Binding Name}"
                            Style="{DynamicResource label-h1-white}" />
 
-                            <!-- Body -->
                             <Label Grid.Row="1"
                        Text="{Binding Description}"
                        Style="{DynamicResource label-p-white}" />
@@ -109,7 +106,7 @@
                     </Border>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
-        </CollectionView>
+        </CollectionView> -->
 
     </Grid>
 </ContentPage>

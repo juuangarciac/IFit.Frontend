@@ -1,6 +1,7 @@
 using IFit.Helper;
 using IFit.Models;
 using IFit.Models.Dtos;
+using IFit.Models.Dtos.Coach;
 using IFit.Services;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -12,8 +13,8 @@ public class CoachModelTypeSelectionViewModel : INotifyPropertyChanged
     private DatabaseService? databaseService = App.GetService<DatabaseService>();
     private AppUserService? appUserService = App.GetService<AppUserService>();
 
-    private CoachModelType? selectedCoachModelType = null;
-    public CoachModelType? SelectedCoachModelType
+    private CoachModelTypeResponseDto? selectedCoachModelType = null;
+    public CoachModelTypeResponseDto? SelectedCoachModelType
     {
         get => selectedCoachModelType;
         set
@@ -28,7 +29,7 @@ public class CoachModelTypeSelectionViewModel : INotifyPropertyChanged
         }
     }
 
-    private async void OnSelectedCoachChanged(CoachModelType? selectedCoachModelType)
+    private async void OnSelectedCoachChanged(CoachModelTypeResponseDto? selectedCoachModelType)
     {
         if (selectedCoachModelType == null || databaseService == null || appUserService == null)
         {
@@ -64,8 +65,8 @@ public class CoachModelTypeSelectionViewModel : INotifyPropertyChanged
     }
 
 
-    private List<CoachModelType>? coachModelTypes = new List<CoachModelType>();
-    public List<CoachModelType>? CoachModelTypes
+    private List<CoachModelTypeResponseDto>? coachModelTypes = new List<CoachModelTypeResponseDto>();
+    public List<CoachModelTypeResponseDto>? CoachModelTypes
     {
         get => coachModelTypes;
         set
