@@ -1,204 +1,532 @@
-using IFit;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using IFit.Helper;
-using IFit.Models;
-using IFit.Models.Dtos;
+using IFit.Models.Dtos.Auth;
 using IFit.Services;
 using System.Diagnostics;
-using System.Windows.Input;
 
 namespace IFit.ViewModels
 {
-    public class SignInViewModel
+    /// <summary>
+    /// ViewModel para la página de inicio de sesión.
+    /// Maneja autenticación, validación y navegación post-login.
+    /// </summary>
+    public partial class SignInViewModel : ObservableObject
     {
-        public string Email { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
+        #region Services (Inyección de Dependencias)
 
-        private readonly AuthenticationService? authenticationService;
-        private readonly AppUserService? appUserService;
-        private DatabaseService? databaseService;
-        private AppUserAnswerService? appUserAnswerService;
-        private AppUserQuestionnaireService? appUserQuestionnaireService;
+        private readonly AuthenticationService _authenticationService;
+        private readonly AppUserService _appUserService;
+        private readonly DatabaseService _databaseService;
 
-        public ICommand LoginCommand { get; }
+        #endregion
 
-        public SignInViewModel()
+        #region State Enum
+
+        public enum LoginState
         {
-            authenticationService = App.GetService<AuthenticationService>();
-            appUserService = App.GetService<AppUserService>();
-            databaseService = App.GetService<DatabaseService>();
-            appUserAnswerService = App.GetService<AppUserAnswerService>();
-            appUserQuestionnaireService = App.GetService<AppUserQuestionnaireService>();
-
-            LoginCommand = new Command(async () => await SignInAsync());
+            Idle,           // Estado inicial
+            Loading,        // Proceso de login en curso
+            Success,        // Login exitoso
+            Error           // Error en el proceso
         }
 
-        public async Task SignInAsync()
+        #endregion
+
+        #region Observable Properties
+
+        /// <summary>
+        /// Email del usuario
+        /// </summary>
+        [ObservableProperty]
+        private string _email = string.Empty;
+
+        /// <summary>
+        /// Contraseña del usuario
+        /// </summary>
+        [ObservableProperty]
+        private string _password = string.Empty;
+
+        /// <summary>
+        /// Estado actual del proceso de login
+        /// </summary>
+        [ObservableProperty]
+        private LoginState _currentState = LoginState.Idle;
+
+        /// <summary>
+        /// Mensaje de error para mostrar al usuario
+        /// </summary>
+        [ObservableProperty]
+        private string _errorMessage = string.Empty;
+
+        #endregion
+
+        #region Computed Properties
+
+        /// <summary>
+        /// Indica si se está procesando el login
+        /// </summary>
+        public bool IsLoading => CurrentState == LoginState.Loading;
+
+        /// <summary>
+        /// Indica si hay un error activo
+        /// </summary>
+        public bool HasError => CurrentState == LoginState.Error;
+
+        /// <summary>
+        /// Indica si está en estado idle (inicial)
+        /// </summary>
+        public bool IsIdle => CurrentState == LoginState.Idle;
+
+        /// <summary>
+        /// Mensaje de estado para la UI
+        /// </summary>
+        public string StatusMessage => IsLoading ? "Iniciando sesión..." : string.Empty;
+
+        /// <summary>
+        /// Texto del botón de login
+        /// </summary>
+        public string LoginButtonText => IsLoading ? "Iniciando..." : "Iniciar Sesión";
+
+        #endregion
+
+        #region Constructor
+
+        /// <summary>
+        /// Constructor principal con inyección de dependencias
+        /// </summary>
+        public SignInViewModel(
+            AuthenticationService authenticationService,
+            AppUserService appUserService,
+            DatabaseService databaseService)
         {
-            if (!ValidateInputs()) return;
-
-            var signInResponseDto = await TryLoginAsync();
-            if (signInResponseDto == null) return;
-
-            SaveLoginData(signInResponseDto);
-
-            var appUser = await LoadUserDataAsync();
-            if (appUser == null) return;
-
-            await InsertUserToDatabase(appUser);
-
-            // If the username is null or empty, it indicates that the user has not completed the initial setup
-            if (!appUser.RegistrationComplete)
-            {
-                if (!await HandleVerificationAsync(appUser)) return; // Verify email first
-                if (!await HandleCoachSelectionAsync(appUser)) return; // Then select coach model type
-                if (!await HandleExperienceLevelSelectionAsync(appUser)) return; // Then select experience level
-                if (!await HandleAppUserQuestionnaireAndQuestionsAnswered(appUser)) return; // Then complete questionnaire
-            }
-
-            await Shell.Current.GoToAsync("///HomeView");
+            _authenticationService = authenticationService ?? throw new ArgumentNullException(nameof(authenticationService));
+            _appUserService = appUserService ?? throw new ArgumentNullException(nameof(appUserService));
+            _databaseService = databaseService ?? throw new ArgumentNullException(nameof(databaseService));
         }
 
-        private bool ValidateInputs()
+        /// <summary>
+        /// Constructor sin parámetros para compatibilidad con XAML
+        /// </summary>
+        public SignInViewModel() : this(
+            App.GetService<AuthenticationService>() ?? throw new InvalidOperationException("AuthenticationService no registrado"),
+            App.GetService<AppUserService>() ?? throw new InvalidOperationException("AppUserService no registrado"),
+            App.GetService<DatabaseService>() ?? throw new InvalidOperationException("DatabaseService no registrado"))
         {
-            if (string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(Password))
-            {
-                _ = ErrorHandler.HandleErrorAsync("Ups!", "Por favor, ingrese su correo electrónico y contraseña.");
-                return false;
-            }
-            return true;
         }
 
-        private async Task<SignInResponseDto?> TryLoginAsync()
-        {
-            if(authenticationService == null)
-            {
-                await ErrorHandler.HandleErrorAsync("Ups!", "No se pudo iniciar sesión. Por favor, intente nuevamente más tarde.");
-                return null;
-            }
+        #endregion
 
-            var response = await authenticationService.LoginAsync(Email, Password);
-            if (response == null)
-            {
-                await ErrorHandler.HandleErrorAsync("Ups!", "No se pudo iniciar sesión. Por favor, verifique sus credenciales.");
-            }
-            // return response;
-            return null;
+        #region Property Changed Handlers
+
+        /// <summary>
+        /// Cuando el estado cambia, notificar propiedades computadas
+        /// </summary>
+        partial void OnCurrentStateChanged(LoginState value)
+        {
+            OnPropertyChanged(nameof(IsLoading));
+            OnPropertyChanged(nameof(HasError));
+            OnPropertyChanged(nameof(IsIdle));
+            OnPropertyChanged(nameof(StatusMessage));
+            OnPropertyChanged(nameof(LoginButtonText));
+
+            // Notificar que CanExecute del comando cambió
+            SignInCommand.NotifyCanExecuteChanged();
         }
 
-        private void SaveLoginData(SignInResponseDto dto)
+        /// <summary>
+        /// Cuando el email cambia, limpiar errores y actualizar comando
+        /// </summary>
+        partial void OnEmailChanged(string value)
         {
-            Preferences.Set("UserEmail", Email);
-            Preferences.Set("UserToken", dto.token);
-            Preferences.Set("UserAuthorities", dto.authorities);
+            if (HasError)
+            {
+                CurrentState = LoginState.Idle;
+                ErrorMessage = string.Empty;
+            }
+            SignInCommand.NotifyCanExecuteChanged();
         }
 
-        private async Task<AppUser?> LoadUserDataAsync()
+        /// <summary>
+        /// Cuando la contraseña cambia, limpiar errores y actualizar comando
+        /// </summary>
+        partial void OnPasswordChanged(string value)
         {
-            if(appUserService == null)
+            if (HasError)
             {
-                await ErrorHandler.HandleErrorAsync("Ups!", "No se pudo recuperar la información del usuario. Por favor, intente nuevamente.");
-                await Shell.Current.GoToAsync("///ErrorView");
-                return null;
+                CurrentState = LoginState.Idle;
+                ErrorMessage = string.Empty;
             }
-
-            var user = await appUserService.findUserByEmail(Email);
-            if (user == null)
-            {
-                await ErrorHandler.HandleErrorAsync("Ups!", "No se pudo recuperar la información del usuario. Por favor, intente nuevamente.");
-                await Shell.Current.GoToAsync("///ErrorView");
-            }
-            Preferences.Set("UserId", user?.Id ?? 0);
-
-            // return user;
-            return null;
+            SignInCommand.NotifyCanExecuteChanged();
         }
 
-        private async Task<bool> HandleVerificationAsync(AppUser appUser)
-        {
+        #endregion
 
-            if(authenticationService == null) {
-                await ErrorHandler.HandleErrorAsync("Ups!", "No se pudo verificar el estado del usuario. Por favor, intente nuevamente más tarde.");
-                await Shell.Current.GoToAsync("///ErrorView");
-                return false;
-            }
+        #region Commands
 
-            if (!appUser.Verified)
-            {
-                // ErrorHandler.HandleErrorAsync("Parece que se le olvido algo la última vez!", "Por favor, verifique su correo electrónico antes de continuar.");
-               //  await authenticationService.SendVerificationEmail(Email);
-                await Shell.Current.GoToAsync("///VerificationView");
-                return false;
-            }
-
-            Preferences.Set("IsVerified", appUser.Verified);
-            return true;
-        }
-
-        private async Task<bool> HandleCoachSelectionAsync(AppUser appUser)
-        {
-            if (!string.IsNullOrEmpty(appUser.CoachModelTypeName))
-            {
-                // ErrorHandler.HandleErrorAsync("Parece que se le olvido algo la última vez!", "Por favor, seleccione un tipo de modelo de entrenador antes de continuar.");
-                await Shell.Current.GoToAsync("///GetStartedView");
-                return false;
-            }
-
-            Preferences.Set("CoachModelTypeName", appUser.CoachModelTypeName);
-            return true;
-        }
-
-        private async Task<bool> HandleExperienceLevelSelectionAsync(AppUser appUser)
-        {
-            if (!string.IsNullOrEmpty(appUser.ExperienceLevelName))
-            {
-                // ErrorHandler.HandleErrorAsync("Parece que se le olvido algo la última vez!", "Por favor, seleccione un tipo de modelo de entrenador antes de continuar.");
-                await Shell.Current.GoToAsync("///GetStartedView");
-                return false;
-            }
-
-            Preferences.Set("ExperienceLevelName", appUser.ExperienceLevelName);
-            return true;
-        }
-
-        private async Task<bool> HandleAppUserQuestionnaireAndQuestionsAnswered(AppUser appUser)
-        {
-            if (appUserQuestionnaireService == null || appUserAnswerService == null)
-            {
-                await Shell.Current.GoToAsync("///ErrorView");
-                return false;
-            }
-
-            // If the user has not completed the questionnaire, navigate to QuestionnaireView
-            var userQuestionnaire = await appUserQuestionnaireService.GetUserQuestionnaireByUserIdAsync(appUser.Id);
-            if (userQuestionnaire == null)
-            {
-                await Shell.Current.GoToAsync("///AppUserQuestionnaireView");
-                return false;
-            }
-
-            return true;
-        }
-
-        private async Task InsertUserToDatabase(AppUser appUser)
+        /// <summary>
+        /// Comando para iniciar sesión con validación de CanExecute
+        /// </summary>
+        [RelayCommand(CanExecute = nameof(CanSignIn))]
+        private async Task SignInAsync()
         {
             try
             {
-                if (databaseService == null)
+                CurrentState = LoginState.Loading;
+                ErrorMessage = string.Empty;
+
+                Debug.WriteLine("Iniciando proceso de login");
+
+                // 1. Validar inputs
+                if (!ValidateInputs())
                 {
-                    await Shell.Current.GoToAsync("///ErrorView");
                     return;
                 }
 
-                await databaseService.InsertAppUserAsync(appUser);
-                Debug.WriteLine("User saved to database successfully.");
+                // 2. Intentar login
+                var appUser = await TryLoginAsync();
+                if (appUser == null)
+                {
+                    return;
+                }
 
-                return;
+                Debug.WriteLine($"Login exitoso para usuario: {appUser.Email}");
+
+                // 3. Guardar datos de sesión
+                await SaveLoginData(appUser);
+
+                // 4. Verificar si necesita completar el proceso de registro
+                if (!appUser.RegistrationComplete)
+                {
+                    Debug.WriteLine("Usuario no ha completado registro inicial");
+
+                    // 4a. Verificar email primero
+                    if (!await HandleVerificationAsync(appUser))
+                    {
+                        return;
+                    }
+
+                    // 4b. Luego seleccionar coach y nivel de experiencia
+                    if (!await HandleUserCoachAndExperienceLevel(appUser))
+                    {
+                        return;
+                    }
+                }
+
+                // 5. Marcar como exitoso y navegar
+                CurrentState = LoginState.Success;
+                Debug.WriteLine("Navegando a HomeView");
+                await Shell.Current.GoToAsync("///HomeView");
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error saving user to database: {ex.Message}");
-                await Shell.Current.GoToAsync("///ErrorView");
+                Debug.WriteLine($"Error inesperado en SignInAsync: {ex.Message}");
+                Debug.WriteLine($"StackTrace: {ex.StackTrace}");
+
+                CurrentState = LoginState.Error;
+                ErrorMessage = "Ocurrió un error inesperado. Por favor, intenta de nuevo.";
+
+                await ErrorHandler.HandleErrorAsync(
+                    "Error Inesperado",
+                    "No se pudo completar el inicio de sesión. Por favor, intenta nuevamente."
+                );
+            }
+            finally
+            {
+                // Asegurar que no quede en Loading si algo falla
+                if (CurrentState == LoginState.Loading)
+                {
+                    CurrentState = LoginState.Error;
+                }
             }
         }
+
+        /// <summary>
+        /// Determina si se puede ejecutar el comando de login
+        /// </summary>
+        private bool CanSignIn()
+        {
+            return !IsLoading
+                   && !string.IsNullOrWhiteSpace(Email)
+                   && !string.IsNullOrWhiteSpace(Password);
+        }
+
+        #endregion
+
+        #region Validation Methods
+
+        /// <summary>
+        /// Valida que los campos de entrada sean correctos
+        /// </summary>
+        private bool ValidateInputs()
+        {
+            // Validar email
+            if (string.IsNullOrWhiteSpace(Email))
+            {
+                CurrentState = LoginState.Error;
+                ErrorMessage = "El email es obligatorio.";
+                return false;
+            }
+
+            if (!IsValidEmail(Email))
+            {
+                CurrentState = LoginState.Error;
+                ErrorMessage = "El formato del email no es válido.";
+                return false;
+            }
+
+            // Validar contraseña
+            if (string.IsNullOrWhiteSpace(Password))
+            {
+                CurrentState = LoginState.Error;
+                ErrorMessage = "La contraseña es obligatoria.";
+                return false;
+            }
+
+            if (Password.Length < 6)
+            {
+                CurrentState = LoginState.Error;
+                ErrorMessage = "La contraseña debe tener al menos 6 caracteres.";
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Valida formato de email
+        /// </summary>
+        private bool IsValidEmail(string email)
+        {
+            try
+            {
+                var addr = new System.Net.Mail.MailAddress(email);
+                return addr.Address == email;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        #endregion
+
+        #region Authentication Methods
+
+        /// <summary>
+        /// Intenta hacer login con las credenciales proporcionadas
+        /// </summary>
+        private async Task<AppUserResponseDto?> TryLoginAsync()
+        {
+            try
+            {
+                Debug.WriteLine($"Intentando login para: {Email}");
+
+                var response = await _authenticationService.LoginAsync(Email, Password);
+
+                if (response == null)
+                {
+                    CurrentState = LoginState.Error;
+                    ErrorMessage = "Credenciales incorrectas. Por favor, verifica tu email y contraseña.";
+
+                    Debug.WriteLine("Login fallido: Respuesta nula del servidor");
+
+                    await ErrorHandler.HandleErrorAsync(
+                        "Error de Inicio de Sesión",
+                        "No se pudo iniciar sesión. Por favor, verifica tus credenciales."
+                    );
+
+                    return null;
+                }
+
+                if (response.AppUser == null)
+                {
+                    CurrentState = LoginState.Error;
+                    ErrorMessage = "Error al obtener datos del usuario.";
+
+                    Debug.WriteLine("Login fallido: AppUser es null");
+
+                    await ErrorHandler.HandleErrorAsync(
+                        "Error",
+                        "No se pudieron obtener los datos del usuario."
+                    );
+
+                    return null;
+                }
+
+                Debug.WriteLine($"Login exitoso. UserId: {response.AppUser.Id}");
+                return response.AppUser;
+            }
+            catch (Exception ex)
+            {
+                CurrentState = LoginState.Error;
+                ErrorMessage = "Error de conexión. Por favor, verifica tu conexión a internet.";
+
+                Debug.WriteLine($"Excepción en TryLoginAsync: {ex.Message}");
+
+                await ErrorHandler.HandleErrorAsync(
+                    "Error de Conexión",
+                    "No se pudo conectar con el servidor. Por favor, verifica tu conexión a internet."
+                );
+
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Guarda los datos del usuario en Preferences y base de datos local
+        /// </summary>
+        private async Task SaveLoginData(AppUserResponseDto dto)
+        {
+            try
+            {
+                Debug.WriteLine($"Guardando datos de login para usuario: {dto.Email}");
+
+                // Guardar en Preferences para acceso rápido
+                Preferences.Set("UserId", dto.Id);
+                Preferences.Set("UserEmail", dto.Email);
+                Preferences.Set("Name", dto.Name);
+                Preferences.Set("IsVerified", dto.Verified);
+
+                if (!string.IsNullOrEmpty(dto.CoachModelTypeName))
+                {
+                    Preferences.Set("CoachModelTypeName", dto.CoachModelTypeName);
+                }
+
+                Debug.WriteLine("Datos guardados en Preferences");
+
+                // Guardar en base de datos local
+                await InsertUserToDatabase(dto);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error guardando datos de login: {ex.Message}");
+                // No bloqueamos el flujo si falla el guardado local
+                // El usuario ya está autenticado en el servidor
+            }
+        }
+
+        /// <summary>
+        /// Verifica si el usuario ha confirmado su email
+        /// </summary>
+        private async Task<bool> HandleVerificationAsync(AppUserResponseDto appUser)
+        {
+            try
+            {
+                if (!appUser.Verified)
+                {
+                    Debug.WriteLine("Usuario no verificado, navegando a VerificationView");
+
+                    // Opcionalmente enviar email de verificación
+                    // await _authenticationService.SendVerificationEmail(Email);
+
+                    await Shell.Current.GoToAsync("///VerificationView");
+                    return false;
+                }
+
+                Debug.WriteLine("Usuario verificado correctamente");
+                Preferences.Set("IsVerified", true);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error en HandleVerificationAsync: {ex.Message}");
+
+                await ErrorHandler.HandleErrorAsync(
+                    "Error",
+                    "No se pudo verificar el estado del usuario. Por favor, intenta nuevamente."
+                );
+
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Verifica si el usuario ha seleccionado coach y nivel de experiencia
+        /// </summary>
+        private async Task<bool> HandleUserCoachAndExperienceLevel(AppUserResponseDto appUser)
+        {
+            try
+            {
+                var needsCoachSelection = string.IsNullOrEmpty(appUser.CoachModelTypeName);
+                var needsExperienceLevel = string.IsNullOrEmpty(appUser.ExperienceLevelName);
+
+                if (needsCoachSelection || needsExperienceLevel)
+                {
+                    Debug.WriteLine($"Usuario necesita completar setup - Coach: {needsCoachSelection}, Experience: {needsExperienceLevel}");
+
+                    await Shell.Current.GoToAsync("///GetStartedView");
+                    return false;
+                }
+
+                Debug.WriteLine("Usuario tiene coach y nivel de experiencia configurados");
+                Preferences.Set("CoachModelTypeName", appUser.CoachModelTypeName);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error en HandleUserCoachAndExperienceLevel: {ex.Message}");
+
+                await ErrorHandler.HandleErrorAsync(
+                    "Error",
+                    "No se pudo verificar la configuración del usuario."
+                );
+
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Guarda el usuario en la base de datos local SQLite
+        /// </summary>
+        private async Task InsertUserToDatabase(AppUserResponseDto appUser)
+        {
+            try
+            {
+                Debug.WriteLine($"Insertando usuario en BD local: {appUser.Email}");
+
+                var entity = appUser.toEntity();
+                await _databaseService.InsertAppUserAsync(entity);
+
+                Debug.WriteLine("Usuario guardado en BD local exitosamente");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error guardando usuario en BD local: {ex.Message}");
+                Debug.WriteLine($"StackTrace: {ex.StackTrace}");
+
+                // No lanzamos excepción porque el login ya fue exitoso
+                // La BD local es solo para caché
+            }
+        }
+
+        #endregion
+
+        #region Public Methods
+
+        /// <summary>
+        /// Limpia los campos del formulario
+        /// </summary>
+        public void ClearForm()
+        {
+            Email = string.Empty;
+            Password = string.Empty;
+            CurrentState = LoginState.Idle;
+            ErrorMessage = string.Empty;
+
+            Debug.WriteLine("Formulario limpiado");
+        }
+
+        /// <summary>
+        /// Limpia solo los errores
+        /// </summary>
+        public void ClearErrors()
+        {
+            CurrentState = LoginState.Idle;
+            ErrorMessage = string.Empty;
+        }
+
+        #endregion
     }
 }

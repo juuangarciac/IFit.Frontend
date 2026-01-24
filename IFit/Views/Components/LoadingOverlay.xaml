@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="IFit.Views.Components.LoadingOverlay"
+             x:Name="loadingOverlay">
+    <Grid IsVisible="{Binding IsLoading, Source={x:Reference loadingOverlay}}"
+          BackgroundColor="#80000000">
+
+        <VerticalStackLayout VerticalOptions="Center"
+                            HorizontalOptions="Center">
+
+            <Border BackgroundColor="White"
+                    Padding="40,30"
+                    StrokeThickness="0">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="15"/>
+                </Border.StrokeShape>
+
+                <VerticalStackLayout Spacing="15">
+                    <!-- Spinner -->
+                    <ActivityIndicator IsRunning="{Binding IsLoading, Source={x:Reference loadingOverlay}}"
+                                      Color="{StaticResource Primary}"
+                                      HeightRequest="50"
+                                      WidthRequest="50"/>
+
+                    <!-- Mensaje -->
+                    <Label Text="{Binding Message, Source={x:Reference loadingOverlay}}"
+                           FontFamily="Montserrat-Regular"
+                           FontSize="16"
+                           TextColor="Black"
+                           HorizontalTextAlignment="Center"
+                           IsVisible="{Binding HasMessage, Source={x:Reference loadingOverlay}}"/>
+                </VerticalStackLayout>
+            </Border>
+        </VerticalStackLayout>
+    </Grid>
+</ContentView>

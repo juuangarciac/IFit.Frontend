@@ -1,296 +1,585 @@
-﻿using IFit.Helper;
-using IFit.Models;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using IFit.Helper;
+using IFit.Models.Dtos.Questionnaire;
 using IFit.Services;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Windows.Input;
 
 namespace IFit.ViewModels
 {
-    public class AppUserQuestionnaireViewModel : INotifyPropertyChanged
+    /// <summary>
+    /// ViewModel para responder un cuestionario.
+    /// Gestiona el flujo de preguntas, respuestas y progreso del usuario.
+    /// 
+    /// FLUJO:
+    /// 1. Usuario selecciona un cuestionario (desde otra vista)
+    /// 2. Se inicia una sesión con StartQuestionnaire
+    /// 3. Usuario responde pregunta por pregunta
+    /// 4. Al completar todas, se marca como completado automáticamente
+    /// </summary>
+    public class AppUserQuestionnaireViewModel : ObservableObject
     {
-        // Services
-        private DatabaseService? databaseService = App.GetService<DatabaseService>();
-        private AppUserService? appUserService = App.GetService<AppUserService>();
-        private AppQuestionService? questionService = App.GetService<AppQuestionService>();
-        private AnswerService? answerService = App.GetService<AnswerService>();
-        private AppUserQuestionnaireService? appUserQuestionnaireService = App.GetService<AppUserQuestionnaireService>();
-        private AppUserAnswerService? appUserAnswerService = App.GetService<AppUserAnswerService>();
+        #region Fields
 
-        #region Questionnaire and Questions
-        private AppQuestionnaire appQuestionnaire = new AppQuestionnaire();
-        public AppQuestionnaire AppQuestionnaire
+        private readonly QuestionnaireService _questionnaireService;
+        private readonly long _userId;
+        private readonly long _questionnaireId;
+
+        // Estado de la sesión
+        private long _responseId;  // ID de la sesión de respuestas
+        private bool _isLoading;
+        private bool _hasError;
+        private string _errorMessage = string.Empty;
+
+        // Datos del cuestionario
+        private string _questionnaireName = string.Empty;
+        private string _questionnaireDescription = string.Empty;
+
+        // Pregunta actual
+        private QuestionDTO? _currentQuestion;
+        private int _currentQuestionIndex;
+        private int _totalQuestions;
+
+        // Respuesta seleccionada
+        private OptionDTO? _selectedOption;
+        private string _additionalText = string.Empty;
+
+        // Navegación
+        private bool _canGoBack;
+        private bool _canGoNext;
+        private bool _isLastQuestion;
+
+        #endregion
+
+        #region Properties
+
+        /// <summary>
+        /// Indica si se está cargando datos
+        /// </summary>
+        public bool IsLoading
         {
-            get => appQuestionnaire;
+            get => _isLoading;
             set
             {
-                appQuestionnaire = value;
-            }
-        }
-
-        private List<AppQuestion> appQuestions = new List<AppQuestion>();
-        public List<AppQuestion> AppQuestions
-        {
-            get => appQuestions;
-            set
-            {
-                appQuestions = value;
-            }
-        }
-
-        // User question response
-        private int currentQuestionIndex = 0;
-
-        private String questionTitle = string.Empty;
-        public String QuestionTitle
-        {
-            get => questionTitle;
-            set
-            {
-                questionTitle = value;
-                OnPropertyChanged(nameof(QuestionTitle));
-            }
-        }
-
-        private List<AppAnswer> questionAnswers = new List<AppAnswer>();
-        public List<AppAnswer> QuestionAnswers
-        {
-            get => questionAnswers;
-            set
-            {
-                questionAnswers = value;
-                OnPropertyChanged(nameof(QuestionAnswers));
-            }
-        }
-
-        private AppAnswer? selectedAnswer;
-        public AppAnswer? SelectedAnswer
-        {
-            get => selectedAnswer;
-            set
-            {
-                selectedAnswer = value;
-                OnPropertyChanged(nameof(SelectedAnswer));
-                _ = OnSelectedAnswer();
-            }
-        }
-
-        private List<AppUserAnswer> userAnswers = new List<AppUserAnswer>();
-        private async Task OnSelectedAnswer()
-        {
-            userAnswers.Add(new AppUserAnswer
-            {
-                QuestionId = AppQuestions[currentQuestionIndex].Id,
-                AnswerId = SelectedAnswer?.Id ?? 0
-            });
-
-            currentQuestionIndex++;
-              
-            // Update to next question
-            if (currentQuestionIndex < AppQuestions.Count)
-            {
-                QuestionTitle = AppQuestions[currentQuestionIndex].QuestionText;
-                QuestionAnswers = AppQuestions[currentQuestionIndex].Answers ?? new List<AppAnswer>();
-            }
-            else
-            {
-                // All questions answered, save answers
-                if( await SaveUserAnswersAsync() )
+                if (SetProperty(ref _isLoading, value))
                 {
-                       await Shell.Current.GoToAsync("//AIGenerationRoutineView");
-                }     
+                    OnPropertyChanged(nameof(CanGoNext));
+                    OnPropertyChanged(nameof(CanGoBack));
+                }
             }
         }
 
-        private async Task<Boolean> SaveUserAnswersAsync()
+        /// <summary>
+        /// Indica si hay un error activo
+        /// </summary>
+        public bool HasError
+        {
+            get => _hasError;
+            set => SetProperty(ref _hasError, value);
+        }
+
+        /// <summary>
+        /// Mensaje de error para mostrar al usuario
+        /// </summary>
+        public string ErrorMessage
+        {
+            get => _errorMessage;
+            set => SetProperty(ref _errorMessage, value);
+        }
+
+        /// <summary>
+        /// Nombre del cuestionario
+        /// </summary>
+        public string QuestionnaireName
+        {
+            get => _questionnaireName;
+            set => SetProperty(ref _questionnaireName, value);
+        }
+
+        /// <summary>
+        /// Descripción del cuestionario
+        /// </summary>
+        public string QuestionnaireDescription
+        {
+            get => _questionnaireDescription;
+            set => SetProperty(ref _questionnaireDescription, value);
+        }
+
+        /// <summary>
+        /// Pregunta actual
+        /// </summary>
+        public QuestionDTO? CurrentQuestion
+        {
+            get => _currentQuestion;
+            set
+            {
+                if (SetProperty(ref _currentQuestion, value))
+                {
+                    OnPropertyChanged(nameof(QuestionText));
+                    OnPropertyChanged(nameof(Options));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Texto de la pregunta actual
+        /// </summary>
+        public string QuestionText => CurrentQuestion?.Text ?? string.Empty;
+
+        /// <summary>
+        /// Opciones de respuesta de la pregunta actual
+        /// </summary>
+        public ObservableCollection<OptionDTO> Options =>
+            CurrentQuestion?.Options != null
+                ? new ObservableCollection<OptionDTO>(CurrentQuestion.Options)
+                : new ObservableCollection<OptionDTO>();
+
+        /// <summary>
+        /// Opción seleccionada por el usuario
+        /// </summary>
+        public OptionDTO? SelectedOption
+        {
+            get => _selectedOption;
+            set
+            {
+                if (SetProperty(ref _selectedOption, value))
+                {
+                    OnPropertyChanged(nameof(CanGoNext));
+                    OnPropertyChanged(nameof(HasSelectedOption));
+
+                    // Limpiar texto adicional si cambia la opción
+                    if (value != _selectedOption)
+                    {
+                        AdditionalText = string.Empty;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Texto adicional opcional para la respuesta
+        /// </summary>
+        public string AdditionalText
+        {
+            get => _additionalText;
+            set => SetProperty(ref _additionalText, value);
+        }
+
+        /// <summary>
+        /// Indica si el usuario ha seleccionado una opción
+        /// </summary>
+        public bool HasSelectedOption => SelectedOption != null;
+
+        /// <summary>
+        /// Índice de la pregunta actual (basado en 0)
+        /// </summary>
+        public int CurrentQuestionIndex
+        {
+            get => _currentQuestionIndex;
+            set
+            {
+                if (SetProperty(ref _currentQuestionIndex, value))
+                {
+                    OnPropertyChanged(nameof(CurrentQuestionNumber));
+                    OnPropertyChanged(nameof(ProgressPercentage));
+                    OnPropertyChanged(nameof(ProgressText));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Número de pregunta actual (basado en 1 para mostrar al usuario)
+        /// </summary>
+        public int CurrentQuestionNumber => CurrentQuestionIndex + 1;
+
+        /// <summary>
+        /// Total de preguntas del cuestionario
+        /// </summary>
+        public int TotalQuestions
+        {
+            get => _totalQuestions;
+            set
+            {
+                if (SetProperty(ref _totalQuestions, value))
+                {
+                    OnPropertyChanged(nameof(ProgressPercentage));
+                    OnPropertyChanged(nameof(ProgressText));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Porcentaje de progreso (0.0 a 1.0)
+        /// </summary>
+        public double ProgressPercentage =>
+            TotalQuestions > 0 ? (double)CurrentQuestionNumber / TotalQuestions : 0;
+
+        /// <summary>
+        /// Texto de progreso para mostrar al usuario
+        /// </summary>
+        public string ProgressText => $"Pregunta {CurrentQuestionNumber} de {TotalQuestions}";
+
+        /// <summary>
+        /// Indica si se puede ir a la pregunta anterior
+        /// </summary>
+        public bool CanGoBack
+        {
+            get => _canGoBack;
+            set => SetProperty(ref _canGoBack, value);
+        }
+
+        /// <summary>
+        /// Indica si se puede ir a la siguiente pregunta
+        /// </summary>
+        public bool CanGoNext
+        {
+            get => _canGoNext;
+            set => SetProperty(ref _canGoNext, value);
+        }
+
+        /// <summary>
+        /// Indica si es la última pregunta
+        /// </summary>
+        public bool IsLastQuestion
+        {
+            get => _isLastQuestion;
+            set
+            {
+                if (SetProperty(ref _isLastQuestion, value))
+                {
+                    OnPropertyChanged(nameof(NextButtonText));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Texto del botón "Siguiente" (cambia en la última pregunta)
+        /// </summary>
+        public string NextButtonText => IsLastQuestion ? "Finalizar" : "Siguiente";
+
+        #endregion
+
+        #region Commands
+
+        public ICommand GoNextCommand { get; }
+        public ICommand GoBackCommand { get; }
+
+        #endregion
+
+        #region Constructor
+
+        public AppUserQuestionnaireViewModel(
+            QuestionnaireService questionnaireService,
+            long userId,
+            long questionnaireId)
+        {
+            _questionnaireService = questionnaireService ?? throw new ArgumentNullException(nameof(questionnaireService));
+            _userId = userId;
+            _questionnaireId = questionnaireId;
+
+            // Inicializar comandos
+            GoNextCommand = new Command(
+                execute: async () => await GoNextAsync(),
+                canExecute: () => HasSelectedOption && !IsLoading
+            );
+
+            GoBackCommand = new Command(
+                execute: async () => await GoBackAsync(),
+                canExecute: () => CanGoBack && !IsLoading
+            );
+
+            // Cargar datos iniciales
+            _ = InitializeAsync();
+        }
+
+        /// <summary>
+        /// Constructor sin parámetros para compatibilidad con XAML
+        /// </summary>
+        public AppUserQuestionnaireViewModel() : this(
+            App.GetService<QuestionnaireService>() ?? throw new InvalidOperationException("QuestionnaireService no registrado"),
+            Preferences.Get("UserId", 0L),
+            0L) // questionnaireId debe pasarse por parámetro de navegación
+        {
+        }
+
+        #endregion
+
+        #region Initialization
+
+        /// <summary>
+        /// Inicializa el cuestionario y carga la primera pregunta
+        /// </summary>
+        private async Task InitializeAsync()
         {
             try
             {
-                if (appUserService == null || databaseService == null || appUserQuestionnaireService == null || appUserAnswerService == null)
+                IsLoading = true;
+                HasError = false;
+                ErrorMessage = string.Empty;
+
+                Debug.WriteLine($"Inicializando cuestionario {_questionnaireId} para usuario {_userId}");
+
+                // Validar parámetros
+                if (_userId <= 0)
                 {
-                    await ErrorHandler.HandleErrorAsync("Services are not initialized.", "//ErrorView");
-                    return false;
+                    throw new InvalidOperationException("UserId no válido. Asegúrate de estar autenticado.");
                 }
 
-
-                AppUser? user = await databaseService.GetCurrentUserAsync();
-                if (user == null)
+                if (_questionnaireId <= 0)
                 {
-                    await ErrorHandler.HandleErrorAsync("No user found in the database.", "//ErrorView");
-                    return false;
+                    throw new InvalidOperationException("QuestionnaireId no válido.");
                 }
 
-                // Save questionnaire for user
-                var result = await appUserQuestionnaireService.SaveAppUserQuestionnaire(user.Id, appQuestionnaire.Id);
-                if (result == null)
+                // 1. Iniciar sesión de cuestionario
+                var response = await _questionnaireService.StartQuestionnaire(_userId, _questionnaireId);
+
+                if (response == null)
                 {
-                    await ErrorHandler.HandleErrorAsync("Failed to set questionnaire for user.", "//ErrorView",
+                    HasError = true;
+                    ErrorMessage = "No se pudo iniciar el cuestionario.";
+
+                    await ErrorHandler.HandleErrorAsync(
                         "Error",
-                        "No se pudo establecer el cuestionario para el usuario. Por favor, inténtelo más tarde.");
-                    return false;
+                        "No se pudo iniciar el cuestionario. Por favor, intenta nuevamente."
+                    );
+                    return;
                 }
 
-                // Save user answers
-                foreach (var userAnswer in userAnswers)
+                // 2. Guardar responseId para respuestas futuras
+                _responseId = response.ResponseId;
+                Debug.WriteLine($"Sesión iniciada con responseId: {_responseId}");
+
+                // 3. Mostrar primera pregunta
+                if (response.CurrentQuestion != null)
                 {
-                    var answerResult = await appUserAnswerService.SaveUserAnswer(user.Id, userAnswer.QuestionId, AppQuestionnaire.Id, userAnswer.AnswerId);
-                    if (answerResult == null)
-                    {
-                        await ErrorHandler.HandleErrorAsync("Failed to save user answer.", "//ErrorView",
-                            "Error",
-                            "No se pudo guardar la respuesta del usuario. Por favor, inténtelo más tarde.");
-                        return false;
-                    }
+                    CurrentQuestion = response.CurrentQuestion;
+                    CurrentQuestionIndex = 0;
+                    UpdateNavigationState();
+
+                    Debug.WriteLine($"Primera pregunta cargada: {CurrentQuestion.Text}");
                 }
-
-                user.RegistrationComplete = true;
-                await appUserService.MarkRegistrationComplete(user.Id); // Update on server
-                await databaseService.SaveAppUserAsync(user);   // Update locally
-
-                return true;
-
-            } catch(Exception ex)
-            {
-                await ErrorHandler.HandleErrorAsync($"Exception in SaveUserAnswersAsync: {ex.Message}", "//ErrorView",
-                    "Error",
-                    "Ha ocurrido un error al guardar las respuestas del usuario. Por favor, inténtelo más tarde.");
-                return false;
-            }
-        }
-        #endregion
-
-        public AppUserQuestionnaireViewModel()
-        {
-            _ = LoadDataForQuestionnaire();
-        }
-
-
-        # region LoadData
-        private async Task LoadDataForQuestionnaire()
-        {
-            await LoadQuestionnaireForCurrentUserAsync();
-            await LoadQuestionsForQuestionnaireAsync();
-            await LoadAnswersForQuestionsAsync();
-
-            // Init Data for first question
-            if (AppQuestions != null && AppQuestions.Count > 0)
-            {
-                QuestionTitle = AppQuestions[currentQuestionIndex].QuestionText;
-                QuestionAnswers = AppQuestions[currentQuestionIndex].Answers ?? new List<AppAnswer>();
-            }
-        }
-
-        public async Task<bool> LoadQuestionnaireForCurrentUserAsync()
-        {
-            if (databaseService == null || appUserService == null || questionService == null)
-            {
-                await ErrorHandler.HandleErrorAsync("Services are not initialized.", "//ErrorView");
-                return false;
-            }
-
-            AppUser? user = await databaseService.GetCurrentUserAsync();
-            if (user == null)
-            {
-                await ErrorHandler.HandleErrorAsync("No user found in the database.", "//ErrorView");
-                return false;
-            }
-
-            AppQuestionnaire? questionnaire = /*await appUserService.GetQuestionnaireForUserAsync(user)*/ null;
-            if (questionnaire == null)
-            {
-                await ErrorHandler.HandleErrorAsync("No questionnaire found for the current user.", "//ErrorView",
-                    "Error",
-                    "No se encontró ningún cuestionario para el usuario actual. Por favor, póngase en contacto con el soporte.");
-                return false;
-            }
-
-            AppQuestionnaire = questionnaire;
-            return true;
-        }
-
-        public async Task<bool> LoadQuestionsForQuestionnaireAsync()
-        {
-            if (databaseService == null || appUserService == null || questionService == null)
-            {
-                await ErrorHandler.HandleErrorAsync("Services are not initialized.", "//ErrorView");
-                return false;
-            }
-
-            if (AppQuestionnaire == null || AppQuestionnaire.Id <= 0)
-            {
-                await ErrorHandler.HandleErrorAsync("Questionnaire is not set or invalid.", "//ErrorView");
-                return false;
-            }
-
-            List<AppQuestion>? questions = await questionService.findQuestionsByQuestionnaireId(AppQuestionnaire.Id);
-            if (questions == null || questions.Count == 0)
-            {
-                await ErrorHandler.HandleErrorAsync("No questions found for the questionnaire.", "//ErrorView",
-                    "Error",
-                    "No se encontraron preguntas para el cuestionario. Por favor, póngase en contacto con el soporte.");
-                return false;
-            }
-
-            AppQuestions = questions;
-            return true;
-        }
-
-        public async Task<bool> LoadAnswersForQuestionsAsync()
-        {
-            if (databaseService == null || appUserService == null || questionService == null || answerService == null)
-            {
-                await ErrorHandler.HandleErrorAsync("Services are not initialized.", "//ErrorView");
-                return false;
-            }
-
-            if (AppQuestions == null || AppQuestions.Count == 0)
-            {
-                await ErrorHandler.HandleErrorAsync("Questions are not loaded.", "//ErrorView");
-                return false;
-            }
-
-            foreach (var question in AppQuestions)
-            {
-                List<AppAnswer>? answers = await answerService.findAnswersByQuestionId(question.Id);
-                if (answers == null || answers.Count == 0)
+                else
                 {
-                    await ErrorHandler.HandleErrorAsync($"No answers found for question ID {question.Id}.", "//ErrorView",
+                    HasError = true;
+                    ErrorMessage = "El cuestionario no tiene preguntas.";
+
+                    await ErrorHandler.HandleErrorAsync(
                         "Error",
-                        $"No se encontraron respuestas para la pregunta con ID {question.Id}. Por favor, póngase en contacto con el soporte.");
-                    return false;
+                        "El cuestionario no tiene preguntas disponibles."
+                    );
                 }
-                question.Answers = answers;
             }
-            return true;
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error en InitializeAsync: {ex.Message}");
+                Debug.WriteLine($"StackTrace: {ex.StackTrace}");
+
+                HasError = true;
+                ErrorMessage = "Error al cargar el cuestionario.";
+
+                await ErrorHandler.HandleErrorAsync(
+                    "Error Inesperado",
+                    "No se pudo cargar el cuestionario. Por favor, intenta nuevamente."
+                );
+            }
+            finally
+            {
+                IsLoading = false;
+            }
         }
 
         #endregion
 
-        #region ICommand
+        #region Navigation Methods
 
-        public ICommand PreviousQuestionCommand { get { return new Command(PreviousQuestion); } }
-
-        private void PreviousQuestion()
+        /// <summary>
+        /// Avanza a la siguiente pregunta o finaliza el cuestionario
+        /// </summary>
+        private async Task GoNextAsync()
         {
-            if (currentQuestionIndex > 0)
+            try
             {
-                userAnswers.RemoveAt(currentQuestionIndex - 1); // Remove last answer
-                currentQuestionIndex--;
-                // Update to previous question
-                QuestionTitle = AppQuestions[currentQuestionIndex].QuestionText;
-                QuestionAnswers = AppQuestions[currentQuestionIndex].Answers ?? new List<AppAnswer>();
+                if (SelectedOption == null)
+                {
+                    HasError = true;
+                    ErrorMessage = "Por favor, selecciona una opción.";
+                    return;
+                }
+
+                IsLoading = true;
+                HasError = false;
+                ErrorMessage = string.Empty;
+
+                Debug.WriteLine($"Respondiendo pregunta {CurrentQuestionNumber}: Opción seleccionada = {SelectedOption.Id}");
+
+                // 1. Crear request de respuesta
+                var answerRequest = new AnswerRequestDTO
+                {
+                    QuestionId = CurrentQuestion!.Id,
+                    SelectedOptionId = SelectedOption.Id,
+                    AdditionalText = string.IsNullOrWhiteSpace(AdditionalText) ? null : AdditionalText
+                };
+
+                // 2. Enviar respuesta al servidor
+                var response = await _questionnaireService.AnswerQuestion(_responseId, answerRequest);
+
+                if (response == null)
+                {
+                    HasError = true;
+                    ErrorMessage = "No se pudo guardar la respuesta.";
+
+                    await ErrorHandler.HandleErrorAsync(
+                        "Error",
+                        "No se pudo guardar tu respuesta. Por favor, intenta nuevamente."
+                    );
+                    return;
+                }
+
+                Debug.WriteLine($"Respuesta guardada. IsCompleted: {response.IsCompleted}");
+
+                // 3. Verificar si el cuestionario está completado
+                if (response.IsCompleted)
+                {
+                    Debug.WriteLine("Cuestionario completado exitosamente");
+
+                    await OnQuestionnaireCompleted();
+                    return;
+                }
+
+                // 4. Cargar siguiente pregunta
+                if (response.CurrentQuestion != null)
+                {
+                    CurrentQuestion = response.CurrentQuestion;
+                    CurrentQuestionIndex++;
+
+                    // Limpiar selección anterior
+                    SelectedOption = null;
+                    AdditionalText = string.Empty;
+
+                    UpdateNavigationState();
+
+                    Debug.WriteLine($"Siguiente pregunta cargada: {CurrentQuestion.Text}");
+                }
+                else
+                {
+                    // No debería pasar si IsCompleted es false
+                    Debug.WriteLine("Error: No hay siguiente pregunta pero IsCompleted=false");
+
+                    HasError = true;
+                    ErrorMessage = "Error al cargar la siguiente pregunta.";
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error en GoNextAsync: {ex.Message}");
+                Debug.WriteLine($"StackTrace: {ex.StackTrace}");
+
+                HasError = true;
+                ErrorMessage = "Error al procesar la respuesta.";
+
+                await ErrorHandler.HandleErrorAsync(
+                    "Error Inesperado",
+                    "No se pudo procesar tu respuesta. Por favor, intenta nuevamente."
+                );
+            }
+            finally
+            {
+                IsLoading = false;
             }
         }
 
-        #endregion 
+        /// <summary>
+        /// Retrocede a la pregunta anterior (si el backend lo soporta)
+        /// NOTA: El flujo actual del backend no soporta retroceder.
+        /// Esta funcionalidad requeriría cambios en el backend.
+        /// </summary>
+        private async Task GoBackAsync()
+        {
+            // TODO: Implementar retroceso si el backend lo soporta
+            // Por ahora, el flujo del QuestionnaireService no permite retroceder
 
-        public event PropertyChangedEventHandler? PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = "")
-            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            await ErrorHandler.HandleErrorAsync(
+                "Función No Disponible",
+                "No es posible retroceder a preguntas anteriores en este momento."
+            );
+        }
+
+        /// <summary>
+        /// Actualiza el estado de navegación (botones habilitados/deshabilitados)
+        /// </summary>
+        private void UpdateNavigationState()
+        {
+            // Por ahora, no se puede retroceder
+            CanGoBack = false; // Cambiar a true si el backend soporta retroceso
+
+            // Se puede avanzar si hay una opción seleccionada
+            CanGoNext = HasSelectedOption;
+
+            // Verificar si es la última pregunta
+            IsLastQuestion = CurrentQuestionIndex >= TotalQuestions - 1;
+
+            Debug.WriteLine($"Estado navegación - CanGoBack: {CanGoBack}, CanGoNext: {CanGoNext}, IsLastQuestion: {IsLastQuestion}");
+        }
+
+        #endregion
+
+        #region Completion
+
+        /// <summary>
+        /// Maneja la finalización del cuestionario
+        /// </summary>
+        private async Task OnQuestionnaireCompleted()
+        {
+            try
+            {
+                Debug.WriteLine($"Cuestionario {_questionnaireId} completado por usuario {_userId}");
+
+                // Mostrar mensaje de éxito
+                await ErrorHandler.HandleErrorAsync(
+                    "¡Felicitaciones!",
+                    "Has completado el cuestionario exitosamente."
+                );
+
+                // Navegar a la siguiente pantalla (generación de rutina)
+                Debug.WriteLine("Navegando a AIGenerationRoutineView");
+
+                // Pasar el responseId a la siguiente vista para generar rutina
+                await Shell.Current.GoToAsync($"//AIGenerationRoutineView?responseId={_responseId}");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error en OnQuestionnaireCompleted: {ex.Message}");
+
+                // Aunque haya error en la navegación, el cuestionario ya está completado
+                await ErrorHandler.HandleErrorAsync(
+                    "Cuestionario Completado",
+                    "Tu cuestionario se completó exitosamente, pero hubo un problema al continuar."
+                );
+            }
+        }
+
+        #endregion
+
+        #region Public Methods
+
+        /// <summary>
+        /// Reinicia el cuestionario (útil para testing o si el usuario quiere empezar de nuevo)
+        /// </summary>
+        public async Task RestartQuestionnaireAsync()
+        {
+            // Limpiar estado
+            SelectedOption = null;
+            AdditionalText = string.Empty;
+            CurrentQuestion = null;
+            CurrentQuestionIndex = 0;
+            HasError = false;
+            ErrorMessage = string.Empty;
+
+            // Volver a inicializar
+            await InitializeAsync();
+        }
+
+        #endregion
     }
 }

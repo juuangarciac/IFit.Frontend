@@ -22,11 +22,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<AuthenticationService>();
         builder.Services.AddSingleton<CoachModelTypeService>();
         builder.Services.AddSingleton<ExperienceLevelService>();
-        builder.Services.AddSingleton<AppQuestionnaireService>();
-        builder.Services.AddSingleton<AppQuestionService>();
-        builder.Services.AddSingleton<AnswerService>();
-        builder.Services.AddSingleton<AppUserQuestionnaireService>();
-        builder.Services.AddSingleton<AppUserAnswerService>();
+        builder.Services.AddSingleton<QuestionnaireService>();
         builder.Services.AddSingleton<AIRoutineService>();
         builder.Services.AddSingleton<QuestionnaireService>();
 

@@ -89,7 +89,7 @@ public class AIGenerationRoutineViewModel : INotifyPropertyChanged
                 return;
             }
 
-            var prompt = await AIRoutineService.CreateRoutinePromptForAI(appuser);
+            var prompt = string.Empty; // Revisar await AIRoutineService.GenerateRoutineFromQuestionnaire(appuser)
             if (prompt == null)
             {
                 await ErrorHandler.HandleErrorAsync(
@@ -100,7 +100,7 @@ public class AIGenerationRoutineViewModel : INotifyPropertyChanged
                 return;
             }
 
-            await AIRoutineService.GenerateRoutineFromAI(appuser, prompt);
+            // Revisar await AIRoutineService.GenerateRoutineFromQuestionnaire(prompt); 
 
             // Si llegamos aquí, la generación fue exitosa
             IsGenerating = false;

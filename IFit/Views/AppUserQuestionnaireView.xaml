@@ -59,7 +59,7 @@
                Style="{StaticResource label-h1-white}" />
 
         <!-- AppAnswers -->
-        <CollectionView Grid.Row="2"
+        <!--  <CollectionView Grid.Row="2"
                          ItemsSource="{Binding QuestionAnswers}"
                          SelectionMode="Single"
                          SelectedItem="{Binding SelectedAnswer, Mode=TwoWay}"
@@ -82,7 +82,6 @@
                                      Radius="{DynamicResource CornerRadiusRectangle}" />
                         </Border.Shadow>
 
-                        <!-- Card -->
                         <Grid Margin="10"
                                RowSpacing="5"
                                BackgroundColor="Transparent">
@@ -90,8 +89,7 @@
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
-
-                            <!-- Answer -->
+                            
                             <Label Grid.Column="0"
                                     Text="{Binding AnswerText}"
                                     Style="{DynamicResource label-h1-white}" />
@@ -100,6 +98,6 @@
                     </Border>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
-        </CollectionView>
+        </CollectionView> -->
     </Grid>
 </ContentPage>
