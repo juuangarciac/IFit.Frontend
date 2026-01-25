@@ -85,7 +85,7 @@ namespace IFit.Services
 
                 var request = new RegisterRequestDto
                 {
-                    Name = name,
+                    Name = name,  
                     Email = email,
                     Password = password
                 };
@@ -96,10 +96,22 @@ namespace IFit.Services
                     requiresAuth: false
                 );
 
+                // Manejo de errores específicos de registro
                 if (!response.Success)
                 {
-                    Debug.WriteLine($"Error en registro: {response.ErrorMessage}");
-                    return null;
+                    var error = response.StatusCode switch
+                    {
+                        400 => "Los datos proporcionados no son válidos. Verifica tu email y contraseña.",
+                        409 => "Este email ya está registrado.",
+                        500 => "Tenemos problemas en nuestros servidores. Inténtalo de nuevo en unos minutos.",
+                        503 => "El servicio no está disponible temporalmente. Por favor, inténtalo más tarde.",
+                        _ => response.ErrorMessage ?? "No pudimos completar tu registro. Inténtalo de nuevo."
+                    };
+
+                    AuthResponse registerResponse = new AuthResponse();
+                    registerResponse.ErrorMessage = error;
+
+                    return registerResponse;
                 }
 
                 // Guardar los tokens automáticamente

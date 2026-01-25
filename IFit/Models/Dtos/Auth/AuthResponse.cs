@@ -27,5 +27,11 @@ namespace IFit.Models.Dtos.Auth
 
         [JsonPropertyName("appUser")]
         public AppUserResponseDto? AppUser { get; set; }
+
+        /// <summary>
+        /// Gestionar mensaje de error recibido desde la API.
+        /// </summary>
+        [JsonIgnore]
+        public string ErrorMessage { get; set; } = string.Empty;
     }
 }

@@ -353,7 +353,7 @@ namespace IFit.ViewModels
                 if (response == null)
                 {
                     CurrentState = RegistrationState.Error;
-                    ErrorMessage = "No se pudo crear la cuenta. El email podría estar ya registrado.";
+                    ErrorMessage = "No se pudo crear la cuenta. Por favor, inténtalo más tarde.";
 
                     Debug.WriteLine("Registro fallido: Respuesta nula del servidor");
 
@@ -363,7 +363,9 @@ namespace IFit.ViewModels
                 if (response.AppUser == null)
                 {
                     CurrentState = RegistrationState.Error;
-                    ErrorMessage = "Error al obtener datos del usuario.";
+                    ErrorMessage = (!string.IsNullOrEmpty(response.ErrorMessage)) 
+                        ? response.ErrorMessage 
+                        : "No se pudo crear la cuenta. El email podría estar ya registrado.";
 
                     Debug.WriteLine("Registro fallido: AppUser es null");
 
