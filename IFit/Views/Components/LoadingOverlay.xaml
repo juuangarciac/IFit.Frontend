@@ -4,7 +4,7 @@
              x:Class="IFit.Views.Components.LoadingOverlay"
              x:Name="loadingOverlay">
     <Grid IsVisible="{Binding IsLoading, Source={x:Reference loadingOverlay}}"
-          BackgroundColor="#80000000">
+          BackgroundColor="#40000000">
 
         <VerticalStackLayout VerticalOptions="Center"
                             HorizontalOptions="Center">
@@ -19,7 +19,7 @@
                 <VerticalStackLayout Spacing="15">
                     <!-- Spinner -->
                     <ActivityIndicator IsRunning="{Binding IsLoading, Source={x:Reference loadingOverlay}}"
-                                      Color="{StaticResource Primary}"
+                                      Color="{StaticResource TertiaryColor}"
                                       HeightRequest="50"
                                       WidthRequest="50"/>
 

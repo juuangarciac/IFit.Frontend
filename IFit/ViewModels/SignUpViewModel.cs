@@ -6,7 +6,6 @@ using IFit.Validations.Rules;
 using Plugin.ValidationRules;
 using System.Diagnostics;
 using System.Text;
-using System.Xml.Linq;
 
 namespace IFit.ViewModels
 {
@@ -43,31 +42,31 @@ namespace IFit.ViewModels
         /// Nombre del usuario
         /// </summary>
         [ObservableProperty]
-        private string _name = string.Empty;
+        public partial string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// Email del usuario
         /// </summary>
         [ObservableProperty]
-        private string _email = string.Empty;
+        public partial string Email { get; set; } = string.Empty;
 
         /// <summary>
         /// Contraseña del usuario
         /// </summary>
         [ObservableProperty]
-        private string _password = string.Empty;
+        public partial string Password { get; set; } = string.Empty;
 
         /// <summary>
         /// Estado actual del proceso de registro
         /// </summary>
         [ObservableProperty]
-        private RegistrationState _currentState = RegistrationState.Idle;
+        public partial RegistrationState CurrentState { get; set; } = RegistrationState.Idle;
 
         /// <summary>
         /// Mensaje de error para mostrar al usuario
         /// </summary>
         [ObservableProperty]
-        private string _errorMessage = string.Empty;
+        public partial string ErrorMessage { get; set; } = string.Empty;
 
         #endregion
 
@@ -226,15 +225,15 @@ namespace IFit.ViewModels
                     CurrentState = RegistrationState.Error;
                     ErrorMessage = validationError;
 
-                    if (App.Current?.MainPage != null)
-                    {
-                        await App.Current.MainPage.DisplayAlert("Error de Validación", validationError, "OK");
-                    }
+                    Debug.WriteLine($"Validación fallida: {validationError}");
+
                     return;
                 }
 
-                // 2. Intentar registro
+                // 2. Cambiar estado a Registering
                 CurrentState = RegistrationState.Registering;
+
+                // 3. Intentar registrar
                 var response = await TryRegisterAsync();
                 if (response == null)
                 {
@@ -243,11 +242,12 @@ namespace IFit.ViewModels
 
                 Debug.WriteLine($"Registro exitoso para usuario: {response.AppUser?.Email}");
 
-                // 3. Guardar datos de sesión
+                // 4. Guardar datos de sesión
                 await SaveRegistrationData(response);
 
-                // 4. Marcar como exitoso y navegar
+                // 5. Marcar como exitoso y navegar
                 CurrentState = RegistrationState.Success;
+
                 Debug.WriteLine("Navegando a VerificationView");
                 await Shell.Current.GoToAsync("///VerificationView");
             }
@@ -258,33 +258,15 @@ namespace IFit.ViewModels
 
                 CurrentState = RegistrationState.Error;
                 ErrorMessage = "Ocurrió un error inesperado. Por favor, intenta de nuevo.";
-
-                if (App.Current?.MainPage != null)
-                {
-                    await App.Current.MainPage.DisplayAlert(
-                        "Error Inesperado",
-                        "No se pudo completar el registro. Por favor, intenta nuevamente.",
-                        "OK"
-                    );
-                }
-            }
-            finally
-            {
-                // Asegurar que no quede en Loading si algo falla
-                if (CurrentState == RegistrationState.Registering || CurrentState == RegistrationState.Validating)
-                {
-                    CurrentState = RegistrationState.Error;
-                }
             }
         }
 
         /// <summary>
-        /// Determina si se puede ejecutar el comando de registro
+        /// Determina si el comando Register puede ejecutarse
         /// </summary>
         private bool CanRegister()
         {
-            return !IsLoading
-                   && !string.IsNullOrWhiteSpace(Name)
+            return !string.IsNullOrWhiteSpace(Name)
                    && !string.IsNullOrWhiteSpace(Email)
                    && !string.IsNullOrWhiteSpace(Password);
         }
@@ -375,15 +357,6 @@ namespace IFit.ViewModels
 
                     Debug.WriteLine("Registro fallido: Respuesta nula del servidor");
 
-                    if (App.Current?.MainPage != null)
-                    {
-                        await App.Current.MainPage.DisplayAlert(
-                            "Error de Registro",
-                            "No se pudo crear la cuenta. Por favor, verifica que el email no esté ya registrado.",
-                            "OK"
-                        );
-                    }
-
                     return null;
                 }
 
@@ -393,15 +366,6 @@ namespace IFit.ViewModels
                     ErrorMessage = "Error al obtener datos del usuario.";
 
                     Debug.WriteLine("Registro fallido: AppUser es null");
-
-                    if (App.Current?.MainPage != null)
-                    {
-                        await App.Current.MainPage.DisplayAlert(
-                            "Error",
-                            "No se pudieron obtener los datos del usuario.",
-                            "OK"
-                        );
-                    }
 
                     return null;
                 }
@@ -415,15 +379,6 @@ namespace IFit.ViewModels
                 ErrorMessage = "Error de conexión. Por favor, verifica tu conexión a internet.";
 
                 Debug.WriteLine($"Excepción en TryRegisterAsync: {ex.Message}");
-
-                if (App.Current?.MainPage != null)
-                {
-                    await App.Current.MainPage.DisplayAlert(
-                        "Error de Conexión",
-                        "No se pudo conectar con el servidor. Por favor, verifica tu conexión a internet.",
-                        "OK"
-                    );
-                }
 
                 return null;
             }

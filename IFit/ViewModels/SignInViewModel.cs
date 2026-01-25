@@ -39,25 +39,25 @@ namespace IFit.ViewModels
         /// Email del usuario
         /// </summary>
         [ObservableProperty]
-        private string _email = string.Empty;
+        public partial string Email { get; set; } = string.Empty;
 
         /// <summary>
         /// Contraseña del usuario
         /// </summary>
         [ObservableProperty]
-        private string _password = string.Empty;
+        public partial string Password { get; set; } = string.Empty;
 
         /// <summary>
         /// Estado actual del proceso de login
         /// </summary>
         [ObservableProperty]
-        private LoginState _currentState = LoginState.Idle;
+        public partial LoginState CurrentState { get; set; } = LoginState.Idle;
 
         /// <summary>
         /// Mensaje de error para mostrar al usuario
         /// </summary>
         [ObservableProperty]
-        private string _errorMessage = string.Empty;
+        public partial string ErrorMessage { get; set; } = string.Empty;
 
         #endregion
 
@@ -225,30 +225,17 @@ namespace IFit.ViewModels
 
                 CurrentState = LoginState.Error;
                 ErrorMessage = "Ocurrió un error inesperado. Por favor, intenta de nuevo.";
-
-                await ErrorHandler.HandleErrorAsync(
-                    "Error Inesperado",
-                    "No se pudo completar el inicio de sesión. Por favor, intenta nuevamente."
-                );
-            }
-            finally
-            {
-                // Asegurar que no quede en Loading si algo falla
-                if (CurrentState == LoginState.Loading)
-                {
-                    CurrentState = LoginState.Error;
-                }
             }
         }
 
         /// <summary>
-        /// Determina si se puede ejecutar el comando de login
+        /// Determina si el comando SignIn puede ejecutarse
         /// </summary>
         private bool CanSignIn()
         {
-            return !IsLoading
-                   && !string.IsNullOrWhiteSpace(Email)
-                   && !string.IsNullOrWhiteSpace(Password);
+            return !string.IsNullOrWhiteSpace(Email)
+                   && !string.IsNullOrWhiteSpace(Password)
+                   && CurrentState != LoginState.Loading;
         }
 
         #endregion
@@ -256,37 +243,37 @@ namespace IFit.ViewModels
         #region Validation Methods
 
         /// <summary>
-        /// Valida que los campos de entrada sean correctos
+        /// Valida los campos de entrada antes del login
         /// </summary>
         private bool ValidateInputs()
         {
-            // Validar email
+            // Email validation
             if (string.IsNullOrWhiteSpace(Email))
             {
                 CurrentState = LoginState.Error;
-                ErrorMessage = "El email es obligatorio.";
+                ErrorMessage = "Por favor, ingresa tu email.";
                 return false;
             }
 
             if (!IsValidEmail(Email))
             {
                 CurrentState = LoginState.Error;
-                ErrorMessage = "El formato del email no es válido.";
+                ErrorMessage = "Por favor, ingresa un email válido.";
                 return false;
             }
 
-            // Validar contraseña
+            // Password validation
             if (string.IsNullOrWhiteSpace(Password))
             {
                 CurrentState = LoginState.Error;
-                ErrorMessage = "La contraseña es obligatoria.";
+                ErrorMessage = "Por favor, ingresa tu contraseña.";
                 return false;
             }
 
-            if (Password.Length < 6)
+            if (Password.Length < 8)
             {
                 CurrentState = LoginState.Error;
-                ErrorMessage = "La contraseña debe tener al menos 6 caracteres.";
+                ErrorMessage = "La contraseña debe tener al menos 8 caracteres.";
                 return false;
             }
 
@@ -294,7 +281,7 @@ namespace IFit.ViewModels
         }
 
         /// <summary>
-        /// Valida formato de email
+        /// Valida si un email tiene formato correcto
         /// </summary>
         private bool IsValidEmail(string email)
         {
@@ -330,12 +317,6 @@ namespace IFit.ViewModels
                     ErrorMessage = "Credenciales incorrectas. Por favor, verifica tu email y contraseña.";
 
                     Debug.WriteLine("Login fallido: Respuesta nula del servidor");
-
-                    await ErrorHandler.HandleErrorAsync(
-                        "Error de Inicio de Sesión",
-                        "No se pudo iniciar sesión. Por favor, verifica tus credenciales."
-                    );
-
                     return null;
                 }
 
@@ -345,11 +326,6 @@ namespace IFit.ViewModels
                     ErrorMessage = "Error al obtener datos del usuario.";
 
                     Debug.WriteLine("Login fallido: AppUser es null");
-
-                    await ErrorHandler.HandleErrorAsync(
-                        "Error",
-                        "No se pudieron obtener los datos del usuario."
-                    );
 
                     return null;
                 }
@@ -364,11 +340,6 @@ namespace IFit.ViewModels
 
                 Debug.WriteLine($"Excepción en TryLoginAsync: {ex.Message}");
 
-                await ErrorHandler.HandleErrorAsync(
-                    "Error de Conexión",
-                    "No se pudo conectar con el servidor. Por favor, verifica tu conexión a internet."
-                );
-
                 return null;
             }
         }
@@ -382,7 +353,7 @@ namespace IFit.ViewModels
             {
                 Debug.WriteLine($"Guardando datos de login para usuario: {dto.Email}");
 
-                // Guardar en Preferences para acceso rápido
+                // Guarda en Preferences para acceso rápido
                 Preferences.Set("UserId", dto.Id);
                 Preferences.Set("UserEmail", dto.Email);
                 Preferences.Set("Name", dto.Name);
@@ -430,12 +401,10 @@ namespace IFit.ViewModels
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error en HandleVerificationAsync: {ex.Message}");
+                CurrentState = LoginState.Error;
+                ErrorMessage = "No se pudo verificar el estado del usuario. Por favor, intenta nuevamente.";
 
-                await ErrorHandler.HandleErrorAsync(
-                    "Error",
-                    "No se pudo verificar el estado del usuario. Por favor, intenta nuevamente."
-                );
+                Debug.WriteLine($"Error en HandleVerificationAsync: {ex.Message}");
 
                 return false;
             }
@@ -466,12 +435,10 @@ namespace IFit.ViewModels
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error en HandleUserCoachAndExperienceLevel: {ex.Message}");
+                CurrentState = LoginState.Error;
+                ErrorMessage = "No se pudo verificar la configuración del usuario.";
 
-                await ErrorHandler.HandleErrorAsync(
-                    "Error",
-                    "No se pudo verificar la configuración del usuario."
-                );
+                Debug.WriteLine($"Error en HandleUserCoachAndExperienceLevel: {ex.Message}");
 
                 return false;
             }

@@ -8,16 +8,13 @@
              Title="SignInView"
              Shell.NavBarIsVisible="False"
              BackgroundColor="{StaticResource BackgroundPrimaryDark}">
-
     <!-- Inyección del ViewModel -->
     <ContentPage.BindingContext>
         <vm:SignInViewModel />
     </ContentPage.BindingContext>
-
     <Grid>
         <!-- Contenido principal - Visible cuando NO está cargando -->
-        <ScrollView BackgroundColor="{StaticResource BackgroundPrimaryDark}"
-                    IsVisible="{Binding IsLoading, Converter={StaticResource InvertedBoolConverter}}">
+        <ScrollView BackgroundColor="{StaticResource BackgroundPrimaryDark}">
 
             <Grid Style="{StaticResource BasicGrid}"
                   HorizontalOptions="Fill"
