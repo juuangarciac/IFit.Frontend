@@ -11,7 +11,7 @@ namespace IFit.XUnit.Integration.Services
     /// Pruebas de integración para AppUserService
     /// 
     /// REQUISITOS:
-    /// - Servidor Spring Boot corriendo en http://192.168.1.72:8080
+    /// - Servidor Spring Boot corriendo en http://192.168.1.98:8080
     /// - Keycloak activo
     /// - Usuario de prueba registrado y autenticado
     /// 
@@ -26,7 +26,7 @@ namespace IFit.XUnit.Integration.Services
         private readonly WebService _webService;
 
         // Configuración de tu API
-        private const string API_BASE_URL = "http://192.168.1.72:8080/ifit/api/v1";
+        private const string API_BASE_URL = "http://192.168.1.98:8080/ifit/api/v1";
         private const string REFRESH_ENDPOINT = "/auth/refresh";
 
         // Credenciales de usuario de prueba

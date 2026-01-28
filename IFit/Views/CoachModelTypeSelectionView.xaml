@@ -2,7 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"  
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"  
              xmlns:vm="clr-namespace:IFit.ViewModels"  
-             xmlns:models="clr-namespace:IFit.Models"
+             xmlns:models="clr-namespace:IFit.Models.Dtos.Coach"
              x:Class="IFit.Views.CoachModelTypeSelectionView"  
              Title="CoachModelTypeSelectionView"  
              Shell.NavBarIsVisible="False"  
@@ -12,7 +12,7 @@
     </ContentPage.BindingContext>  
     <Grid BackgroundColor="{StaticResource BackgroundPrimaryDark}"  
           Margin="15"  
-          RowSpacing="15">  
+          RowSpacing="10">  
         <Grid.RowDefinitions>  
             <RowDefinition Height="Auto" />  
             <RowDefinition Height="Auto" />  
@@ -66,7 +66,7 @@
 
 
         <!-- CoachModelTypes -->
-        <!-- <CollectionView Grid.Row="2"
+        <CollectionView Grid.Row="2"
                 ItemsSource="{Binding CoachModelTypes}"
                 SelectionMode="Single"
                 SelectedItem="{Binding SelectedCoachModelType, Mode=TwoWay}"
@@ -121,7 +121,7 @@
                     </Border>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
-        </CollectionView> -->
+        </CollectionView>
 
     </Grid>  
 </ContentPage>

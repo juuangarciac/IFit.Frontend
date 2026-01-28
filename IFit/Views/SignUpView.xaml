@@ -13,7 +13,7 @@
         <vm:SignUpViewModel />
     </ContentPage.BindingContext>
     <Grid>
-        <!-- Contenido principal - Visible cuando NO está cargando -->
+        <!-- Contenido principal -->
         <ScrollView BackgroundColor="{StaticResource BackgroundPrimaryDark}">
 
             <Grid Style="{StaticResource BasicGrid}"

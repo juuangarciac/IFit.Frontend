@@ -1,99 +1,161 @@
+锘縰sing CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using IFit.Models.Dtos;
+using IFit.Models.Dtos.Auth;
 using IFit.Services;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace IFit.ViewModels;
 
-public class VerificationViewModel : INotifyPropertyChanged
+public partial class VerificationViewModel : ObservableObject
 {
-    private AuthenticationService authenticationService;
+    #region Fields
+    [ObservableProperty]
+    public partial string Email { get; set; } = string.Empty;
 
-    private string _email = string.Empty;
-    private string _verificationCode = string.Empty;
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(VerifyEmailCommand))]
+    public partial string VerificationCode { get; set; } = string.Empty;
 
-    public string Email
+    #endregion
+
+    #region Services
+
+    private readonly AuthenticationService authenticationService;
+
+    #endregion
+
+    #region Enums
+
+    public enum RegistrationState
     {
-        get => _email;
-        set
-        {
-            if (_email != value)
-            {
-                _email = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-    public string VerificationCode
-    {
-        get => _verificationCode;
-        set
-        {
-            if (_verificationCode != value)
-            {
-                _verificationCode = value;
-                OnPropertyChanged();
-            }
-        }
+        Idle,
+        Verifying,
+        Verified,
+        Error
     }
 
-    public VerificationViewModel()
-	{
-        /* authenticationService = new AuthenticationService(); */
+    #endregion
 
-        LoadUserEmail();
-        VerifyEmailCommand = new Command(VerifyEmail);
+    #region Properties
+
+    /// <summary>
+    /// Estado actual del proceso de registro
+    /// </summary>
+    [ObservableProperty]
+    public partial RegistrationState CurrentState { get; set; } = RegistrationState.Idle;
+
+    /// <summary>
+    /// Mensaje de error para mostrar al usuario
+    /// </summary>
+    [ObservableProperty]
+    public partial string ErrorMessage { get; set; } = string.Empty;
+
+    #endregion
+
+    #region Constructor 
+    /// <summary>
+    /// Consutrctor con inyecci贸n de dependencias
+    /// </summary>
+
+    public VerificationViewModel(AuthenticationService authenticationService)
+    {
+        this.authenticationService = authenticationService ?? throw new ArgumentNullException(nameof(authenticationService));
     }
 
-    private async void LoadUserEmail()
+    /// <summary>
+    /// Constructor sin par谩metros para compatibilidad con XAML
+    /// </summary>
+    public VerificationViewModel() : this(
+        App.GetService<AuthenticationService>() ?? throw new InvalidOperationException("AuthenticationService no registrado"))
     {
-        var defaultValue = "NOT_FOUND";
-        Email = Preferences.Get("UserEmail", defaultValue);
+        // Cargar email desde preferencias
+        Email = Preferences.Get("UserEmail", string.Empty);
         Console.WriteLine("UserEmail: " + Email + " found.");
-
-        if (Email == defaultValue)
-        {
-            await Shell.Current.GoToAsync("///ErrorView");
-        }
     }
 
-    public ICommand VerifyEmailCommand { get; }
+    #endregion
 
-    public async void VerifyEmail()
+    #region Commands
+
+    /// <summary>
+    /// Verifica el correo electr贸nico del usuario
+    /// </summary>
+    [RelayCommand(CanExecute = nameof(CanVerifyEmail))]
+    public async Task VerifyEmailAsync()
     {
-        if (string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(VerificationCode))
+        CurrentState = RegistrationState.Verifying;
+        try
         {
-            if(App.Current?.MainPage != null)
+            //  Obtener password de forma async 
+            string password = await SecureStorage.GetAsync("UserPassword") ?? string.Empty;
+
+            if (string.IsNullOrEmpty(password))
             {
-                await App.Current.MainPage.DisplayAlert("Error", "Por favor, complete todos los campos.", "OK");
-
+                ErrorMessage = "No se encontr贸 la contrase帽a almacenada.";
+                return;
             }
-            return;
-        }
 
-        EmailValidationResponseDto emailValidationResponse = /* await authenticationService.VerifyEmail(Email, VerificationCode) */ new EmailValidationResponseDto();
+            //  Usar la tupla para obtener el resultado
+            var (success, authData, errorMessage) = await authenticationService.VerifyEmailAsync(
+                Email,
+                VerificationCode,
+                password
+            );
 
-        if (emailValidationResponse == null || !emailValidationResponse.isVerified)
-        {
-            if (App.Current?.MainPage != null)
+            if (success && authData != null)
             {
-                await App.Current.MainPage.DisplayAlert("Error", "Error al verificar el correo electr髇ico. Int閚talo de nuevo.", "OK");
-            }
-            return;
-        }
+                // Verificaci贸n exitosa
+                Console.WriteLine($"Email verificado correctamente para: {Email}");
 
-        if (App.Current?.MainPage != null)
+                // Limpiar credenciales temporales
+                SecureStorage.Remove("UserPassword");
+
+                // Navegar a la pantalla ExperienceLevelSelectionView
+                await Shell.Current.GoToAsync("///ExperienceLevelSelectionView");
+            }
+            else
+            {
+                //  Error en la verificaci贸n
+                ErrorMessage = errorMessage ?? "C贸digo de verificaci贸n inv谩lido";
+
+                await Application.Current.MainPage.DisplayAlert(
+                    "Error de verificaci贸n",
+                    ErrorMessage,
+                    "OK"
+                );
+            }
+        }
+        catch (Exception ex)
         {
-            await App.Current.MainPage.DisplayAlert("蓌ito", "Correo electr髇ico verificado correctamente.", "OK");
-            await Shell.Current.GoToAsync("///GetStartedView");
+            CurrentState = RegistrationState.Error;
+            ErrorMessage = "Error de conexi贸n. Por favor, intenta de nuevo.";
+            Debug.WriteLine($" Excepci贸n en VerifyEmailAsync: {ex.Message}");
+
+            await Application.Current.MainPage.DisplayAlert(
+                "Error",
+                ErrorMessage,
+                "OK"
+            );
+        }
+        finally
+        {
+            CurrentState = RegistrationState.Verified;
         }
     }
 
-    public event PropertyChangedEventHandler PropertyChanged;
+    private Boolean CanVerifyEmail()
+    {
+        return !string.IsNullOrWhiteSpace(VerificationCode);
+    }
 
-    protected void OnPropertyChanged([CallerMemberName] string propertyName = "")
-        => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    #endregion
 
+    #region Private Methods
+
+    #endregion
 }

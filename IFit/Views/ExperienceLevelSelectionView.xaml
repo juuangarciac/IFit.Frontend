@@ -2,111 +2,116 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="IFit.Views.ExperienceLevelSelectionView"
+             xmlns:components="clr-namespace:IFit.Views.Components"
              xmlns:vm="clr-namespace:IFit.ViewModels"  
-             xmlns:models="clr-namespace:IFit.Models"
+             xmlns:models="clr-namespace:IFit.Models.Dtos.ExperienceLevel"
              Shell.NavBarIsVisible="False"
              BackgroundColor="{StaticResource BackgroundPrimaryDark}">
     <ContentPage.BindingContext>
         <vm:ExperienceLevelViewModel/>
     </ContentPage.BindingContext>
-    <Grid BackgroundColor="{StaticResource BackgroundPrimaryDark}"  
-      Margin="15"  
-      RowSpacing="15">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
+    <Grid Margin="15">
+        <!-- Main Content -->
+        <Grid RowSpacing="15">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
 
-        <!-- Header-->
-        <Grid Grid.Row="0">
+            <!-- Header-->
+            <Grid Grid.Row="0">
 
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
 
-            <!-- Go Back -->
-            <Button Grid.Column="0"   
-                HorizontalOptions="Center"  
-                VerticalOptions="Center"  
-                BackgroundColor="Transparent"  
-                ImageSource="arrow.png"  
-                Clicked="onCancelClicked" />
+                <!-- Go Back -->
+                <Button Grid.Column="0"   
+                    HorizontalOptions="Center"  
+                    VerticalOptions="Center"  
+                    BackgroundColor="Transparent"  
+                    ImageSource="arrow.png"  
+                    Clicked="onCancelClicked" />
 
-            <!-- Center line -->
-            <Border Grid.Column="1"  
-                BackgroundColor="{StaticResource TextSecondaryColorLight}"  
-                VerticalOptions="Center"  
-                WidthRequest="120"   
-                StrokeThickness="1"/>
+                <!-- Center line -->
+                <Border Grid.Column="1"  
+                    BackgroundColor="{StaticResource TextSecondaryColorLight}"  
+                    VerticalOptions="Center"  
+                    WidthRequest="120"   
+                    StrokeThickness="1"/>
 
-            <!-- Cancel button  -->
-            <Button Grid.Column="2"   
-                HorizontalOptions="Center"  
-                VerticalOptions="Center"  
-                BackgroundColor="Transparent"  
-                ImageSource="cancel.svg"  
-                Clicked="onCancelClicked" />
-        </Grid>
+                <!-- Cancel button  -->
+                <Button Grid.Column="2"   
+                    HorizontalOptions="Center"  
+                    VerticalOptions="Center"  
+                    BackgroundColor="Transparent"  
+                    ImageSource="cancel.svg"  
+                    Clicked="onCancelClicked" />
+            </Grid>
 
-        <!-- Title -->
-        <Label Grid.Row="1">
-            <Label.FormattedText>
-                <FormattedString>
-                    <Span Text="¿Que experiencia tienes en el mundo fitness? " 
-                       Style="{StaticResource label-h1-white}" />
-                </FormattedString>
-            </Label.FormattedText>
-        </Label>
+            <!-- Title -->
+            <Label Grid.Row="1">
+                <Label.FormattedText>
+                    <FormattedString>
+                        <Span Text="¿Que experiencia tienes en el mundo fitness? " 
+                           Style="{StaticResource label-h1-white}" />
+                    </FormattedString>
+                </Label.FormattedText>
+            </Label>
 
 
-        <!-- Experience Levels -->
-        <!-- <CollectionView Grid.Row="2"
-            ItemsSource="{Binding ExperienceLevels}"
-            SelectionMode="Single"
-            SelectedItem="{Binding SelectedExperienceLevel, Mode=TwoWay}"
-            Margin="0,0,0,15">
-
-            <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="models:ExperienceLevel">
-                    <Border StrokeThickness="2"
-                Stroke="{DynamicResource BackgroundPrimaryLight}"
-                BackgroundColor="{DynamicResource PrimaryColorLightOpacity}"
+            <!-- Experience Levels -->
+            <CollectionView Grid.Row="2"
+                ItemsSource="{Binding ExperienceLevels}"
+                SelectionMode="Single"
+                SelectedItem="{Binding SelectedExperienceLevel, Mode=TwoWay}"
                 Margin="0,0,0,15">
 
-                        <Border.StrokeShape>
-                            <RoundRectangle CornerRadius="{DynamicResource CornerRadiusRectangle}" />
-                        </Border.StrokeShape>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:ExperienceLevelDto">
+                        <Border StrokeThickness="2"
+                    Stroke="{DynamicResource BackgroundPrimaryLight}"
+                    BackgroundColor="{DynamicResource PrimaryColorLightOpacity}"
+                    Margin="0,0,0,15">
 
-                        <Border.Shadow>
-                            <Shadow Brush="{DynamicResource BackgroundPrimaryLight}"
-                        Opacity="0.35"
-                        Radius="{DynamicResource CornerRadiusRectangle}" />
-                        </Border.Shadow>
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="{DynamicResource CornerRadiusRectangle}" />
+                            </Border.StrokeShape>
 
-                        <Grid Margin="10"
-                  RowSpacing="5"
-                  BackgroundColor="Transparent">
+                            <Border.Shadow>
+                                <Shadow Brush="{DynamicResource BackgroundPrimaryLight}"
+                            Opacity="0.35"
+                            Radius="{DynamicResource CornerRadiusRectangle}" />
+                            </Border.Shadow>
 
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
+                            <Grid Margin="10"
+                      RowSpacing="5"
+                      BackgroundColor="Transparent">
 
-                            <Label Grid.Column="0"
-                           Text="{Binding Name}"
-                           Style="{DynamicResource label-h1-white}" />
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
 
-                            <Label Grid.Row="1"
-                       Text="{Binding Description}"
-                       Style="{DynamicResource label-p-white}" />
-                        </Grid>
-                    </Border>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView> -->
+                                <Label Grid.Column="0"
+                               Text="{Binding Name}"
+                               Style="{DynamicResource label-h1-white}" />
 
+                                <Label Grid.Row="1"
+                           Text="{Binding Description}"
+                           Style="{DynamicResource label-p-white}" />
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </Grid>
+        
+        <!-- Loading Overlay component -->
+        <components:LoadingOverlay IsLoading="{Binding IsLoading}"
+                                  Message="{Binding StatusMessage}"/>
     </Grid>
 </ContentPage>

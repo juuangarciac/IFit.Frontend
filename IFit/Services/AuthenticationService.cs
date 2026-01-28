@@ -71,7 +71,7 @@ namespace IFit.Services
         /// Registra un nuevo usuario en el sistema
         /// Realiza login automático después del registro exitoso
         /// </summary>
-        public async Task<AuthResponse?> RegisterAsync(string name, string email, string password)
+        public async Task<RegisterResponseDto?> RegisterAsync(string name, string email, string password)
         {
             try
             {
@@ -90,7 +90,7 @@ namespace IFit.Services
                     Password = password
                 };
 
-                var response = await _webService.PostAsync<RegisterRequestDto, AuthResponse>(
+                var response = await _webService.PostAsync<RegisterRequestDto, RegisterResponseDto>(
                     "/auth/register",
                     request,
                     requiresAuth: false
@@ -108,16 +108,10 @@ namespace IFit.Services
                         _ => response.ErrorMessage ?? "No pudimos completar tu registro. Inténtalo de nuevo."
                     };
 
-                    AuthResponse registerResponse = new AuthResponse();
-                    registerResponse.ErrorMessage = error;
-
-                    return registerResponse;
-                }
-
-                // Guardar los tokens automáticamente
-                if (response.Data != null)
-                {
-                    await _webService.SaveAuthenticationAsync(response.Data);
+                    return new RegisterResponseDto
+                    {
+                        Message = error
+                    };
                 }
 
                 return response.Data;
@@ -220,6 +214,48 @@ namespace IFit.Services
                 Debug.WriteLine($"Excepción en LogoutAsync: {ex.Message}");
                 await _webService.LogoutAsync();
                 return false;
+            }
+        }
+
+        /// <summary>
+        /// Verificar email con código de verificación y login automático
+        /// </summary>
+        public async Task<(bool Success, AuthResponse? Data, string? ErrorMessage)> VerifyEmailAsync(string email, string code, string password)
+        {
+            try
+            {
+                  var request = new VerifyRequestDto
+                {
+                    Email = email,
+                    VerificationCode = code,
+                    Password = password
+                };
+
+                var response = await _webService.PostAsync<VerifyRequestDto, AuthResponse>(
+                    "/auth/verify",
+                    request,
+                    requiresAuth: false
+                );
+
+                if (!response.Success)
+                {
+                    Debug.WriteLine($"Error en verify: {response.ErrorMessage}");
+                    // Retornar el mensaje de error de la API
+                    return (false, null, response.ErrorMessage);
+                }
+
+                // Guardar los tokens automáticamente
+                if (response.Data != null)
+                {
+                    await _webService.SaveAuthenticationAsync(response.Data);
+                }
+
+                return (true, response.Data, null);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Excepción en verify: {ex.Message}");
+                return (false, null, "Error de conexión. Por favor, intenta de nuevo.");
             }
         }
 

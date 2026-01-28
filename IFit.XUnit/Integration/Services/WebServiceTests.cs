@@ -28,7 +28,7 @@ namespace IFit.XUnit.Integration.Services
     public class WebServiceIntegrationTests
     {
         private readonly WebService _webService;
-        private const string API_BASE_URL = "http://192.168.1.72:8080/ifit/api/v1";
+        private const string API_BASE_URL = "http://192.168.1.98:8080/ifit/api/v1";
         private const string REFRESH_ENDPOINT = "/auth/refresh";
 
         // Datos del usuario de prueba

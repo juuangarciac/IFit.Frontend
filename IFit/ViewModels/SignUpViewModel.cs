@@ -138,6 +138,14 @@ namespace IFit.ViewModels
             App.GetService<AuthenticationService>() ?? throw new InvalidOperationException("AuthenticationService no registrado"),
             App.GetService<DatabaseService>() ?? throw new InvalidOperationException("DatabaseService no registrado"))
         {
+            _ = InitializeAsync();
+        }
+
+        private async Task InitializeAsync()
+        {
+            Name = "usertest" + DateTime.Now.Ticks;
+            Email = Name + "@test.com";
+            Password = "Test1234!";
         }
 
         #endregion
@@ -240,16 +248,19 @@ namespace IFit.ViewModels
                     return;
                 }
 
-                Debug.WriteLine($"Registro exitoso para usuario: {response.AppUser?.Email}");
+                Debug.WriteLine($"Registro exitoso para usuario: {response.Email}");
 
-                // 4. Guardar datos de sesión
-                await SaveRegistrationData(response);
+                // 4. Guardar datos de sesiónd
+                await SaveRegistrationData(Name, Email);
 
                 // 5. Marcar como exitoso y navegar
                 CurrentState = RegistrationState.Success;
 
                 Debug.WriteLine("Navegando a VerificationView");
-                await Shell.Current.GoToAsync("///VerificationView");
+                await Shell.Current.GoToAsync("/VerificationView", new Dictionary<string, object>
+                {
+                    { "Email", Email }
+                });
             }
             catch (Exception ex)
             {
@@ -338,7 +349,7 @@ namespace IFit.ViewModels
         /// <summary>
         /// Intenta registrar al usuario con los datos proporcionados
         /// </summary>
-        private async Task<AuthResponse?> TryRegisterAsync()
+        private async Task<RegisterResponseDto?> TryRegisterAsync()
         {
             try
             {
@@ -360,19 +371,16 @@ namespace IFit.ViewModels
                     return null;
                 }
 
-                if (response.AppUser == null)
+                if(response.Success == false)
                 {
                     CurrentState = RegistrationState.Error;
-                    ErrorMessage = (!string.IsNullOrEmpty(response.ErrorMessage)) 
-                        ? response.ErrorMessage 
-                        : "No se pudo crear la cuenta. El email podría estar ya registrado.";
-
-                    Debug.WriteLine("Registro fallido: AppUser es null");
-
+                    ErrorMessage = response.Message ?? "Error desconocido durante el registro.";
+                    Debug.WriteLine($"Registro fallido: {response.Message}");
                     return null;
                 }
 
-                Debug.WriteLine($"Registro exitoso. UserId: {response.AppUser.Id}");
+                Debug.WriteLine($"Registro exitoso. Email: {response.Email}");
+
                 return response;
             }
             catch (Exception ex)
@@ -389,43 +397,31 @@ namespace IFit.ViewModels
         /// <summary>
         /// Guarda los datos del usuario registrado en Preferences y base de datos local
         /// </summary>
-        private async Task SaveRegistrationData(AuthResponse response)
+        private async Task SaveRegistrationData(string name, string email)
         {
             try
             {
-                if (response.AppUser == null)
+                if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(email))
                 {
-                    Debug.WriteLine("No se puede guardar: AppUser es null");
+                    Debug.WriteLine("No se puede guardar: Nombre o Email son nulos o vacíos");
                     return;
                 }
 
-                Debug.WriteLine($"Guardando datos de registro para usuario: {response.AppUser.Email}");
+                Debug.WriteLine($"Guardando datos de registro para usuario: {Email}");
 
                 // Guardar en Preferences
-                Preferences.Set("UserEmail", Email);
-                Preferences.Set("UserName", Name);
-                Preferences.Set("UserId", response.AppUser.Id);
+                Preferences.Set("UserEmail", email);
+                Preferences.Set("UserName", name);
+
+                // Almacenar password en SecureStorage para validacion y login automatico en VerificationViewModel
+                // (Nota: Se eliminará después de la verificación)
+                await SecureStorage.SetAsync("UserPassword", Password);
 
                 Debug.WriteLine("Datos guardados en Preferences");
-
-                // Guardar en base de datos local
-                await _databaseService.SaveAppUserAsync(response.AppUser.toEntity());
-
-                Debug.WriteLine("Usuario guardado en BD local");
-
-                /* Envío de email de verificación (deshabilitado temporalmente)
-                var emailValidationResponse = await _authenticationService.SendVerificationEmail(Email);
-                if (emailValidationResponse == null)
-                {
-                    Debug.WriteLine("No se pudo enviar email de verificación");
-                }
-                */
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"Error guardando datos de registro: {ex.Message}");
-                // No bloqueamos el flujo si falla el guardado local
-                // El usuario ya está registrado en el servidor
             }
         }
 

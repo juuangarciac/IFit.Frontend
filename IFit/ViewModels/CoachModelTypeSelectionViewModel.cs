@@ -1,3 +1,4 @@
+using CommunityToolkit.Mvvm.ComponentModel;
 using IFit.Helper;
 using IFit.Models;
 using IFit.Models.Dtos;
@@ -8,28 +9,75 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
 namespace IFit.ViewModels;
-public class CoachModelTypeSelectionViewModel : INotifyPropertyChanged
+public partial class CoachModelTypeSelectionViewModel : ObservableObject
 {
+    #region Services
+
     private DatabaseService? databaseService = App.GetService<DatabaseService>();
     private AppUserService? appUserService = App.GetService<AppUserService>();
+    private CoachModelTypeService _coachModelTypeService = new CoachModelTypeService();
 
-    private CoachModelTypeResponseDto? selectedCoachModelType = null;
-    public CoachModelTypeResponseDto? SelectedCoachModelType
+    #endregion
+
+    #region Properties 
+    [ObservableProperty]
+    public partial CoachModelTypeResponseDto? SelectedCoachModelType { get; set; }
+
+    partial void OnSelectedCoachModelTypeChanged(CoachModelTypeResponseDto? value)
     {
-        get => selectedCoachModelType;
-        set
-        {
-            if (selectedCoachModelType != value)
-            {
-                selectedCoachModelType = value;
+        _ = HandleOnSelectedCoachChanged(value);
+    }
 
-                OnPropertyChanged(nameof(SelectedCoachModelType));
-                OnSelectedCoachChanged(selectedCoachModelType);
+    [ObservableProperty]
+    public partial List<CoachModelTypeResponseDto>? CoachModelTypes { get; set; }
+
+    #endregion
+
+    #region Constructor
+    public CoachModelTypeSelectionViewModel(
+        CoachModelTypeService coachModelTypeService,
+        DatabaseService databaseService,
+        AppUserService appUserService
+        )
+	{
+        _coachModelTypeService = coachModelTypeService;
+        this.databaseService = databaseService;
+        this.appUserService = appUserService;
+    }
+
+    public CoachModelTypeSelectionViewModel() : this(
+         App.GetService<CoachModelTypeService>() ?? throw new InvalidOperationException("CoachModelTypeService no registrado"),
+         App.GetService<DatabaseService>() ?? throw new InvalidOperationException("DatabaseService no registrado"),
+         App.GetService<AppUserService>() ?? throw new InvalidOperationException("AppUserService no registrado"))
+    {
+        _ = InitializeAsync();
+    }
+
+    private async Task InitializeAsync()
+    {
+         await LoadCoachModelTypes();
+    }
+
+    #endregion
+
+
+    #region Methods
+    private async Task LoadCoachModelTypes()
+    {
+        CoachModelTypes = await _coachModelTypeService.GetCoachModelTypes();
+
+        if (CoachModelTypes == null || !CoachModelTypes.Any())
+        {
+            if (App.Current?.MainPage != null)
+            {
+                await App.Current.MainPage.DisplayAlert("Error", "No se encontraron tipos de modelos de entrenador. Por favor, inténtelo más tarde.", "OK");
             }
+            await Shell.Current.GoToAsync("//ErrorView");
+            return;
         }
     }
 
-    private async void OnSelectedCoachChanged(CoachModelTypeResponseDto? selectedCoachModelType)
+    private async Task HandleOnSelectedCoachChanged(CoachModelTypeResponseDto? selectedCoachModelType)
     {
         if (selectedCoachModelType == null || databaseService == null || appUserService == null)
         {
@@ -51,8 +99,9 @@ public class CoachModelTypeSelectionViewModel : INotifyPropertyChanged
             return;
         }
 
-        AppUser? result = /*await appUserService.SetCoachModelType(user.Id, selectedCoachModelType.Id)*/ null;
-        if (result == null)
+        AppUserResponseDto? response = await appUserService.SetCoachModelType(user.Id, selectedCoachModelType.Id);
+        if (response == null
+            && string.IsNullOrEmpty(response?.CoachModelTypeName))
         {
             await ErrorHandler.HandleErrorAsync("Failed to set coach model type.", "//ErrorView",
                 "Error",
@@ -60,48 +109,8 @@ public class CoachModelTypeSelectionViewModel : INotifyPropertyChanged
             return;
         }
 
-        await databaseService.SaveAppUserAsync(result);
-        await Shell.Current.GoToAsync("//ExperienceLevelSelectionView");
+        await databaseService.SaveAppUserAsync(response.toEntity());
+        await Shell.Current.GoToAsync("//AppUserQuestionnaireView");
     }
-
-
-    private List<CoachModelTypeResponseDto>? coachModelTypes = new List<CoachModelTypeResponseDto>();
-    public List<CoachModelTypeResponseDto>? CoachModelTypes
-    {
-        get => coachModelTypes;
-        set
-        {
-            if (coachModelTypes != value)
-            {
-                coachModelTypes = value;
-                OnPropertyChanged(nameof(CoachModelTypes));
-            }
-        }
-    }
-
-    private CoachModelTypeService _coachModelTypeService = new CoachModelTypeService();
-
-    public CoachModelTypeSelectionViewModel()
-	{
-		LoadCoachModelTypes();
-    }
-
-	public async void LoadCoachModelTypes()
-	{
-        CoachModelTypes = await _coachModelTypeService.GetCoachModelTypes();
- 
-        if (CoachModelTypes == null || !CoachModelTypes.Any())
-        {
-            if(App.Current?.MainPage != null)
-            {
-                await App.Current.MainPage.DisplayAlert("Error", "No se encontraron tipos de modelos de entrenador. Por favor, inténtelo más tarde.", "OK");
-            }
-            await Shell.Current.GoToAsync("//ErrorView");
-            return;
-        }
-    }
-
-    public event PropertyChangedEventHandler? PropertyChanged;
-    protected void OnPropertyChanged([CallerMemberName] string propertyName = "")
-        => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    #endregion
 }
