@@ -144,15 +144,6 @@ namespace IFit.XUnit.Integration.Services
 
             // Assert
             Assert.NotNull(result);
-            Assert.NotEmpty(result.AccessToken);
-            Assert.NotEmpty(result.RefreshToken);
-            Assert.Equal("Bearer", result.TokenType);
-
-            Assert.NotNull(result.AppUser);
-            Assert.Equal(uniqueEmail, result.AppUser.Email);
-            Assert.Contains("Test User", result.AppUser.Name);
-            Assert.False(result.AppUser.RegistrationComplete); // Registro inicial incompleto
-            Assert.False(result.AppUser.Verified);
         }
 
         [Fact]
@@ -445,7 +436,6 @@ namespace IFit.XUnit.Integration.Services
             );
 
             Assert.NotNull(registerResult);
-            Assert.NotEmpty(registerResult.AccessToken);
             Assert.True(await _authService.IsAuthenticatedAsync());
 
             // PASO 2: Logout

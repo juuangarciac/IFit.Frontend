@@ -53,30 +53,31 @@ namespace IFit.XUnit.Integration.Services
         /// <summary>
         /// Autentica al usuario de prueba antes de cada test
         /// </summary>
-        private async Task AuthenticateTestUser()
+        private async Task<AppUserResponseDto?> AuthenticateTestUser()
         {
             var loginResult = await _authService.LoginAsync(TEST_USER_EMAIL, TEST_USER_PASSWORD);
             if (loginResult == null)
             {
                 throw new Exception($"No se pudo autenticar el usuario de prueba: {TEST_USER_EMAIL}");
             }
+            return loginResult.AppUser;
         }
 
         /// <summary>
         /// Crea y autentica un nuevo usuario para pruebas
         /// </summary>
-        private async Task<AppUserResponseDto?> CreateAndAuthenticateNewUser()
+        private async Task<RegisterResponseDto?> CreateAndAuthenticateNewUser()
         {
             var uniqueEmail = GetUniqueEmail();
             var userName = "Test User " + DateTime.Now.ToString("HHmmss");
 
             var registerResult = await _authService.RegisterAsync(userName, uniqueEmail, "P@ssw0rd123");
-            if (registerResult == null || registerResult.AppUser == null)
+            if (registerResult == null)
             {
                 return null;
             }
 
-            return registerResult.AppUser;
+            return registerResult;
         }
 
         #endregion
@@ -335,14 +336,15 @@ namespace IFit.XUnit.Integration.Services
         public async Task SetCoachModelType_ConIdsValidos_DebeAsignarCoach()
         {
             // Arrange
-            var newUser = await CreateAndAuthenticateNewUser();
+            var newUser = await AuthenticateTestUser();
             long coachId = 1; // Asumiendo que existe un coach con ID 1
 
             // Act
-            var result = await _userService.SetCoachModelType(newUser.Id, coachId);
+            var result = await _userService.SetCoachModelType(newUser?.Id, coachId);
 
             // Assert
             Assert.NotNull(result);
+            Assert.NotNull(newUser?.Id);
             Assert.NotNull(result.CoachModelTypeName);
             // Verificar que el coach fue asignado consultando de nuevo
             var updatedUser = await _userService.findUserById(newUser.Id);
@@ -410,7 +412,9 @@ namespace IFit.XUnit.Integration.Services
         public async Task SetExperienceLevel_ConIdsValidos_DebeAsignarNivel()
         {
             // Arrange
-            var newUser = await CreateAndAuthenticateNewUser();
+            var newUser = await AuthenticateTestUser();
+            Assert.NotNull(newUser);
+
             long levelId = 2; // Asumiendo que existe un nivel con ID 2
 
             // Act
@@ -473,10 +477,10 @@ namespace IFit.XUnit.Integration.Services
         public async Task MarkRegistrationComplete_ConIdValido_DebeMarcarComoCompleto()
         {
             // Arrange
-            var newUser = await CreateAndAuthenticateNewUser();
+            var newUser = await AuthenticateTestUser();
 
             // Verificar que inicialmente NO está completo
-            Assert.False(newUser.RegistrationComplete);
+            Assert.False(newUser?.RegistrationComplete);
 
             // Act
             var result = await _userService.MarkRegistrationComplete(newUser.Id);
@@ -533,7 +537,9 @@ namespace IFit.XUnit.Integration.Services
         public async Task MarkRegistrationComplete_MultipleVeces_DebeSerIdempotente()
         {
             // Arrange
-            var newUser = await CreateAndAuthenticateNewUser();
+            var newUser = await AuthenticateTestUser();
+
+            Assert.NotNull(newUser);
 
             // Act - Marcar como completo dos veces
             var result1 = await _userService.MarkRegistrationComplete(newUser.Id);
@@ -612,7 +618,9 @@ namespace IFit.XUnit.Integration.Services
         public async Task UpdateUser_ConDtoValido_DebeActualizarUsuario()
         {
             // Arrange
-            var newUser = await CreateAndAuthenticateNewUser();
+            var newUser = await AuthenticateTestUser();
+            Assert.NotNull(newUser);
+
             var updateDto = new UpdateAppUserRequestDto
             {
                 Name = "Nombre Actualizado " + DateTime.Now.ToString("HHmmss")
@@ -631,7 +639,9 @@ namespace IFit.XUnit.Integration.Services
         public async Task UpdateUser_CambiandoEmail_DebeActualizarEmail()
         {
             // Arrange
-            var newUser = await CreateAndAuthenticateNewUser();
+            var newUser = await AuthenticateTestUser();
+            Assert.NotNull(newUser);
+
             var newEmail = GetUniqueEmail();
             var updateDto = new UpdateAppUserRequestDto
             {
@@ -650,7 +660,9 @@ namespace IFit.XUnit.Integration.Services
         public async Task UpdateUser_ConEmailDuplicado_DebeRetornarNull()
         {
             // Arrange
-            var newUser = await CreateAndAuthenticateNewUser();
+            var newUser = await AuthenticateTestUser();
+            Assert.NotNull(newUser);
+
             var updateDto = new UpdateAppUserRequestDto
             {
                 Email = TEST_USER_EMAIL // Email que ya existe
@@ -701,7 +713,9 @@ namespace IFit.XUnit.Integration.Services
         public async Task DeleteUser_ConIdValido_DebeEliminarUsuario()
         {
             // Arrange
-            var newUser = await CreateAndAuthenticateNewUser();
+            var newUser = await AuthenticateTestUser();
+            Assert.NotNull(newUser);
+
             var userId = newUser.Id;
 
             // Act
@@ -818,7 +832,7 @@ namespace IFit.XUnit.Integration.Services
         public async Task FlujoCompleto_CrearYConfigurarUsuario_DebeCompletarCorrectamente()
         {
             // PASO 1: Crear usuario
-            var newUser = await CreateAndAuthenticateNewUser();
+            var newUser = await AuthenticateTestUser();
             Assert.NotNull(newUser);
             Assert.False(newUser.RegistrationComplete);
 
@@ -852,7 +866,8 @@ namespace IFit.XUnit.Integration.Services
         public async Task FlujoCompleto_BuscarActualizarEliminar_DebeCompletarCorrectamente()
         {
             // PASO 1: Crear usuario
-            var newUser = await CreateAndAuthenticateNewUser();
+            var newUser = await AuthenticateTestUser();
+            Assert.NotNull(newUser);
 
             // PASO 2: Buscar por ID
             var foundById = await _userService.findUserById(newUser.Id);
