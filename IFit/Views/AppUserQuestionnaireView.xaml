@@ -2,102 +2,259 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:IFit.ViewModels"  
-             xmlns:models="clr-namespace:IFit.Models"
+             xmlns:models="clr-namespace:IFit.Models.Dtos.Questionnaire"
              x:Class="IFit.Views.AppUserQuestionnaireView"
-             Title="AppUserQuestionnaireView"
+             Title="Cuestionario"
              Shell.NavBarIsVisible="False" 
              BackgroundColor="{StaticResource BackgroundPrimaryDark}">
+
     <ContentPage.BindingContext>
         <vm:AppUserQuestionnaireViewModel/>
     </ContentPage.BindingContext>
-    <Grid BackgroundColor="{StaticResource BackgroundPrimaryDark}"
-          Margin="15"
-          RowSpacing="15">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
 
-        <!-- Header-->
-        <Grid Grid.Row="0"
-              RowSpacing="15">
+    <Grid BackgroundColor="{StaticResource BackgroundPrimaryDark}">
 
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-
-            <!-- Go Back -->
-            <Button Grid.Column="0"   
-             HorizontalOptions="Center"  
-             VerticalOptions="Center"  
-             BackgroundColor="Transparent"  
-             ImageSource="arrow.png"  
-             Command="{Binding PreviousQuestionCommand}" />
-
-            <!-- Center line -->
-            <Border Grid.Column="1"  
-             BackgroundColor="{StaticResource TextSecondaryColorLight}"  
-             VerticalOptions="Center"  
-             WidthRequest="120"   
-             StrokeThickness="1"/>
-
-            <!-- Cancel button  -->
-            <Button Grid.Column="2"   
-             HorizontalOptions="Center"  
-             VerticalOptions="Center"  
-             BackgroundColor="Transparent"  
-             ImageSource="cancel.svg"  
-             Clicked="onCancelClicked" />
+        <!-- Loading Overlay -->
+        <Grid IsVisible="{Binding IsLoading}"
+              BackgroundColor="#80000000"
+              ZIndex="999">
+            <ActivityIndicator IsRunning="{Binding IsLoading}"
+                              Color="{StaticResource PrimaryColor}"
+                              HeightRequest="60"
+                              WidthRequest="60"
+                              HorizontalOptions="Center"
+                              VerticalOptions="Center"/>
         </Grid>
 
-        <!-- Title -->
-        <Label Grid.Row="1"
-               Text="{Binding QuestionTitle}"
-               Style="{StaticResource label-h1-white}" />
+        <!-- Main Content -->
+        <ScrollView>
+            <Grid Margin="15"
+                  RowSpacing="15">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <!-- Header -->
+                    <RowDefinition Height="Auto" />
+                    <!-- Progress -->
+                    <RowDefinition Height="Auto" />
+                    <!-- Question Title -->
+                    <RowDefinition Height="*" />
+                    <!-- Options + Additional Text -->
+                    <RowDefinition Height="Auto" />
+                    <!-- Error Message -->
+                    <RowDefinition Height="Auto" />
+                    <!-- Navigation Buttons -->
+                </Grid.RowDefinitions>
 
-        <!-- AppAnswers -->
-        <!--  <CollectionView Grid.Row="2"
-                         ItemsSource="{Binding QuestionAnswers}"
-                         SelectionMode="Single"
-                         SelectedItem="{Binding SelectedAnswer, Mode=TwoWay}"
-                         Margin="0,0,0,15">
+                <!-- ===== HEADER ===== -->
+                <Grid Grid.Row="0"
+                      ColumnSpacing="15">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
 
-            <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="models:AppAnswer">
-                    <Border StrokeThickness="2"
-                             Stroke="{DynamicResource BackgroundPrimaryLight}"
-                             BackgroundColor="{DynamicResource PrimaryColorLightOpacity}"
-                             Margin="0,0,0,15">
+                    <!-- Back Button (disabled by default in your ViewModel) -->
+                    <Button Grid.Column="0"
+                            HorizontalOptions="Start"
+                            VerticalOptions="Center"
+                            BackgroundColor="Transparent"
+                            ImageSource="arrow.png"
+                            Command="{Binding GoBackCommand}"
+                            IsEnabled="{Binding CanGoBack}"
+                            Opacity="{Binding CanGoBack, Converter={StaticResource BoolToOpacityConverter}}" />
+
+                    <!-- Center line / Questionnaire Name -->
+                    <Label Grid.Column="1"
+                           Text="{Binding QuestionnaireName}"
+                           Style="{StaticResource label-h3-white}"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"
+                           LineBreakMode="TailTruncation"
+                           MaxLines="1" />
+
+                    <!-- Cancel button -->
+                    <Button Grid.Column="2"
+                            HorizontalOptions="End"
+                            VerticalOptions="Center"
+                            BackgroundColor="Transparent"
+                            ImageSource="cancel.svg"
+                            Clicked="onCancelClicked" />
+                </Grid>
+
+                <!-- ===== PROGRESS BAR ===== -->
+                <Grid Grid.Row="1"
+                      RowSpacing="5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <!-- Progress Text -->
+                    <Label Grid.Row="0"
+                           Text="{Binding ProgressText}"
+                           Style="{StaticResource label-h4-white}"
+                           HorizontalOptions="Center" />
+
+                    <!-- Progress Bar -->
+                    <ProgressBar Grid.Row="1"
+                                 Progress="{Binding ProgressPercentage}"
+                                 ProgressColor="{StaticResource PrimaryColor}"
+                                 HeightRequest="8"
+                                 Margin="0,5,0,0" />
+                </Grid>
+
+                <!-- ===== QUESTION TEXT ===== -->
+                <Label Grid.Row="2"
+                       Text="{Binding QuestionText}"
+                       Style="{StaticResource label-h1-white}"
+                       Margin="0,20,0,10" />
+
+                <!-- ===== OPTIONS LIST + ADDITIONAL TEXT INPUT ===== -->
+                <Grid Grid.Row="3">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <!-- Options -->
+                        <RowDefinition Height="Auto" />
+                        <!-- Additional Text Input -->
+                    </Grid.RowDefinitions>
+
+                    <!-- Options List -->
+                    <CollectionView Grid.Row="0"
+                                    ItemsSource="{Binding Options}"
+                                    SelectionMode="Single"
+                                    SelectedItem="{Binding SelectedOption, Mode=TwoWay}"
+                                    Margin="0,0,0,15">
+
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="models:OptionDTO">
+                                <Border StrokeThickness="2"
+                                        Margin="0,0,0,15"
+                                        BackgroundColor="{DynamicResource PrimaryColorLightOpacity}">
+
+                                    <!-- Triggers para cambiar el estilo cuando está seleccionada -->
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border"
+                                                     Binding="{Binding Source={RelativeSource AncestorType={x:Type CollectionView}}, Path=SelectedItem}"
+                                                     Value="{Binding .}">
+                                            <Setter Property="Stroke" Value="{StaticResource PrimaryColor}" />
+                                            <Setter Property="BackgroundColor" Value="{StaticResource PrimaryColorDarkOpacity}" />
+                                        </DataTrigger>
+                                    </Border.Triggers>
+
+                                    <Border.Stroke>
+                                        <SolidColorBrush Color="{StaticResource BackgroundPrimaryLight}" />
+                                    </Border.Stroke>
+
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="{DynamicResource CornerRadiusRectangle}" />
+                                    </Border.StrokeShape>
+
+                                    <Border.Shadow>
+                                        <Shadow Brush="{DynamicResource BackgroundPrimaryLight}"
+                                                Opacity="0.35"
+                                                Radius="{DynamicResource CornerRadiusRectangle}" />
+                                    </Border.Shadow>
+
+                                    <Grid Margin="15"
+                                          BackgroundColor="Transparent">
+                                        <Label Text="{Binding Text}"
+                                               Style="{DynamicResource label-h2-white}"
+                                               VerticalOptions="Center" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+                    <!-- Additional Text Input (shown when option requires it) -->
+                    <Border Grid.Row="1"
+                            IsVisible="{Binding SelectedOption.RequiresTextInput}"
+                            StrokeThickness="1"
+                            Stroke="{StaticResource PrimaryColor}"
+                            BackgroundColor="{StaticResource BackgroundSecondaryDark}"
+                            Padding="15"
+                            Margin="0,0,0,15">
 
                         <Border.StrokeShape>
                             <RoundRectangle CornerRadius="{DynamicResource CornerRadiusRectangle}" />
                         </Border.StrokeShape>
 
-                        <Border.Shadow>
-                            <Shadow Brush="{DynamicResource BackgroundPrimaryLight}"
-                                     Opacity="0.35"
-                                     Radius="{DynamicResource CornerRadiusRectangle}" />
-                        </Border.Shadow>
-
-                        <Grid Margin="10"
-                               RowSpacing="5"
-                               BackgroundColor="Transparent">
-
+                        <Grid RowSpacing="10">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
-                            
-                            <Label Grid.Column="0"
-                                    Text="{Binding AnswerText}"
-                                    Style="{DynamicResource label-h1-white}" />
 
+                            <!-- Prompt Label -->
+                            <Label Grid.Row="0"
+                                   Text="{Binding SelectedOption.TextInputPrompt}"
+                                   Style="{StaticResource label-h3-white}"
+                                   IsVisible="{Binding SelectedOption.TextInputPrompt, Converter={StaticResource StringNotNullOrEmptyConverter}}" />
+
+                            <!-- Text Entry -->
+                            <Entry Grid.Row="1"
+                                   Text="{Binding AdditionalText, Mode=TwoWay}"
+                                   Placeholder="{Binding SelectedOption.TextInputPlaceholder}"
+                                   PlaceholderColor="{StaticResource TextSecondaryColor}"
+                                   TextColor="{StaticResource TextPrimaryColor}"
+                                   BackgroundColor="{StaticResource BackgroundPrimaryDark}"
+                                   HeightRequest="100"
+                                   MaxLength="500"
+                                   VerticalOptions="Start"
+                                   VerticalTextAlignment="Start" />
                         </Grid>
                     </Border>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView> -->
+                </Grid>
+
+                <!-- ===== ERROR MESSAGE ===== -->
+                <Border Grid.Row="4"
+                        IsVisible="{Binding HasError}"
+                        BackgroundColor="#FFEBEE"
+                        StrokeThickness="1"
+                        Stroke="#F44336"
+                        Padding="12"
+                        Margin="0,0,0,15">
+
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="8" />
+                    </Border.StrokeShape>
+
+                    <Label Text="{Binding ErrorMessage}"
+                           TextColor="#C62828"
+                           FontSize="14"
+                           FontAttributes="Bold"
+                           HorizontalTextAlignment="Center" />
+                </Border>
+
+                <!-- ===== NAVIGATION BUTTONS ===== -->
+                <Grid Grid.Row="5"
+                      ColumnSpacing="15"
+                      Margin="0,10,0,20">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Back Button (alternativo al del header) -->
+                    <!-- Puedes comentar este si solo quieres el del header -->
+                    <!--
+                    <Button Grid.Column="0"
+                            Text="Atrás"
+                            Style="{StaticResource button-secondary}"
+                            Command="{Binding GoBackCommand}"
+                            IsEnabled="{Binding CanGoBack}" />
+                    -->
+
+                    <!-- Next Button -->
+                    <Button Grid.Column="1"
+                            Text="{Binding IsLastQuestion, Converter={StaticResource BoolToNextButtonTextConverter}, ConverterParameter='Finalizar|Siguiente'}"
+                            Style="{StaticResource button-primary}"
+                            Command="{Binding GoNextCommand}"
+                            IsEnabled="{Binding CanGoNext}"
+                            HorizontalOptions="Fill" />
+                </Grid>
+            </Grid>
+        </ScrollView>
     </Grid>
 </ContentPage>

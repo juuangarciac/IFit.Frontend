@@ -276,7 +276,7 @@ namespace IFit.ViewModels
         {
             _questionnaireService = questionnaireService ?? throw new ArgumentNullException(nameof(questionnaireService));
             _userId = userId;
-            _questionnaireId = questionnaireId;
+            _questionnaireId = 1;
 
             // Inicializar comandos
             GoNextCommand = new Command(

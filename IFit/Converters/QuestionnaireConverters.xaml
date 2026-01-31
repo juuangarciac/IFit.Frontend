@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                    xmlns:converters="clr-namespace:IFit.Converters">
+
+    <!-- Converters for Questionnaire View -->
+    <converters:BoolToOpacityConverter x:Key="BoolToOpacityConverter" />
+    <converters:StringNotNullOrEmptyConverter x:Key="StringNotNullOrEmptyConverter" />
+    <converters:BoolToNextButtonTextConverter x:Key="BoolToNextButtonTextConverter" />
+
+</ResourceDictionary>
