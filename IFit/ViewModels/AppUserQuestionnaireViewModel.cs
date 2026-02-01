@@ -119,6 +119,11 @@ namespace IFit.ViewModels
                     OnPropertyChanged(nameof(QuestionText));
                     OnPropertyChanged(nameof(Options));
                 }
+
+                // Actualizar Options cuando cambia la pregunta
+                Options = CurrentQuestion?.Options != null
+                    ? new ObservableCollection<OptionDTO>(CurrentQuestion.Options)
+                    : new ObservableCollection<OptionDTO>();
             }
         }
 
@@ -130,10 +135,13 @@ namespace IFit.ViewModels
         /// <summary>
         /// Opciones de respuesta de la pregunta actual
         /// </summary>
-        public ObservableCollection<OptionDTO> Options =>
-            CurrentQuestion?.Options != null
-                ? new ObservableCollection<OptionDTO>(CurrentQuestion.Options)
-                : new ObservableCollection<OptionDTO>();
+        private ObservableCollection<OptionDTO> _options = new();
+
+        public ObservableCollection<OptionDTO> Options
+        {
+            get => _options;
+            set => SetProperty(ref _options, value);
+        }
 
         /// <summary>
         /// Opción seleccionada por el usuario
@@ -145,14 +153,19 @@ namespace IFit.ViewModels
             {
                 if (SetProperty(ref _selectedOption, value))
                 {
-                    OnPropertyChanged(nameof(CanGoNext));
+                    // Actualizar RequiresTextInput basado en la opción seleccionada
+                    RequiresTextInput = value?.RequiresTextInput ?? false;
+
+                    // IMPORTANTE: Actualizar CanGoNext directamente
+                    CanGoNext = HasSelectedOption && !IsLoading;
+
                     OnPropertyChanged(nameof(HasSelectedOption));
 
                     // Limpiar texto adicional si cambia la opción
-                    if (value != _selectedOption)
-                    {
-                        AdditionalText = string.Empty;
-                    }
+                    AdditionalText = string.Empty;
+
+                    // Reevaluar el comando para habilitar el botón
+                    ((Command)GoNextCommand).ChangeCanExecute();
                 }
             }
         }
@@ -170,6 +183,16 @@ namespace IFit.ViewModels
         /// Indica si el usuario ha seleccionado una opción
         /// </summary>
         public bool HasSelectedOption => SelectedOption != null;
+
+        /// <summary>
+        /// Indica si alguna de las respuesta requiere texto adicional
+        /// </summary>
+        private bool _requiresTextInput;
+        public bool RequiresTextInput
+        {
+            get => _requiresTextInput;
+            set => SetProperty(ref _requiresTextInput, value);
+        }
 
         /// <summary>
         /// Índice de la pregunta actual (basado en 0)
@@ -264,6 +287,7 @@ namespace IFit.ViewModels
 
         public ICommand GoNextCommand { get; }
         public ICommand GoBackCommand { get; }
+        public ICommand CloseInputCommand { get; }
 
         #endregion
 
@@ -288,6 +312,12 @@ namespace IFit.ViewModels
                 execute: async () => await GoBackAsync(),
                 canExecute: () => CanGoBack && !IsLoading
             );
+
+            // Comando para cerrar el overlay del input de texto
+            CloseInputCommand = new Command(() =>
+            {
+                RequiresTextInput = false;
+            });
 
             // Cargar datos iniciales
             _ = InitializeAsync();
@@ -418,7 +448,7 @@ namespace IFit.ViewModels
                 {
                     QuestionId = CurrentQuestion!.Id,
                     SelectedOptionId = SelectedOption.Id,
-                    AdditionalText = string.IsNullOrWhiteSpace(AdditionalText) ? null : AdditionalText
+                    AdditionalText = string.IsNullOrWhiteSpace(AdditionalText) ? string.Empty : AdditionalText
                 };
 
                 // 2. Enviar respuesta al servidor

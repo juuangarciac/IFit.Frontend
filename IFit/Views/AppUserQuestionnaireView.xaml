@@ -16,10 +16,10 @@
 
         <!-- Loading Overlay -->
         <Grid IsVisible="{Binding IsLoading}"
-              BackgroundColor="#80000000"
+              BackgroundColor="{DynamicResource PrimaryColorLightOpacity}"
               ZIndex="999">
             <ActivityIndicator IsRunning="{Binding IsLoading}"
-                              Color="{StaticResource PrimaryColor}"
+                              Color="{StaticResource TertiaryColor}"
                               HeightRequest="60"
                               WidthRequest="60"
                               HorizontalOptions="Center"
@@ -27,25 +27,23 @@
         </Grid>
 
         <!-- Main Content -->
-        <ScrollView>
+        <ScrollView ZIndex="1">
             <Grid Margin="15"
                   RowSpacing="15">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <!-- Header -->
                     <RowDefinition Height="Auto" />
-                    <!-- Progress -->
-                    <RowDefinition Height="Auto" />
                     <!-- Question Title -->
                     <RowDefinition Height="*" />
-                    <!-- Options + Additional Text -->
+                    <!-- Options -->
                     <RowDefinition Height="Auto" />
                     <!-- Error Message -->
                     <RowDefinition Height="Auto" />
                     <!-- Navigation Buttons -->
                 </Grid.RowDefinitions>
 
-                <!-- ===== HEADER ===== -->
+                <!--Header -->
                 <Grid Grid.Row="0"
                       ColumnSpacing="15">
                     <Grid.ColumnDefinitions>
@@ -82,133 +80,59 @@
                             Clicked="onCancelClicked" />
                 </Grid>
 
-                <!-- ===== PROGRESS BAR ===== -->
-                <Grid Grid.Row="1"
-                      RowSpacing="5">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-
-                    <!-- Progress Text -->
-                    <Label Grid.Row="0"
-                           Text="{Binding ProgressText}"
-                           Style="{StaticResource label-h4-white}"
-                           HorizontalOptions="Center" />
-
-                    <!-- Progress Bar -->
-                    <ProgressBar Grid.Row="1"
-                                 Progress="{Binding ProgressPercentage}"
-                                 ProgressColor="{StaticResource PrimaryColor}"
-                                 HeightRequest="8"
-                                 Margin="0,5,0,0" />
-                </Grid>
-
-                <!-- ===== QUESTION TEXT ===== -->
-                <Label Grid.Row="2"
+                <!-- Question text -->
+                <Label Grid.Row="1"
                        Text="{Binding QuestionText}"
                        Style="{StaticResource label-h1-white}"
                        Margin="0,20,0,10" />
 
-                <!-- ===== OPTIONS LIST + ADDITIONAL TEXT INPUT ===== -->
-                <Grid Grid.Row="3">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*" />
-                        <!-- Options -->
-                        <RowDefinition Height="Auto" />
-                        <!-- Additional Text Input -->
-                    </Grid.RowDefinitions>
+                <!-- Options List -->
+                <CollectionView Grid.Row="2"
+                                ItemsSource="{Binding Options}"
+                                SelectionMode="Single"
+                                SelectedItem="{Binding SelectedOption, Mode=TwoWay}"
+                                Margin="0,0,0,15">
 
-                    <!-- Options List -->
-                    <CollectionView Grid.Row="0"
-                                    ItemsSource="{Binding Options}"
-                                    SelectionMode="Single"
-                                    SelectedItem="{Binding SelectedOption, Mode=TwoWay}"
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="models:OptionDTO">
+                            <Border StrokeThickness="2"
+                                    Stroke="{DynamicResource BackgroundPrimaryLight}"
+                                    BackgroundColor="{DynamicResource PrimaryColorLightOpacity}"
                                     Margin="0,0,0,15">
 
-                        <CollectionView.ItemTemplate>
-                            <DataTemplate x:DataType="models:OptionDTO">
-                                <Border StrokeThickness="2"
-                                        Margin="0,0,0,15"
-                                        BackgroundColor="{DynamicResource PrimaryColorLightOpacity}">
+                                <!-- Triggers para cambiar el estilo cuando está seleccionada -->
+                                <Border.Triggers>
+                                    <DataTrigger TargetType="Border"
+                                                 Binding="{Binding Source={RelativeSource AncestorType={x:Type CollectionView}}, Path=SelectedItem}"
+                                                 Value="{Binding .}">
+                                        <Setter Property="Stroke" Value="{StaticResource PrimaryColor}" />
+                                        <Setter Property="BackgroundColor" Value="{StaticResource PrimaryColorDarkOpacity}" />
+                                    </DataTrigger>
+                                </Border.Triggers>
 
-                                    <!-- Triggers para cambiar el estilo cuando está seleccionada -->
-                                    <Border.Triggers>
-                                        <DataTrigger TargetType="Border"
-                                                     Binding="{Binding Source={RelativeSource AncestorType={x:Type CollectionView}}, Path=SelectedItem}"
-                                                     Value="{Binding .}">
-                                            <Setter Property="Stroke" Value="{StaticResource PrimaryColor}" />
-                                            <Setter Property="BackgroundColor" Value="{StaticResource PrimaryColorDarkOpacity}" />
-                                        </DataTrigger>
-                                    </Border.Triggers>
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="{DynamicResource CornerRadiusRectangle}" />
+                                </Border.StrokeShape>
 
-                                    <Border.Stroke>
-                                        <SolidColorBrush Color="{StaticResource BackgroundPrimaryLight}" />
-                                    </Border.Stroke>
+                                <Border.Shadow>
+                                    <Shadow Brush="{DynamicResource BackgroundPrimaryLight}"
+                                            Opacity="0.35"
+                                            Radius="{DynamicResource CornerRadiusRectangle}" />
+                                </Border.Shadow>
 
-                                    <Border.StrokeShape>
-                                        <RoundRectangle CornerRadius="{DynamicResource CornerRadiusRectangle}" />
-                                    </Border.StrokeShape>
+                                <Grid Margin="10"
+                                      BackgroundColor="Transparent">
+                                    <Label Text="{Binding Text}"
+                                           Style="{DynamicResource label-h1-white}"
+                                           VerticalOptions="Center" />
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
 
-                                    <Border.Shadow>
-                                        <Shadow Brush="{DynamicResource BackgroundPrimaryLight}"
-                                                Opacity="0.35"
-                                                Radius="{DynamicResource CornerRadiusRectangle}" />
-                                    </Border.Shadow>
-
-                                    <Grid Margin="15"
-                                          BackgroundColor="Transparent">
-                                        <Label Text="{Binding Text}"
-                                               Style="{DynamicResource label-h2-white}"
-                                               VerticalOptions="Center" />
-                                    </Grid>
-                                </Border>
-                            </DataTemplate>
-                        </CollectionView.ItemTemplate>
-                    </CollectionView>
-
-                    <!-- Additional Text Input (shown when option requires it) -->
-                    <Border Grid.Row="1"
-                            IsVisible="{Binding SelectedOption.RequiresTextInput}"
-                            StrokeThickness="1"
-                            Stroke="{StaticResource PrimaryColor}"
-                            BackgroundColor="{StaticResource BackgroundSecondaryDark}"
-                            Padding="15"
-                            Margin="0,0,0,15">
-
-                        <Border.StrokeShape>
-                            <RoundRectangle CornerRadius="{DynamicResource CornerRadiusRectangle}" />
-                        </Border.StrokeShape>
-
-                        <Grid RowSpacing="10">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
-
-                            <!-- Prompt Label -->
-                            <Label Grid.Row="0"
-                                   Text="{Binding SelectedOption.TextInputPrompt}"
-                                   Style="{StaticResource label-h3-white}"
-                                   IsVisible="{Binding SelectedOption.TextInputPrompt, Converter={StaticResource StringNotNullOrEmptyConverter}}" />
-
-                            <!-- Text Entry -->
-                            <Entry Grid.Row="1"
-                                   Text="{Binding AdditionalText, Mode=TwoWay}"
-                                   Placeholder="{Binding SelectedOption.TextInputPlaceholder}"
-                                   PlaceholderColor="{StaticResource TextSecondaryColor}"
-                                   TextColor="{StaticResource TextPrimaryColor}"
-                                   BackgroundColor="{StaticResource BackgroundPrimaryDark}"
-                                   HeightRequest="100"
-                                   MaxLength="500"
-                                   VerticalOptions="Start"
-                                   VerticalTextAlignment="Start" />
-                        </Grid>
-                    </Border>
-                </Grid>
-
-                <!-- ===== ERROR MESSAGE ===== -->
-                <Border Grid.Row="4"
+                <!-- Error Message -->
+                <Border Grid.Row="3"
                         IsVisible="{Binding HasError}"
                         BackgroundColor="#FFEBEE"
                         StrokeThickness="1"
@@ -227,34 +151,121 @@
                            HorizontalTextAlignment="Center" />
                 </Border>
 
-                <!-- ===== NAVIGATION BUTTONS ===== -->
-                <Grid Grid.Row="5"
+                <!--Navigation Buttons -->
+                <Grid Grid.Row="4"
                       ColumnSpacing="15"
-                      Margin="0,10,0,20">
+                      Margin="0,5,0,5">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
-                    <!-- Back Button (alternativo al del header) -->
-                    <!-- Puedes comentar este si solo quieres el del header -->
-                    <!--
-                    <Button Grid.Column="0"
-                            Text="Atrás"
-                            Style="{StaticResource button-secondary}"
-                            Command="{Binding GoBackCommand}"
-                            IsEnabled="{Binding CanGoBack}" />
-                    -->
-
                     <!-- Next Button -->
                     <Button Grid.Column="1"
-                            Text="{Binding IsLastQuestion, Converter={StaticResource BoolToNextButtonTextConverter}, ConverterParameter='Finalizar|Siguiente'}"
-                            Style="{StaticResource button-primary}"
+                            Text="{Binding NextButtonText}"
+                            Style="{StaticResource ButtonBold-XL-dark-yellow}"
                             Command="{Binding GoNextCommand}"
                             IsEnabled="{Binding CanGoNext}"
                             HorizontalOptions="Fill" />
                 </Grid>
             </Grid>
         </ScrollView>
+
+        <!-- ========== INPUT TEXT OVERLAY ========== -->
+        <Grid IsVisible="{Binding RequiresTextInput}"
+              BackgroundColor="#CC000000"
+              ZIndex="998"
+              Padding="20">
+
+            <!-- Al hacer clic en el fondo oscuro, se cierra el overlay -->
+            <Grid.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding CloseInputCommand}" />
+            </Grid.GestureRecognizers>
+
+            <!-- Input Container (no se cierra al hacer clic aquí) -->
+            <Border StrokeThickness="2"
+                    Stroke="{DynamicResource BackgroundPrimaryLight}"
+                    BackgroundColor="{DynamicResource PrimaryColorLightOpacity90}"
+                    Padding="20"
+                    VerticalOptions="Center"
+                    MaximumWidthRequest="500">
+
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="{DynamicResource CornerRadiusRectangle}" />
+                </Border.StrokeShape>
+
+                <!-- Grid interno con GestureRecognizer para detener propagación del tap -->
+                <Grid RowSpacing="10">
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer />
+                    </Grid.GestureRecognizers>
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <!-- Close button -->
+                        <RowDefinition Height="Auto" />
+                        <!-- Prompt Label -->
+                        <RowDefinition Height="Auto" />
+                        <!-- Text Entry -->
+                        <RowDefinition Height="Auto" />
+                        <!-- Save Button -->
+                    </Grid.RowDefinitions>
+
+                    <!-- Close button -->
+                    <Label Grid.Row="0"
+                           Text="✕"
+                           FontSize="24"
+                           TextColor="{StaticResource TextPrimaryColorLight}"
+                           HorizontalOptions="End"
+                           VerticalOptions="Start"
+                           Padding="5">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding CloseInputCommand}" />
+                        </Label.GestureRecognizers>
+                    </Label>
+
+                    <!-- Prompt Label -->
+                    <Label Grid.Row="1"
+                           Text="{Binding SelectedOption.TextInputPrompt}"
+                           Style="{DynamicResource label-h2-white}"
+                           HorizontalTextAlignment="Center"
+                           IsVisible="{Binding SelectedOption.TextInputPrompt, Converter={StaticResource StringNotNullOrEmptyConverter}}" />
+
+                    <!-- Text Entry -->
+                    <Border Grid.Row="2"
+                            StrokeThickness="1"
+                            Stroke="{StaticResource QuaternaryColor}"
+                            BackgroundColor="{StaticResource BackgroundPrimaryDark}">
+
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="8" />
+                        </Border.StrokeShape>
+
+                        <Entry x:Name="AdditionalTextEntry"
+                               Text="{Binding AdditionalText, Mode=TwoWay}"
+                               Placeholder="{Binding SelectedOption.TextInputPlaceholder}"
+                               PlaceholderColor="{StaticResource QuaternaryColor}"
+                               TextColor="{StaticResource QuaternaryColor}"
+                               BackgroundColor="Transparent"
+                               HeightRequest="120"
+                               MaxLength="500"
+                               VerticalOptions="Start"
+                               VerticalTextAlignment="Start"
+                               IsSpellCheckEnabled="False"
+                               IsTextPredictionEnabled="False"
+                               HandlerChanged="OnEntryHandlerChanged"
+                               Margin="10" />
+                    </Border>
+
+                    <!-- Save Button -->
+                    <Button Grid.Row="3"
+                            Text="Guardar"
+                            Style="{StaticResource ButtonBold-XL-dark-yellow}"
+                            Command="{Binding CloseInputCommand}"
+                            HorizontalOptions="Fill"
+                            Margin="0,10,0,0" />
+                </Grid>
+            </Border>
+        </Grid>
     </Grid>
 </ContentPage>

@@ -61,6 +61,8 @@
     <Color x:Key="BackgroundSecondaryLight">#F5F5F5</Color>
 
     <Color x:Key="PrimaryColorLightOpacity">#66222831</Color>
+    <Color x:Key="PrimaryColorLightOpacity70">#B3222831</Color>
+    <Color x:Key="PrimaryColorLightOpacity90">#E6222831</Color>
     <Color x:Key="BorderButtonLightColor">#73b5b5b5</Color>
     
 </ResourceDictionary>
