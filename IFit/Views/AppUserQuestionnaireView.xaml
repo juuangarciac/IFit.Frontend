@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:IFit.ViewModels"  
              xmlns:models="clr-namespace:IFit.Models.Dtos.Questionnaire"
+             xmlns:components="clr-namespace:IFit.Views.Components"
              x:Class="IFit.Views.AppUserQuestionnaireView"
              Title="Cuestionario"
              Shell.NavBarIsVisible="False" 
@@ -15,16 +16,9 @@
     <Grid BackgroundColor="{StaticResource BackgroundPrimaryDark}">
 
         <!-- Loading Overlay -->
-        <Grid IsVisible="{Binding IsLoading}"
-              BackgroundColor="{DynamicResource PrimaryColorLightOpacity}"
-              ZIndex="999">
-            <ActivityIndicator IsRunning="{Binding IsLoading}"
-                              Color="{StaticResource TertiaryColor}"
-                              HeightRequest="60"
-                              WidthRequest="60"
-                              HorizontalOptions="Center"
-                              VerticalOptions="Center"/>
-        </Grid>
+        <components:LoadingOverlay IsLoading="{Binding IsLoading}"
+                                   Message="{Binding StatusMessage}"
+                                   ZIndex="999"/>
 
         <!-- Main Content -->
         <ScrollView ZIndex="1">

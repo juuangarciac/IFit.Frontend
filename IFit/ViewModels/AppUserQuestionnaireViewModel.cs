@@ -32,6 +32,7 @@ namespace IFit.ViewModels
         private long _responseId;  // ID de la sesión de respuestas
         private bool _isLoading;
         private bool _hasError;
+        private string _statusMessage = string.Empty;
         private string _errorMessage = string.Empty;
 
         // Datos del cuestionario
@@ -70,6 +71,15 @@ namespace IFit.ViewModels
                     OnPropertyChanged(nameof(CanGoBack));
                 }
             }
+        }
+
+        /// <summary>
+        /// Mensaje con informacion sobre el estado de las solicitudes
+        /// </summary>
+        public string StatusMessage
+        {
+            get => _statusMessage;
+            set => SetProperty(ref _statusMessage, value);
         }
 
         /// <summary>
@@ -351,6 +361,8 @@ namespace IFit.ViewModels
             try
             {
                 IsLoading = true;
+                StatusMessage = "Creando cuestinario personalizado...";
+
                 HasError = false;
                 ErrorMessage = string.Empty;
 
@@ -442,6 +454,7 @@ namespace IFit.ViewModels
             finally
             {
                 IsLoading = false;
+                StatusMessage = string.Empty;
             }
         }
 
