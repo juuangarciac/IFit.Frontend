@@ -108,6 +108,8 @@ public partial class CoachModelTypeSelectionViewModel : ObservableObject
                 "No se pudo establecer el tipo de modelo de entrenador. Por favor, inténtelo más tarde.");
             return;
         }
+        Preferences.Set("CoachId", selectedCoachModelType.Id);
+        Preferences.Set("CoachName", selectedCoachModelType.Name);
 
         await databaseService.SaveAppUserAsync(response.toEntity());
         await Shell.Current.GoToAsync("//AppUserQuestionnaireView");

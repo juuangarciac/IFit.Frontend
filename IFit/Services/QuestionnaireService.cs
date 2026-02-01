@@ -72,6 +72,47 @@ namespace IFit.Services
             }
         }
 
+
+        /// <summary>
+        /// Obtiene un cuestinario por coach y nivel de experiencia.
+        /// </summary>
+        /// <param name="coachId"></param>
+        /// <param name="experienceLevelId"></param>
+        /// <returns></returns>
+        public async Task<QuestionnaireDTO?> GetQuestionnaireByCoachIdAndExperienceLevelId(long coachId, long experienceLevelId)
+        {
+            try
+            {
+                if(coachId <= 0)
+                {
+                    Debug.WriteLine("Error: ID del coach inválido");
+                    return null;
+                }
+
+                if(experienceLevelId <= 0)
+                {
+                    Debug.WriteLine("Error: ID del nivel de experiencia inválido");
+                    return null;
+                }
+
+                var response = await _webService.GetAsync<QuestionnaireDTO>($"/coach/{coachId}/experience-level/{experienceLevelId}");
+
+                 if (!response.Success)
+                 {
+                    Debug.WriteLine($"Error obteniendo cuestionario coachId {coachId} y nivel de experiencia {experienceLevelId}: {response.ErrorMessage}");
+                    return null;
+                 }
+
+                return response.Data;
+
+            }
+            catch(Exception ex)
+            {
+                Debug.WriteLine($"Excepción en GetQuestionnaireByCoachIdAndExperienceLevelId: {ex.Message}");
+                return null;
+            }
+        }
+
         /// <summary>
         /// Obtiene un cuestionario con su primera pregunta incluida
         /// Endpoint optimizado que reduce llamadas a la API

@@ -138,6 +138,8 @@ namespace IFit.ViewModels
                     "No se pudo establecer el tipo de modelo de entrenador. Por favor, inténtelo más tarde.");
                 return;
             }
+            Preferences.Set("ExperienceLevelId", selectedLevel.Id);
+            Preferences.Set("ExperienceName", selectedLevel.Name);
 
             await databaseService.SaveAppUserAsync(response.toEntity());
             await Shell.Current.GoToAsync("//CoachModelTypeSelectionView");

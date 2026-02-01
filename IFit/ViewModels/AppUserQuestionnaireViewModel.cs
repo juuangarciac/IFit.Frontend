@@ -24,7 +24,9 @@ namespace IFit.ViewModels
 
         private readonly QuestionnaireService _questionnaireService;
         private readonly long _userId;
-        private readonly long _questionnaireId;
+        private readonly long _coachId;
+        private readonly long _experienceLevelId;
+        private long _questionnaireId; // No es readonly por que se asigna en InitializeAsync()
 
         // Estado de la sesión
         private long _responseId;  // ID de la sesión de respuestas
@@ -296,11 +298,14 @@ namespace IFit.ViewModels
         public AppUserQuestionnaireViewModel(
             QuestionnaireService questionnaireService,
             long userId,
-            long questionnaireId)
+            long coachId,
+            long experienceLevelId)
         {
             _questionnaireService = questionnaireService ?? throw new ArgumentNullException(nameof(questionnaireService));
+
             _userId = userId;
-            _questionnaireId = 1;
+            _coachId = coachId;
+            _experienceLevelId = experienceLevelId;
 
             // Inicializar comandos
             GoNextCommand = new Command(
@@ -329,7 +334,8 @@ namespace IFit.ViewModels
         public AppUserQuestionnaireViewModel() : this(
             App.GetService<QuestionnaireService>() ?? throw new InvalidOperationException("QuestionnaireService no registrado"),
             Preferences.Get("UserId", 0L),
-            0L) // questionnaireId debe pasarse por parámetro de navegación
+            Preferences.Get("CoachId", 0L),
+            Preferences.Get("ExperienceLevelId", 0L)) // questionnaireId se obtiene posteriormente, mediante una llamada al servidor
         {
         }
 
@@ -350,18 +356,38 @@ namespace IFit.ViewModels
 
                 Debug.WriteLine($"Inicializando cuestionario {_questionnaireId} para usuario {_userId}");
 
-                // Validar parámetros
+                // 0. Validar parámetros
                 if (_userId <= 0)
                 {
                     throw new InvalidOperationException("UserId no válido. Asegúrate de estar autenticado.");
                 }
+
+                if (_coachId <= 0)
+                {
+                    throw new InvalidOperationException("CoachId no válido. Asegúrate de haber seleccionado un entrenador.");
+                }
+
+                if (_experienceLevelId <= 0)
+                {
+                    throw new InvalidOperationException("ExperienceLevelId no válido. Asegúrate de haber seleccionado un nivel de experiencia.");
+                }
+
+                // 1. Obtener cuestinario
+                var questionnaireDto = _questionnaireService.GetQuestionnaireByCoachIdAndExperienceLevelId(_coachId, _experienceLevelId);
+
+                if(questionnaireDto == null)
+                {
+                    throw new InvalidOperationException("No se ha encontrado un cuestionario para el entrenador y nivel de experiencia seleccionado.");
+                }
+
+                _questionnaireId = questionnaireDto.Id;
 
                 if (_questionnaireId <= 0)
                 {
                     throw new InvalidOperationException("QuestionnaireId no válido.");
                 }
 
-                // 1. Iniciar sesión de cuestionario
+                // 2. Iniciar sesión de cuestionario
                 var response = await _questionnaireService.StartQuestionnaire(_userId, _questionnaireId);
 
                 if (response == null)
@@ -376,11 +402,11 @@ namespace IFit.ViewModels
                     return;
                 }
 
-                // 2. Guardar responseId para respuestas futuras
+                // 3. Guardar responseId para respuestas futuras
                 _responseId = response.ResponseId;
                 Debug.WriteLine($"Sesión iniciada con responseId: {_responseId}");
 
-                // 3. Mostrar primera pregunta
+                // 4. Mostrar primera pregunta
                 if (response.CurrentQuestion != null)
                 {
                     CurrentQuestion = response.CurrentQuestion;
