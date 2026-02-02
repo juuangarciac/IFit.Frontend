@@ -112,6 +112,7 @@ public partial class CoachModelTypeSelectionViewModel : ObservableObject
         Preferences.Set("CoachName", selectedCoachModelType.Name);
 
         await databaseService.SaveAppUserAsync(response.toEntity());
+
         await Shell.Current.GoToAsync("//AppUserQuestionnaireView");
     }
     #endregion

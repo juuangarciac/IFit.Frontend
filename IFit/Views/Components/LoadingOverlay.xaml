@@ -7,6 +7,7 @@
           BackgroundColor="#40000000">
 
         <VerticalStackLayout VerticalOptions="Center"
+                             Margin="15"
                             HorizontalOptions="Center">
 
             <Border BackgroundColor="White"

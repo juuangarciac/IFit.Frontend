@@ -27,6 +27,8 @@ public partial class VerificationViewModel : ObservableObject
 
     private readonly AuthenticationService authenticationService;
 
+    private readonly DatabaseService _databaseService;
+
     #endregion
 
     #region Enums
@@ -62,17 +64,19 @@ public partial class VerificationViewModel : ObservableObject
     /// Consutrctor con inyección de dependencias
     /// </summary>
 
-    public VerificationViewModel(AuthenticationService authenticationService)
+    public VerificationViewModel(AuthenticationService authenticationService, DatabaseService databaseService)
     {
         this.authenticationService = authenticationService ?? throw new ArgumentNullException(nameof(authenticationService));
+        _databaseService = databaseService;
     }
 
     /// <summary>
     /// Constructor sin parámetros para compatibilidad con XAML
     /// </summary>
     public VerificationViewModel() : this(
-        App.GetService<AuthenticationService>() ?? throw new InvalidOperationException("AuthenticationService no registrado"))
-    {
+        App.GetService<AuthenticationService>() ?? throw new InvalidOperationException("AuthenticationService no registrado"),
+        App.GetService<DatabaseService>() ?? throw new InvalidOperationException("DatabaseService no registrado"))
+        {
         // Cargar email desde preferencias
         Email = Preferences.Get("UserEmail", string.Empty);
         Console.WriteLine("UserEmail: " + Email + " found.");
@@ -115,6 +119,9 @@ public partial class VerificationViewModel : ObservableObject
                 // Limpiar credenciales temporales
                 SecureStorage.Remove("UserPassword");
 
+                // Guardar datos del usuario
+                await InsertUserToDatabase(authData.AppUser);
+
                 // Navegar a la pantalla ExperienceLevelSelectionView
                 await Shell.Current.GoToAsync("///ExperienceLevelSelectionView");
             }
@@ -156,6 +163,30 @@ public partial class VerificationViewModel : ObservableObject
     #endregion
 
     #region Private Methods
+
+    /// <summary>
+    /// Guarda el usuario en la base de datos local SQLite
+    /// </summary>
+    private async Task InsertUserToDatabase(AppUserResponseDto appUser)
+    {
+        try
+        {
+            Debug.WriteLine($"Insertando usuario en BD local: {appUser.Email}");
+
+            var entity = appUser.toEntity();
+            await _databaseService.InsertAppUserAsync(entity);
+
+            Debug.WriteLine("Usuario guardado en BD local exitosamente");
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Error guardando usuario en BD local: {ex.Message}");
+            Debug.WriteLine($"StackTrace: {ex.StackTrace}");
+
+            // No lanzamos excepción porque el login ya fue exitoso
+            // La BD local es solo para caché
+        }
+    }
 
     #endregion
 }

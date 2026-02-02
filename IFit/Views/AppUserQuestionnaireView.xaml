@@ -18,7 +18,7 @@
         <!-- Loading Overlay -->
         <components:LoadingOverlay IsLoading="{Binding IsLoading}"
                                    Message="{Binding StatusMessage}"
-                                   ZIndex="999"/>
+                                    ZIndex="999"/>
 
         <!-- Main Content -->
         <ScrollView ZIndex="1">

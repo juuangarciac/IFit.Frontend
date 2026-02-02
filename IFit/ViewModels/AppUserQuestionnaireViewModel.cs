@@ -604,17 +604,12 @@ namespace IFit.ViewModels
             {
                 Debug.WriteLine($"Cuestionario {_questionnaireId} completado por usuario {_userId}");
 
-                // Mostrar mensaje de éxito
-                await ErrorHandler.HandleErrorAsync(
-                    "¡Felicitaciones!",
-                    "Has completado el cuestionario exitosamente."
-                );
-
                 // Navegar a la siguiente pantalla (generación de rutina)
                 Debug.WriteLine("Navegando a AIGenerationRoutineView");
 
                 // Pasar el responseId a la siguiente vista para generar rutina
-                await Shell.Current.GoToAsync($"//AIGenerationRoutineView?responseId={_responseId}");
+                Preferences.Set("responseId", _responseId);
+                await Shell.Current.GoToAsync("///AIGenerationRoutineView");
             }
             catch (Exception ex)
             {

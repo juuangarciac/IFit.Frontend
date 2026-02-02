@@ -1,3 +1,5 @@
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using IFit.Helper;
 using IFit.Models;
 using IFit.Services;
@@ -7,50 +9,80 @@ using System.Windows.Input;
 
 namespace IFit.ViewModels;
 
-public class AIGenerationRoutineViewModel : INotifyPropertyChanged
+public partial class AIGenerationRoutineViewModel : ObservableObject
 {
-    private bool _isGenerating = false;
-    private bool _isCompleted = false;
-    private bool _showStartButton = true;
+    #region Services
+    private readonly AIRoutineService _aiRoutineService;
+    private readonly DatabaseService _databaseService;
 
-    public event PropertyChangedEventHandler? PropertyChanged;
+    #endregion
 
-    public bool IsGenerating
+    #region Fields
+    private readonly long _responseId;
+
+    #endregion
+
+    #region Properties
+
+    [ObservableProperty]
+    public partial bool IsGenerating { get; set; } = false;
+
+    [ObservableProperty]
+    public partial bool IsCompleted { get; set; } = false;
+
+    [ObservableProperty]
+    public partial bool ShowStartButton { get; set; } = false;
+
+    #endregion
+
+    #region Constructor
+
+    /// <summary>
+    /// Constructor con inyeccion de dependencias
+    /// </summary>
+    /// <param name="airoutineService"></param>
+    public AIGenerationRoutineViewModel()
     {
-        get => _isGenerating;
-        set
+        System.Diagnostics.Debug.WriteLine("=== Iniciando constructor AIGenerationRoutineViewModel ===");
+
+        try
         {
-            _isGenerating = value;
-            OnPropertyChanged();
+            System.Diagnostics.Debug.WriteLine("Obteniendo AIRoutineService...");
+            var aiService = App.GetService<AIRoutineService>()
+                ?? throw new InvalidOperationException("AIRoutineService no registrado");
+            System.Diagnostics.Debug.WriteLine("? AIRoutineService obtenido");
+
+            System.Diagnostics.Debug.WriteLine("Obteniendo DatabaseService...");
+            var dbService = App.GetService<DatabaseService>()
+                ?? throw new InvalidOperationException("DatabaseService no registrado");
+            System.Diagnostics.Debug.WriteLine("? DatabaseService obtenido");
+
+            System.Diagnostics.Debug.WriteLine("Obteniendo responseId de Preferences...");
+            var responseId = Preferences.Get("responseId", 0L);
+            System.Diagnostics.Debug.WriteLine($"? ResponseId obtenido: {responseId}");
+
+            _aiRoutineService = aiService;
+            _databaseService = dbService;
+            _responseId = responseId;
+
+            ShowStartButton = true;
+
+            System.Diagnostics.Debug.WriteLine("=== Constructor AIGenerationRoutineViewModel completado ===");
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"? Error en constructor: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"StackTrace: {ex.StackTrace}");
+            throw;
         }
     }
 
-    public bool IsCompleted
-    {
-        get => _isCompleted;
-        set
-        {
-            _isCompleted = value;
-            OnPropertyChanged();
-        }
-    }
+    #endregion
 
-    public bool ShowStartButton
-    {
-        get => _showStartButton;
-        set
-        {
-            _showStartButton = value;
-            OnPropertyChanged();
-        }
-    }
+    #region Commands
 
-    public ICommand StartGenerationCommand { get { return new Command(async () => await StartGeneration());  } }
-    public ICommand ViewRoutineCommand { get { return new Command(async () => await NavigateToRoutine()); } }
-
-    public AIGenerationRoutineViewModel() { }
-
-    private async Task StartGeneration()
+    [RelayCommand()]
+    private async Task StartGenerationAsync()
     {
         if (IsGenerating) return;
 
@@ -61,24 +93,16 @@ public class AIGenerationRoutineViewModel : INotifyPropertyChanged
         await GenerateRoutine();
     }
 
+    #endregion
+
+    #region Methods
+
     private async Task GenerateRoutine()
     {
         try
         {
-            AIRoutineService? AIRoutineService = App.GetService<AIRoutineService>();
-            DatabaseService? databaseService = App.GetService<DatabaseService>();
 
-            if (AIRoutineService == null || databaseService == null)
-            {
-                await ErrorHandler.HandleErrorAsync(
-                    "No se pudieron inicializar los servicios necesarios. " +
-                    "Por favor, reinicia la aplicación."
-                );
-                ResetToStart();
-                return;
-            }
-
-            AppUser? appuser = await databaseService.GetCurrentUserAsync();
+            AppUser? appuser = await _databaseService.GetCurrentUserAsync();
             if (appuser == null)
             {
                 await ErrorHandler.HandleErrorAsync(
@@ -89,7 +113,7 @@ public class AIGenerationRoutineViewModel : INotifyPropertyChanged
                 return;
             }
 
-            var prompt = string.Empty; // Revisar await AIRoutineService.GenerateRoutineFromQuestionnaire(appuser)
+            var prompt = await _aiRoutineService.GenerateRoutineFromQuestionnaire(appuser.Id, _responseId, appuser.CoachModelTypeName, true);
             if (prompt == null)
             {
                 await ErrorHandler.HandleErrorAsync(
@@ -128,8 +152,6 @@ public class AIGenerationRoutineViewModel : INotifyPropertyChanged
         await Shell.Current.GoToAsync("//HomeView"); // Ajusta la ruta según tu app
     }
 
-    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
+    #endregion
+
 }

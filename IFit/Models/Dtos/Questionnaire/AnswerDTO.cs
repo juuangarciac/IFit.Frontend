@@ -7,16 +7,13 @@ namespace IFit.Models.Dtos.Questionnaire
     /// </summary>
     public class AnswerDTO
     {
-        [JsonPropertyName("questionId")]
-        public long QuestionId { get; set; }
+        [JsonPropertyName("answerId")]
+        public long AnswerId { get; set; }
 
         [JsonPropertyName("questionText")]
         public string QuestionText { get; set; } = string.Empty;
 
-        [JsonPropertyName("selectedOptionId")]
-        public long SelectedOptionId { get; set; }
-
-        [JsonPropertyName("selectedOptionText")]
+        [JsonPropertyName("selectedOption")]
         public string SelectedOptionText { get; set; } = string.Empty;
 
         [JsonPropertyName("additionalText")]

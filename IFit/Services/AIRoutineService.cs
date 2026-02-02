@@ -44,7 +44,7 @@ namespace IFit.Services
             _database = databaseService?.GetConnection() ?? throw new ArgumentNullException(nameof(databaseService));
 
             // Inicializar tabla de conversaciones
-            InitializeAsync().Wait();
+            _ = InitializeAsync();
         }
 
         /// <summary>
@@ -408,7 +408,7 @@ namespace IFit.Services
 
             // Respuestas del cuestionario
             promptBuilder.AppendLine("=== RESPUESTAS AL CUESTIONARIO ===");
-            foreach (var answer in summary.Answers.OrderBy(a => a.QuestionId))
+            foreach (var answer in summary.Answers)
             {
                 promptBuilder.AppendLine($"• {answer.QuestionText}");
                 promptBuilder.AppendLine($"  Respuesta: {answer.SelectedOptionText}");

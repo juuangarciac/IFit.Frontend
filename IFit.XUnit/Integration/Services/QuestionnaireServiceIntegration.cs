@@ -788,12 +788,12 @@ namespace IFit.XUnit.Integration.Services
                 IsCompleted = true,
                 Answers = new List<AnswerDTO>
                 {
-                    new AnswerDTO { QuestionId = 1, QuestionText = "¿Cuál es tu objetivo principal?",
-                        SelectedOptionId = 2, SelectedOptionText = "Ganar masa muscular", AnsweredAt = DateTime.UtcNow.AddMinutes(-29) },
-                    new AnswerDTO { QuestionId = 2, QuestionText = "¿Condiciones médicas?",
-                        SelectedOptionId = 6, SelectedOptionText = "No tengo ninguna limitación", AnsweredAt = DateTime.UtcNow.AddMinutes(-28) },
-                    new AnswerDTO { QuestionId = 6, QuestionText = "¿Cuál es tu peso actual?",
-                        SelectedOptionId = 23, SelectedOptionText = "Ingresar peso", AdditionalText = "75", AnsweredAt = DateTime.UtcNow.AddMinutes(-25) },
+                    new AnswerDTO { QuestionText = "¿Cuál es tu objetivo principal?",
+                       SelectedOptionText = "Ganar masa muscular", AnsweredAt = DateTime.UtcNow.AddMinutes(-29) },
+                    new AnswerDTO { QuestionText = "¿Condiciones médicas?",
+                        SelectedOptionText = "No tengo ninguna limitación", AnsweredAt = DateTime.UtcNow.AddMinutes(-28) },
+                    new AnswerDTO { QuestionText = "¿Cuál es tu peso actual?",
+                        SelectedOptionText = "Ingresar peso", AdditionalText = "75", AnsweredAt = DateTime.UtcNow.AddMinutes(-25) },
                     // ... más respuestas
                 }
             };
@@ -823,11 +823,6 @@ namespace IFit.XUnit.Integration.Services
             Assert.True(result.IsCompleted);
             Assert.NotNull(result.CompletedAt);
             Assert.NotEmpty(result.Answers);
-
-            // Verificar que hay respuesta con texto adicional (peso)
-            var pesoAnswer = result.Answers.FirstOrDefault(a => a.QuestionId == 6);
-            Assert.NotNull(pesoAnswer);
-            Assert.Equal("75", pesoAnswer.AdditionalText);
         }
 
         #endregion
