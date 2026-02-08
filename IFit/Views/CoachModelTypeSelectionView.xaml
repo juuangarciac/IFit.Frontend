@@ -110,8 +110,8 @@
                                Style="{DynamicResource label-h1-white}" />
 
                                 <Label Grid.Column="1"
-                               FontSize="16"
-                               Text="{Binding EmojiCharacter}" />
+                                    FontSize="16"
+                                    Text="{Binding Emoji}" />
                             </Grid>
 
                             <Label Grid.Row="1"

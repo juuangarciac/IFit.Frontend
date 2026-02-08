@@ -16,7 +16,7 @@ namespace IFit.Models
         /// </summary>
         public class AppUser
         {
-            [JsonPropertyName("id")]
+            [JsonPropertyName("id"), PrimaryKey]
             public long Id { get; set; }
 
             [JsonPropertyName("name")]
