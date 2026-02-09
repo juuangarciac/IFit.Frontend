@@ -14,6 +14,7 @@ namespace IFit.Services
     public class WebService
     {
         private readonly HttpClient _httpClient;
+        private readonly HttpClient _aiHttpClient;
         private readonly TokenManager _tokenManager;
         private readonly string _baseUrl;
         private readonly string _refreshEndpoint;
@@ -34,6 +35,10 @@ namespace IFit.Services
         public WebService(HttpClient httpClient, string baseUrl, string refreshEndpoint = "/auth/refresh")
         {
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+
+            _aiHttpClient = new HttpClient();
+            _aiHttpClient.Timeout = TimeSpan.FromSeconds(1800); // Timeout largo para peticiones de AI
+
             _tokenManager = new TokenManager();
             _baseUrl = baseUrl.TrimEnd('/');
             _refreshEndpoint = refreshEndpoint;
@@ -258,9 +263,17 @@ namespace IFit.Services
 
                     request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 }
-
+                
+                var response = new HttpResponseMessage();
                 // Enviar la petición
-                var response = await _httpClient.SendAsync(request);
+                if (url.Contains("/routines"))
+                {
+                     response = await _aiHttpClient.SendAsync(request);
+                }
+                else
+                {
+                    response = await _httpClient.SendAsync(request);
+                }
 
                 // Si recibimos 401 Unauthorized y no es un reintento, refrescar token y reintentar
                 if (response.StatusCode == HttpStatusCode.Unauthorized && requiresAuth && !isRetry)

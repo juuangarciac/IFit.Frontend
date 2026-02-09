@@ -47,7 +47,7 @@ public partial class AIGenerationRoutineViewModel : ObservableObject
     private string _statusMessage = "Presiona el botón para generar tu rutina personalizada";
 
     [ObservableProperty]
-    private RoutineResponseDto? _generatedRoutine;
+    private RoutineDto? _generatedRoutine;
 
     #endregion
 
@@ -217,8 +217,6 @@ public partial class AIGenerationRoutineViewModel : ObservableObject
             }
 
             System.Diagnostics.Debug.WriteLine("✓ Rutina generada exitosamente");
-            System.Diagnostics.Debug.WriteLine($"  Mensaje del coach: {routine.Message}");
-            System.Diagnostics.Debug.WriteLine($"  Días de entrenamiento: {routine.Routine?.TrainingDays}");
 
             // Guardar la rutina generada
             GeneratedRoutine = routine;

@@ -80,7 +80,7 @@ namespace IFit.Services
         /// <param name="userId">ID del usuario (String, ej: "user_12345")</param>
         /// <param name="responseId">ID de la respuesta del cuestionario completado</param>
         /// <returns>RoutineResponseDto con la rutina generada o null si hay error</returns>
-        public async Task<RoutineResponseDto?> GenerateRoutineAsync(string userId, long responseId)
+        public async Task<RoutineDto?> GenerateRoutineAsync(string userId, long responseId)
         {
             try
             {
@@ -111,7 +111,7 @@ namespace IFit.Services
                 Debug.WriteLine($"→ Llamando a POST /api/routines/generate");
 
                 // Llamar al endpoint del backend
-                var response = await _webService.PostAsync<GenerateRoutineRequestDto, RoutineResponseDto>(
+                var response = await _webService.PostAsync<GenerateRoutineRequestDto, RoutineDto>(
                     "/routines/generate",
                     request
                 );
@@ -130,9 +130,6 @@ namespace IFit.Services
                 }
 
                 Debug.WriteLine("✓ Rutina generada exitosamente");
-                Debug.WriteLine($"  Mensaje: {response.Data.Message}");
-                Debug.WriteLine($"  Días de entrenamiento: {response.Data.Routine?.TrainingDays}");
-                Debug.WriteLine($"  Total de días: {response.Data.Routine?.Days?.Count}");
 
                 return response.Data;
             }
