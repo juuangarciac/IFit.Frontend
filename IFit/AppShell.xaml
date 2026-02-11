@@ -49,7 +49,7 @@
         Route="CoachModelTypeSelectionView" />
 
     <ShellContent
-        Title="ExperienceLevelSelection"
+        Title="ExperienceLevelSelection" 
         ContentTemplate="{DataTemplate views:ExperienceLevelSelectionView}"
         Route="ExperienceLevelSelectionView" />
 

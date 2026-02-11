@@ -14,6 +14,7 @@
             <converters:BoolToNextButtonTextConverter x:Key="BoolToNextButtonTextConverter" />
             <converters:BoolToOpacityConverter x:Key="BoolToOpacityConverter" />
             <converters:StringNotNullOrEmptyConverter x:Key="StringNotNullOrEmptyConverter" />
+            <converters:AnswerTextConverter x:Key="AnswerTextConverter" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

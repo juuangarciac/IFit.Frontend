@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using IFit.Helper;
 using IFit.Models;
 using IFit.Models.Dtos.AI;
+using IFit.Models.Dtos.Questionnaire;
 using IFit.Services;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -25,6 +26,7 @@ public partial class AIGenerationRoutineViewModel : ObservableObject
 {
     #region Services
     private readonly AIRoutineService _aiRoutineService;
+    private readonly QuestionnaireService _questionnaireService;
     private readonly DatabaseService _databaseService;
     #endregion
 
@@ -33,6 +35,15 @@ public partial class AIGenerationRoutineViewModel : ObservableObject
     #endregion
 
     #region Properties
+
+    [ObservableProperty]
+    private QuestionnaireResponseSummaryDTO _questionnaireSummary;
+
+    [ObservableProperty]
+    private string _questionnaireName = string.Empty;
+
+    [ObservableProperty]
+    private string _coachName = string.Empty;
 
     [ObservableProperty]
     private bool _isGenerating = false;
@@ -56,42 +67,59 @@ public partial class AIGenerationRoutineViewModel : ObservableObject
     /// <summary>
     /// Constructor con inyección de dependencias
     /// </summary>
-    public AIGenerationRoutineViewModel()
-    {
-        System.Diagnostics.Debug.WriteLine("=== Iniciando constructor AIGenerationRoutineViewModel ===");
+    /// 
 
+    public AIGenerationRoutineViewModel(AIRoutineService aiService,
+        DatabaseService dbService,
+        QuestionnaireService questionnaireService,
+        long responseId)
+    { 
+        _aiRoutineService = aiService ?? throw new ArgumentNullException(nameof(aiService));
+        _databaseService = dbService ?? throw new ArgumentNullException(nameof(dbService));
+        _questionnaireService = questionnaireService ?? throw new ArgumentNullException(nameof(questionnaireService));
+        _responseId = responseId;
+    }
+
+    public AIGenerationRoutineViewModel() :this(
+        App.GetService<AIRoutineService>() ?? throw new InvalidOperationException("AIRoutineService no registrado"),
+        App.GetService<DatabaseService>() ?? throw new InvalidOperationException("DatabaseService no registrado"),
+        App.GetService<QuestionnaireService>() ?? throw new InvalidOperationException("QuestionnaireService no registrado"),
+        Preferences.Get("responseId", 0L)
+    )
+    {
+        _ = InitializeAsync();
+    }
+
+    private async Task InitializeAsync()
+
+    {
+        // Obtener resumen del cuestionario para mostrar en la UI
         try
         {
-            System.Diagnostics.Debug.WriteLine("→ Obteniendo AIRoutineService...");
-            var aiService = App.GetService<AIRoutineService>()
-                ?? throw new InvalidOperationException("AIRoutineService no registrado");
-            System.Diagnostics.Debug.WriteLine("✓ AIRoutineService obtenido");
-
-            System.Diagnostics.Debug.WriteLine("→ Obteniendo DatabaseService...");
-            var dbService = App.GetService<DatabaseService>()
-                ?? throw new InvalidOperationException("DatabaseService no registrado");
-            System.Diagnostics.Debug.WriteLine("✓ DatabaseService obtenido");
-
-            System.Diagnostics.Debug.WriteLine("→ Obteniendo responseId de Preferences...");
-            var responseId = Preferences.Get("responseId", 0L);
-            System.Diagnostics.Debug.WriteLine($"✓ ResponseId obtenido: {responseId}");
-
-            if (responseId <= 0)
+            QuestionnaireResponseSummaryDTO? summary = await _questionnaireService.GetResponseSummary(_responseId);
+            if (summary == null)
             {
-                System.Diagnostics.Debug.WriteLine("⚠ Warning: responseId inválido o no encontrado");
+                System.Diagnostics.Debug.WriteLine("✗ No se pudo obtener el resumen del cuestionario");
+                await ErrorHandler.HandleErrorAsync(
+                    "No se pudo obtener el resumen de tu cuestionario. " +
+                    "Por favor, verifica tu conexión a internet e intenta nuevamente."
+                );
+                ResetToStart();
+                return;
             }
+            QuestionnaireSummary = summary;
+            QuestionnaireName = summary.QuestionnaireName;
+            CoachName = Preferences.Get("CoachName", "");
 
-            _aiRoutineService = aiService;
-            _databaseService = dbService;
-            _responseId = responseId;
-
-            System.Diagnostics.Debug.WriteLine("=== Constructor AIGenerationRoutineViewModel completado ===");
+            System.Diagnostics.Debug.WriteLine("✓ Resumen del cuestionario obtenido exitosamente");
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"✗ Error en constructor: {ex.Message}");
-            System.Diagnostics.Debug.WriteLine($"StackTrace: {ex.StackTrace}");
-            throw;
+            System.Diagnostics.Debug.WriteLine($"✗ Error obteniendo resumen del cuestionario: {ex.Message}");
+            await ErrorHandler.HandleErrorAsync(
+                $"Ocurrió un error al obtener el resumen de tu cuestionario: {ex.Message}"
+            );
+            ResetToStart();
         }
     }
 

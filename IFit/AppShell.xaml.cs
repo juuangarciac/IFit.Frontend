@@ -1,4 +1,5 @@
 ﻿using IFit.Views;
+using IFit.Views.Components;
 
 namespace IFit
 {

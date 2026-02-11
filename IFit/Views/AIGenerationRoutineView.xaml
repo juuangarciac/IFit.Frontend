@@ -2,23 +2,70 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:IFit.ViewModels"
+             xmlns:dtos="clr-namespace:IFit.Models.Dtos.Questionnaire"
+             xmlns:converters="clr-namespace:IFit.Converters"
              x:Class="IFit.Views.AIGenerationRoutineView"
              Title="AIGenerationRoutineView"
              Shell.NavBarIsVisible="False"
              BackgroundColor="{DynamicResource BackgroundPrimaryDark}">
+    
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:AnswerTextConverter x:Key="AnswerTextConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    
     <ContentPage.BindingContext>
         <vm:AIGenerationRoutineViewModel />
     </ContentPage.BindingContext>
-
-    <Grid HorizontalOptions="Center"
-          VerticalOptions="Center"
-          Margin="15">
+    
+    <!-- Main Grid -->
+    <Grid HorizontalOptions="Start"
+          VerticalOptions="Start"
+          Margin="15"
+          RowSpacing="15">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <!-- Estado inicial: Botón para iniciar generación -->
-        <Grid Grid.Row="0" 
+        <!--Header -->
+        <Grid Grid.Row="0">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Go Back -->
+            <Button Grid.Column="0"   
+            HorizontalOptions="Center"  
+            VerticalOptions="Center"  
+            BackgroundColor="Transparent"  
+            ImageSource="arrow.png"  
+            Clicked="onCancelClicked" />
+
+            <!-- Center line -->
+            <Border Grid.Column="1"  
+            BackgroundColor="{StaticResource TextSecondaryColorLight}"  
+            VerticalOptions="Center"  
+            WidthRequest="120"   
+            StrokeThickness="1"/>
+
+            <!-- Cancel button  -->
+            <Button Grid.Column="2"   
+            HorizontalOptions="Center"  
+            VerticalOptions="Center"  
+            BackgroundColor="Transparent"  
+            ImageSource="cancel.svg"  
+            Clicked="onCancelClicked" />
+        </Grid>
+
+        <!-- Title -->
+        <Grid Grid.Row="1" 
               IsVisible="{Binding ShowStartButton}"
               VerticalOptions="Center">
             <Grid.RowDefinitions>
@@ -27,93 +74,107 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <Label Text="Genera tu rutina personalizada"
+            <Label Text="Esto es lo que sabemos sobre tí"
                    Style="{StaticResource label-h1-white}"
-                   FontSize="28"
-                   HorizontalOptions="Center"
-                   HorizontalTextAlignment="Center"
-                   Margin="0,0,0,20"
+                   HorizontalOptions="Start"
                    Grid.Row="0" />
 
-            <Label Text="Crearemos una rutina de ejercicios adaptada a tus objetivos y nivel"
-                   Style="{StaticResource label-p-white}"
-                   HorizontalTextAlignment="Center"
-                   Margin="0,0,0,30"
-                   Grid.Row="1" />
-
-            <Button Text="Generar Rutina"
-                    Command="{Binding StartGenerationCommand}"
-                    HorizontalOptions="Fill"
-                    Style="{StaticResource ButtonBold-XL-yellow}"
-                    CornerRadius="{StaticResource CornerRadiusRectangle}" 
-                    Grid.Row="2" />
+            <Label Grid.Row="1">
+                <Label.FormattedText>
+                    <FormattedString>
+                        <Span Text="Esta información se pasará a " 
+                              TextColor="{StaticResource TextPrimaryColorLight}"
+                              FontFamily="Montserrat-Medium"
+                              FontSize="16"/>
+                        <Span Text="{Binding CoachName}"
+                              TextColor="{StaticResource TertiaryColor}"
+                              FontFamily="Montserrat-Medium"
+                              FontSize="16" />
+                        <Span Text=" , para generar tú rutina."  
+                                   TextColor="{StaticResource TextPrimaryColorLight}"
+                                   FontFamily="Montserrat-Medium"
+                                   FontSize="16"/>
+                    </FormattedString>
+                </Label.FormattedText>
+            </Label>
         </Grid>
+        
+        <!-- Questionnaire Summary with ScrollView -->
+        <ScrollView Grid.Row="2"
+                    VerticalOptions="Fill">
+            <Grid RowSpacing="5">
+                
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
 
-        <!-- Estado de generación: Loading spinner -->
-        <Grid Grid.Row="0" 
-              IsVisible="{Binding IsGenerating}"
-              VerticalOptions="Center">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
+                <Label Text="{Binding QuestionnaireName}"
+                       Style="{StaticResource label-h1-white}"
+                       HorizontalOptions="Start"
+                       Grid.Row="0" />
 
-            <Label Text="Estamos creando tu rutina"
-                   Style="{StaticResource label-h1-white}"
-                   HorizontalOptions="Center"
-                   Margin="0,0,0,10"
-                   Grid.Row="0" />
+                <CollectionView Grid.Row="1"
+                    ItemsSource="{Binding QuestionnaireSummary.Answers}"
+                    SelectionMode="Single"
+                    SelectedItem="{Binding SelectedSummaryItem}"
+                    VerticalOptions="Start"
+                    HorizontalOptions="Center">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="dtos:AnswerDTO">
+                                <Border StrokeThickness="2"
+                        Stroke="{DynamicResource BackgroundPrimaryLight}"
+                        BackgroundColor="{DynamicResource PrimaryColorLightOpacity}"
+                        Margin="0,0,0,15">
 
-            <Label Text="Esto puede tardar unos minutos, por favor espera..."
-                   Style="{StaticResource label-p-white}"
-                   HorizontalTextAlignment="Center"
-                   Margin="0,0,0,30"
-                   Grid.Row="1" />
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="{DynamicResource CornerRadiusRectangle}" />
+                                    </Border.StrokeShape>
 
-            <Image Source="loading_spinner.gif"
-                   WidthRequest="100"
-                   HeightRequest="100"
-                   HorizontalOptions="Center"
-                   Grid.Row="2" 
-                   IsAnimationPlaying="True"/>
-        </Grid>
+                                    <Border.Shadow>
+                                        <Shadow Brush="{DynamicResource BackgroundPrimaryLight}"
+                                Opacity="0.35"
+                                Radius="{DynamicResource CornerRadiusRectangle}" />
+                                    </Border.Shadow>
 
-        <!-- Estado final: Rutina completada -->
-        <Grid Grid.Row="0" 
-              IsVisible="{Binding IsCompleted}"
-              VerticalOptions="Center">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
+                                    <!-- Answer information -->
+                                    <Grid Margin="10"
+                          BackgroundColor="Transparent">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
 
-            <Label Text="✓"
-                   FontSize="80"
-                   TextColor="#4CAF50"
-                   HorizontalOptions="Center"
-                   Margin="0,0,0,20"
-                   Grid.Row="0" />
+                                        <Label Text="{Binding QuestionText}"
+                               Style="{StaticResource label-h2-white}"
+                               FontSize="18"
+                               HorizontalOptions="Start"
+                               Grid.Row="0" />
 
-            <Label Text="¡Rutina creada con éxito!"
-                   Style="{StaticResource label-h1-white}"
-                   HorizontalOptions="Center"
-                   Margin="0,0,0,10"
-                   Grid.Row="1" />
-
-            <Label Text="Tu rutina personalizada está lista para comenzar"
-                   Style="{StaticResource label-p-white}"
-                   HorizontalTextAlignment="Center"
-                   Margin="0,0,0,30"
-                   Grid.Row="2" />
-
-            <Button Text="!Vamos allá!"
-                    Command="{Binding ViewRoutineCommand}"
-                    HorizontalOptions="Center"
-                    WidthRequest="200"
-                    Grid.Row="3" />
-        </Grid>
-
+                                        <!-- Usando el Converter para decidir qué texto mostrar -->
+                                        <Label Text="{Binding ., Converter={StaticResource AnswerTextConverter}}"
+                                  Style="{StaticResource label-p-white}"
+                                  FontSize="16"
+                                  HorizontalOptions="Start"
+                                  Grid.Row="1" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+            </Grid>
+        </ScrollView>
+        
+        
+        <!-- Button -->
+        <Button Grid.Row="3"
+                Margin="15" 
+                Text="Generar rutina"
+                Style="{StaticResource ButtonBold-XL-yellow}"
+                CornerRadius="{StaticResource CornerRadiusRectangle}"
+                Command="{Binding StartGenerationCommand}"
+                HorizontalOptions="Fill"
+                VerticalOptions="End"
+                />
     </Grid>
 </ContentPage>
