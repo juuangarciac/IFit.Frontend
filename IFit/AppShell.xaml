@@ -63,4 +63,14 @@
         ContentTemplate="{DataTemplate views:AIGenerationRoutineView}"
         Route="AIGenerationRoutineView" />
 
+    <ShellContent
+        Title="QuestionnaireSummary" 
+        ContentTemplate="{DataTemplate views:QuestionnaireSummaryView}" 
+        Route="QuestionnaireSummaryView" />
+
+    <ShellContent
+    Title="RoutineSummaryView" 
+    ContentTemplate="{DataTemplate views:RoutineSummaryView}" 
+    Route="RoutineSummaryView" />
+
 </Shell>

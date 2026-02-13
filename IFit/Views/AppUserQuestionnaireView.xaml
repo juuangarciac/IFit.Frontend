@@ -6,7 +6,7 @@
              xmlns:components="clr-namespace:IFit.Views.Components"
              x:Class="IFit.Views.AppUserQuestionnaireView"
              Title="Cuestionario"
-             Shell.NavBarIsVisible="False" 
+             Shell.NavBarIsVisible="False"
              BackgroundColor="{StaticResource BackgroundPrimaryDark}">
 
     <ContentPage.BindingContext>

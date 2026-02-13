@@ -609,7 +609,7 @@ namespace IFit.ViewModels
 
                 // Pasar el responseId a la siguiente vista para generar rutina
                 Preferences.Set("responseId", _responseId);
-                await Shell.Current.GoToAsync("///AIGenerationRoutineView");
+                await Shell.Current.GoToAsync("///QuestionnaireSummaryView");
             }
             catch (Exception ex)
             {

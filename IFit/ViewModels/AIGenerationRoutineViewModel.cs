@@ -49,13 +49,10 @@ public partial class AIGenerationRoutineViewModel : ObservableObject
     private bool _isGenerating = false;
 
     [ObservableProperty]
-    private bool _isCompleted = false;
+    private bool _isLoading = false;
 
     [ObservableProperty]
-    private bool _showStartButton = true;
-
-    [ObservableProperty]
-    private string _statusMessage = "Presiona el botón para generar tu rutina personalizada";
+    private string _statusMessage = "Cargando...";
 
     [ObservableProperty]
     private RoutineDto? _generatedRoutine;
@@ -96,10 +93,12 @@ public partial class AIGenerationRoutineViewModel : ObservableObject
         // Obtener resumen del cuestionario para mostrar en la UI
         try
         {
+            StatusMessage = "Obteniendo resumen de tu cuestionario...";
+            IsLoading = true;
+
             QuestionnaireResponseSummaryDTO? summary = await _questionnaireService.GetResponseSummary(_responseId);
             if (summary == null)
             {
-                System.Diagnostics.Debug.WriteLine("✗ No se pudo obtener el resumen del cuestionario");
                 await ErrorHandler.HandleErrorAsync(
                     "No se pudo obtener el resumen de tu cuestionario. " +
                     "Por favor, verifica tu conexión a internet e intenta nuevamente."
@@ -107,19 +106,24 @@ public partial class AIGenerationRoutineViewModel : ObservableObject
                 ResetToStart();
                 return;
             }
+
             QuestionnaireSummary = summary;
             QuestionnaireName = summary.QuestionnaireName;
             CoachName = Preferences.Get("CoachName", "");
 
-            System.Diagnostics.Debug.WriteLine("✓ Resumen del cuestionario obtenido exitosamente");
+            await GenerateRoutineAsync();
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"✗ Error obteniendo resumen del cuestionario: {ex.Message}");
             await ErrorHandler.HandleErrorAsync(
                 $"Ocurrió un error al obtener el resumen de tu cuestionario: {ex.Message}"
             );
             ResetToStart();
+        }
+        finally 
+        {
+           IsLoading = false;
+            StatusMessage = string.Empty;
         }
     }
 
@@ -133,15 +137,6 @@ public partial class AIGenerationRoutineViewModel : ObservableObject
     [RelayCommand]
     private async Task StartGenerationAsync()
     {
-        if (IsGenerating) return;
-
-        System.Diagnostics.Debug.WriteLine("=== Iniciando generación de rutina ===");
-
-        ShowStartButton = false;
-        IsGenerating = true;
-        IsCompleted = false;
-        StatusMessage = "Generando tu rutina personalizada...";
-
         await GenerateRoutineAsync();
     }
 
@@ -153,30 +148,17 @@ public partial class AIGenerationRoutineViewModel : ObservableObject
     {
         if (GeneratedRoutine == null)
         {
-            System.Diagnostics.Debug.WriteLine("✗ No hay rutina generada para navegar");
             return;
         }
 
         try
         {
-            // TODO: Navegar a la vista de detalle de rutina
-            // Pasar GeneratedRoutine como parámetro de navegación
             await Shell.Current.GoToAsync("//RoutineDetailView");
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"✗ Error navegando a rutina: {ex.Message}");
             await ErrorHandler.HandleErrorAsync($"Error al mostrar la rutina: {ex.Message}");
         }
-    }
-
-    /// <summary>
-    /// Comando para reintentar la generación
-    /// </summary>
-    [RelayCommand]
-    private void RetryGeneration()
-    {
-        ResetToStart();
     }
 
     #endregion
@@ -191,14 +173,10 @@ public partial class AIGenerationRoutineViewModel : ObservableObject
     {
         try
         {
-            System.Diagnostics.Debug.WriteLine("→ Obteniendo usuario actual...");
-
             // Obtener usuario actual
             AppUser? appUser = await _databaseService.GetCurrentUserAsync();
             if (appUser == null)
             {
-                System.Diagnostics.Debug.WriteLine("✗ No hay usuario activo");
-
                 await ErrorHandler.HandleErrorAsync(
                     "No hay ningún usuario activo. " +
                     "Por favor, inicia sesión para generar una rutina personalizada."
@@ -207,13 +185,9 @@ public partial class AIGenerationRoutineViewModel : ObservableObject
                 return;
             }
 
-            System.Diagnostics.Debug.WriteLine($"✓ Usuario obtenido: {appUser.Name} (ID: {appUser.Id})");
-
             // Validar responseId
             if (_responseId <= 0)
             {
-                System.Diagnostics.Debug.WriteLine("✗ ResponseId inválido");
-
                 await ErrorHandler.HandleErrorAsync(
                     "No se encontró un cuestionario completado. " +
                     "Por favor, completa el cuestionario antes de generar tu rutina."
@@ -224,7 +198,6 @@ public partial class AIGenerationRoutineViewModel : ObservableObject
 
             // Convertir el ID de usuario a String (como espera el backend)
             string userId = appUser.Id.ToString();
-            System.Diagnostics.Debug.WriteLine($"→ Generando rutina para userId: {userId}, responseId: {_responseId}");
 
             StatusMessage = "Analizando tu cuestionario...";
             await Task.Delay(500); // Dar feedback visual
@@ -234,8 +207,6 @@ public partial class AIGenerationRoutineViewModel : ObservableObject
 
             if (routine == null)
             {
-                System.Diagnostics.Debug.WriteLine("✗ No se pudo generar la rutina");
-
                 await ErrorHandler.HandleErrorAsync(
                     "No se pudo generar tu rutina. " +
                     "Por favor, verifica tu conexión a internet e intenta nuevamente."
@@ -244,21 +215,11 @@ public partial class AIGenerationRoutineViewModel : ObservableObject
                 return;
             }
 
-            System.Diagnostics.Debug.WriteLine("✓ Rutina generada exitosamente");
-
             // Guardar la rutina generada
             GeneratedRoutine = routine;
 
             // Actualizar UI
             StatusMessage = "¡Rutina generada exitosamente!";
-            IsGenerating = false;
-            IsCompleted = true;
-
-            System.Diagnostics.Debug.WriteLine("=== Generación completada ===");
-
-            // Opcional: Navegar automáticamente a la vista de rutina
-            // await Task.Delay(1000);
-            // await NavigateToRoutineAsync();
         }
         catch (HttpRequestException httpEx)
         {
@@ -272,9 +233,6 @@ public partial class AIGenerationRoutineViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"✗ Error inesperado: {ex.Message}");
-            System.Diagnostics.Debug.WriteLine($"StackTrace: {ex.StackTrace}");
-
             await ErrorHandler.HandleErrorAsync(
                 $"Ocurrió un error inesperado al generar tu rutina: {ex.Message}"
             );
@@ -287,13 +245,8 @@ public partial class AIGenerationRoutineViewModel : ObservableObject
     /// </summary>
     private void ResetToStart()
     {
-        IsGenerating = false;
-        IsCompleted = false;
-        ShowStartButton = true;
         StatusMessage = "Presiona el botón para generar tu rutina personalizada";
         GeneratedRoutine = null;
-
-        System.Diagnostics.Debug.WriteLine("→ Estado reseteado a inicial");
     }
 
     #endregion

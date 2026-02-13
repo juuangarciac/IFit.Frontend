@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewModels="clr-namespace:IFit.ViewModels"
+             xmlns:models="clr-namespace:IFit.Models.Dtos.AI"
+             x:Class="IFit.Views.RoutineSummaryView"
+             x:DataType="viewModels:RoutineSummaryViewModel"
+             Title="Rutina Personalizada"
+             Shell.NavBarIsVisible="False">
+
+    <Grid>
+        <!-- Fondo con gradiente -->
+        <BoxView>
+            <BoxView.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                    <GradientStop Color="#1a1a2e" Offset="0.0" />
+                    <GradientStop Color="#16213e" Offset="1.0" />
+                </LinearGradientBrush>
+            </BoxView.Background>
+        </BoxView>
+
+        <ScrollView>
+            <VerticalStackLayout Padding="20" Spacing="20">
+
+                <!-- Título principal -->
+                <Label Text="Tu rutina personalizada"
+                       FontSize="28"
+                       FontAttributes="Bold"
+                       TextColor="White"
+                       HorizontalOptions="Center"
+                       Margin="0,20,0,10"/>
+
+                <!-- Mensaje del coach IA -->
+                <Frame BackgroundColor="#2a2a3e"
+                       BorderColor="Transparent"
+                       CornerRadius="15"
+                       Padding="20"
+                       HasShadow="True">
+                    <Label Text="{Binding MessageAI}"
+                           TextColor="White"
+                           FontSize="16"
+                           LineHeight="1.4"/>
+                </Frame>
+
+                <!-- Título "Rutina" -->
+                <Label Text="Rutina"
+                       FontSize="22"
+                       FontAttributes="Bold"
+                       TextColor="White"
+                       Margin="0,10,0,5"/>
+
+                <!-- Scroll horizontal de días de entrenamiento -->
+                <ScrollView Orientation="Horizontal"
+                            HeightRequest="500"
+                            HorizontalScrollBarVisibility="Never">
+                    <HorizontalStackLayout Spacing="15"
+                                          BindableLayout.ItemsSource="{Binding Routine.Days}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="models:TrainingDayDto">
+                                <!-- Card de cada día -->
+                                <Border StrokeThickness="2"
+                                        WidthRequest="280"
+                                        HeightRequest="480"
+                                        BackgroundColor="#2a2a3e">
+                                    <Border.Stroke>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                            <GradientStop Color="#f39c12" Offset="0.0" />
+                                            <GradientStop Color="#e67e22" Offset="1.0" />
+                                        </LinearGradientBrush>
+                                    </Border.Stroke>
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="15"/>
+                                    </Border.StrokeShape>
+
+                                    <Grid Padding="15" RowDefinitions="Auto,Auto,*,Auto">
+
+                                        <!-- Título del día -->
+                                        <Label Grid.Row="0"
+                                               Text="{Binding DayName}"
+                                               FontSize="20"
+                                               FontAttributes="Bold"
+                                               TextColor="White"
+                                               Margin="0,0,0,10"/>
+
+                                        <!-- Descripción del día -->
+                                        <Label Grid.Row="1"
+                                               Text="{Binding Description}"
+                                               FontSize="14"
+                                               TextColor="#cccccc"
+                                               LineHeight="1.3"
+                                               Margin="0,0,0,15"/>
+
+                                        <!-- Lista de ejercicios -->
+                                        <ScrollView Grid.Row="2">
+                                            <VerticalStackLayout Spacing="8"
+                                                               BindableLayout.ItemsSource="{Binding Exercises}">
+                                                <BindableLayout.ItemTemplate>
+                                                    <DataTemplate x:DataType="models:ExerciseDto">
+                                                        <Frame BackgroundColor="#1a1a2e"
+                                                               BorderColor="Transparent"
+                                                               CornerRadius="8"
+                                                               Padding="10"
+                                                               Margin="0,0,0,5">
+                                                            <VerticalStackLayout Spacing="4">
+                                                                <Label FontSize="14"
+                                                                       FontAttributes="Bold"
+                                                                       TextColor="White">
+                                                                    <Label.FormattedText>
+                                                                        <FormattedString>
+                                                                            <Span Text="{Binding ExerciseName}"/>
+                                                                        </FormattedString>
+                                                                    </Label.FormattedText>
+                                                                </Label>
+                                                                <Label FontSize="12"
+                                                                       TextColor="#aaaaaa">
+                                                                    <Label.FormattedText>
+                                                                        <FormattedString>
+                                                                            <Span Text="{Binding Sets, StringFormat='{0} series'}"/>
+                                                                            <Span Text=" × "/>
+                                                                            <Span Text="{Binding Reps, StringFormat='{0} reps'}"/>
+                                                                        </FormattedString>
+                                                                    </Label.FormattedText>
+                                                                </Label>
+                                                                <Label Text="{Binding RestSeconds, StringFormat='Descanso: {0}s'}"
+                                                                       FontSize="11"
+                                                                       TextColor="#888888"
+                                                                       IsVisible="{Binding RestSeconds, Converter={StaticResource IntToBoolConverter}}"/>
+                                                            </VerticalStackLayout>
+                                                        </Frame>
+                                                    </DataTemplate>
+                                                </BindableLayout.ItemTemplate>
+                                            </VerticalStackLayout>
+                                        </ScrollView>
+
+                                        <!-- Logo iFit en la esquina inferior -->
+                                        <Label Grid.Row="3"
+                                               Text="iFit"
+                                               FontSize="16"
+                                               FontAttributes="Bold"
+                                               TextColor="#f39c12"
+                                               HorizontalOptions="End"
+                                               VerticalOptions="End"
+                                               Margin="0,10,0,0"/>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </HorizontalStackLayout>
+                </ScrollView>
+
+                <!-- Botones de acción -->
+                <Grid ColumnDefinitions="*,*"
+                      ColumnSpacing="15"
+                      Margin="0,20,0,30">
+
+                    <!-- Botón Probar de nuevo -->
+                    <Button Grid.Column="0"
+                            Text="Probar de nuevo"
+                            Command="{Binding TryAgainCommand}"
+                            BackgroundColor="#2a2a3e"
+                            TextColor="White"
+                            BorderColor="#f39c12"
+                            BorderWidth="2"
+                            CornerRadius="25"
+                            HeightRequest="50"
+                            FontSize="16"
+                            FontAttributes="Bold"/>
+
+                    <!-- Botón Me gusta -->
+                    <Button Grid.Column="1"
+                            Text="¡Me gusta!"
+                            Command="{Binding SaveRoutineCommand}"
+                            IsEnabled="{Binding IsSaving, Converter={StaticResource InvertedBoolConverter}}"
+                            BackgroundColor="#f39c12"
+                            TextColor="#1a1a2e"
+                            CornerRadius="25"
+                            HeightRequest="50"
+                            FontSize="16"
+                            FontAttributes="Bold"/>
+                </Grid>
+
+                <!-- Indicador de guardado -->
+                <ActivityIndicator IsRunning="{Binding IsSaving}"
+                                 IsVisible="{Binding IsSaving}"
+                                 Color="#f39c12"
+                                 HeightRequest="40"
+                                 WidthRequest="40"
+                                 HorizontalOptions="Center"/>
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>

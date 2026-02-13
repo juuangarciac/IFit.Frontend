@@ -20,6 +20,8 @@ namespace IFit
             Routing.RegisterRoute("ExperienceLevelSelectionView", typeof(ExperienceLevelSelectionView));
             Routing.RegisterRoute("AppUserQuestionnaireView", typeof(AppUserQuestionnaireView));
             Routing.RegisterRoute("AIGenerationRoutineView", typeof(AIGenerationRoutineView));
+            Routing.RegisterRoute("QuestionnaireSummaryView", typeof(QuestionnaireSummaryView));
+            Routing.RegisterRoute("RoutineSummaryView", typeof(RoutineSummaryView));
         }
     }
 }
