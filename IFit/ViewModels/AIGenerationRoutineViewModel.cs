@@ -208,8 +208,8 @@ public partial class AIGenerationRoutineViewModel : ObservableObject
             await Task.Delay(500); // Dar feedback visual
 
             // Llamar al servicio para generar la rutina
-            // var routine = await _aiRoutineService.GenerateRoutineAsync(userId, _responseId);
-            var routine = _aiRoutineService.GenerateTestRoutine();
+            var routine = await _aiRoutineService.GenerateRoutineAsync(userId, _responseId);
+            // var routine = _aiRoutineService.GenerateTestRoutine();
 
             if (routine == null)
             {

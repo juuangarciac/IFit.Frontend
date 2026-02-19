@@ -123,7 +123,7 @@ public partial class VerificationViewModel : ObservableObject
                 await InsertUserToDatabase(authData.AppUser);
 
                 // Navegar a la pantalla ExperienceLevelSelectionView
-                await Shell.Current.GoToAsync("///ExperienceLevelSelectionView");
+                await Shell.Current.GoToAsync("///GetStartedView");
             }
             else
             {

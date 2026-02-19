@@ -12,9 +12,4 @@ public partial class GetStartedView : ContentPage
         Console.WriteLine("Cancel clicked. Going back...");
         await Shell.Current.GoToAsync("///MainPage");
     }
-
-    public async void onContinueClicked(object sender, EventArgs e)
-    {
-        await Shell.Current.GoToAsync("///CoachModelTypeSelectionView");
-    }
 }

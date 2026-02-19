@@ -219,7 +219,7 @@
                         Text="Empieza ahora"
                         Style="{StaticResource ButtonBold-XL-yellow}"
                         CornerRadius="{StaticResource CornerRadiusRectangle}"
-                        Clicked="onContinueClicked"/>
+                        Command="{Binding GetStartedCommand}"/>
             </Grid>
           
         </Grid>

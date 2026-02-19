@@ -1,31 +1,36 @@
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using System.ComponentModel;
 using System.Reflection.Metadata;
 using System.Runtime.CompilerServices;
 
 namespace IFit.ViewModels;
 
-public class GetStartedViewModel : INotifyPropertyChanged
+public partial class GetStartedViewModel : ObservableObject
 {
-    private String _name = string.Empty;
-    public String Name
-    {
-        get => _name;
-        set
-        {
-            if (_name != value)
-            {
-                _name = value;
-                OnPropertyChanged(nameof(Name));
-            }
-        }
-    }
+    [ObservableProperty]
+    public partial string Name { get; set; } = string.Empty;
 
+    #region Constructor
     public GetStartedViewModel()
 	{
 		LoadUserName();
 	}
 
-    public void LoadUserName()
+    #endregion
+
+    #region Commands
+
+    [RelayCommand]
+    public async Task GetStartedAsync()
+    {
+        await Shell.Current.GoToAsync("ExperienceLevelSelectionView");
+    }
+
+    #endregion
+
+    #region Methods
+    private void LoadUserName()
     {
         var defaultValue = "NOT_FOUND";
         Name = Preferences.Get("UserName", defaultValue);
@@ -37,7 +42,5 @@ public class GetStartedViewModel : INotifyPropertyChanged
         }
     }
 
-    public event PropertyChangedEventHandler? PropertyChanged;
-    protected void OnPropertyChanged([CallerMemberName] string propertyName = "")
-        => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    #endregion
 }
