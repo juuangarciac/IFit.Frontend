@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace IFit.ViewModels
 {
+    [QueryProperty(nameof(Routine), "Routine")]
     public partial class RoutineSummaryViewModel : ObservableObject
     {
         #region Services
@@ -35,12 +36,7 @@ namespace IFit.ViewModels
 
         public RoutineSummaryViewModel()
         {
-            // TODO: Descomentar cuando RoutineService esté implementado
-            // _routineService = App.GetService<RoutineService>() 
-            //     ?? throw new InvalidOperationException("RoutineService no registrado");
 
-            // Si no se recibe la rutina por QueryProperty, intentar recuperarla de Preferences
-            _ = LoadRoutineFromPreferencesIfNeeded();
         }
 
         #endregion
@@ -50,36 +46,11 @@ namespace IFit.ViewModels
         /// <summary>
         /// Carga la rutina desde Preferences si no se recibió por navegación
         /// </summary>
-        private async Task LoadRoutineFromPreferencesIfNeeded()
+        partial void OnRoutineChanged(RoutineDto? value)
         {
-            await Task.Delay(100); // Pequeño delay para que QueryProperty se aplique primero
-
-            if (Routine == null)
+            if (value != null)
             {
-                var routineJson = Preferences.Get("TempRoutineData", string.Empty);
-                if (!string.IsNullOrEmpty(routineJson))
-                {
-                    try
-                    {
-                        Routine = System.Text.Json.JsonSerializer.Deserialize<RoutineDto>(routineJson);
-                        Preferences.Remove("TempRoutineData");
-                    }
-                    catch (Exception ex)
-                    {
-                        await ErrorHandler.HandleErrorAsync(
-                            $"Error al cargar la rutina: {ex.Message}"
-                        );
-                    }
-                }
-            }
-
-            if (string.IsNullOrEmpty(MessageAI))
-            {
-                MessageAI = Preferences.Get("TempMessageAI", string.Empty);
-                if (!string.IsNullOrEmpty(MessageAI))
-                {
-                    Preferences.Remove("TempMessageAI");
-                }
+                MessageAI = value.Description;
             }
         }
 

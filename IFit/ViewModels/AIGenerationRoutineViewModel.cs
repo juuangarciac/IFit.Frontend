@@ -153,7 +153,12 @@ public partial class AIGenerationRoutineViewModel : ObservableObject
 
         try
         {
-            await Shell.Current.GoToAsync("//RoutineDetailView");
+            var navigationParameter = new Dictionary<String, Object>() 
+            {
+                {"Routine", GeneratedRoutine }
+            };
+
+            await Shell.Current.GoToAsync($"RoutineSummaryView", navigationParameter);
         }
         catch (Exception ex)
         {
@@ -203,7 +208,8 @@ public partial class AIGenerationRoutineViewModel : ObservableObject
             await Task.Delay(500); // Dar feedback visual
 
             // Llamar al servicio para generar la rutina
-            var routine = await _aiRoutineService.GenerateRoutineAsync(userId, _responseId);
+            // var routine = await _aiRoutineService.GenerateRoutineAsync(userId, _responseId);
+            var routine = _aiRoutineService.GenerateTestRoutine();
 
             if (routine == null)
             {
@@ -220,6 +226,7 @@ public partial class AIGenerationRoutineViewModel : ObservableObject
 
             // Actualizar UI
             StatusMessage = "¡Rutina generada exitosamente!";
+            await NavigateToRoutineAsync();
         }
         catch (HttpRequestException httpEx)
         {

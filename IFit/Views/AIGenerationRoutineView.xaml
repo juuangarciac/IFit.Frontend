@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:vm="clr-namespace:IFit.ViewModels"
-             xmlns:dtos="clr-namespace:IFit.Models.Dtos.Questionnaire"
-             xmlns:converters="clr-namespace:IFit.Converters"
-             xmlns:components="clr-namespace:IFit.Views.Components"
-             x:Class="IFit.Views.AIGenerationRoutineView"
-             Title="AIGenerationRoutineView"
-             Shell.NavBarIsVisible="False"
-             BackgroundColor="{DynamicResource BackgroundPrimaryDark}">
+<ContentPage
+    x:Class="IFit.Views.AIGenerationRoutineView"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:components="clr-namespace:IFit.Views.Components"
+    xmlns:converters="clr-namespace:IFit.Converters"
+    xmlns:dtos="clr-namespace:IFit.Models.Dtos.Questionnaire"
+    xmlns:vm="clr-namespace:IFit.ViewModels"
+    Title="AIGenerationRoutineView"
+    BackgroundColor="{DynamicResource BackgroundPrimaryDark}"
+    Shell.NavBarIsVisible="False">
 
     <ContentPage.Resources>
         <ResourceDictionary>
@@ -23,93 +24,100 @@
     <Grid RowSpacing="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <!-- Header -->
+            <!--  Header  -->
             <RowDefinition Height="Auto" />
-            <!-- Título y subtítulo -->
+            <!--  Título y subtítulo  -->
             <RowDefinition Height="*" />
-            <!-- Body (contenido futuro) -->
+            <!--  Body (contenido futuro)  -->
             <RowDefinition Height="Auto" />
-            <!-- Footer (contenido futuro) -->
+            <!--  Footer (contenido futuro)  -->
         </Grid.RowDefinitions>
 
-        <!-- Header - Row 0 -->
-        <Grid Grid.Row="0"
-              Padding="15"
-              HorizontalOptions="Fill">
+        <!--  Header - Row 0  -->
+        <Grid
+            Grid.Row="0"
+            Padding="15"
+            HorizontalOptions="Fill">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <!-- Go Back -->
-            <Button Grid.Column="0"   
-                    HorizontalOptions="Center"  
-                    VerticalOptions="Center"  
-                    BackgroundColor="Transparent"  
-                    ImageSource="arrow.png"  
-                    Clicked="onCancelClicked" />
+            <!--  Go Back  -->
+            <Button
+                Grid.Column="0"
+                BackgroundColor="Transparent"
+                Clicked="onCancelClicked"
+                HorizontalOptions="Center"
+                ImageSource="arrow.png"
+                VerticalOptions="Center" />
 
-            <!-- Center line -->
-            <Border Grid.Column="1"  
-                    BackgroundColor="{StaticResource TextSecondaryColorLight}"  
-                    VerticalOptions="Center"
-                    HorizontalOptions="Center"
-                    WidthRequest="120"   
-                    HeightRequest="1"
-                    StrokeThickness="0"/>
+            <!--  Center line  -->
+            <Border
+                Grid.Column="1"
+                BackgroundColor="{StaticResource TextSecondaryColorLight}"
+                HeightRequest="1"
+                HorizontalOptions="Center"
+                StrokeThickness="0"
+                VerticalOptions="Center"
+                WidthRequest="120" />
 
-            <!-- Cancel button -->
-            <Button Grid.Column="2"   
-                    HorizontalOptions="Center"  
-                    VerticalOptions="Center"  
-                    BackgroundColor="Transparent"  
-                    ImageSource="cancel.svg"  
-                    Clicked="onCancelClicked" />
+            <!--  Cancel button  -->
+            <Button
+                Grid.Column="2"
+                BackgroundColor="Transparent"
+                Clicked="onCancelClicked"
+                HorizontalOptions="Center"
+                ImageSource="cancel.svg"
+                VerticalOptions="Center" />
         </Grid>
 
-        <!-- Título y Subtítulo - Row 1 -->
-        <Grid Grid.Row="1"
-              Padding="15,0"
-              RowSpacing="5"
-              HorizontalOptions="Center">
+        <!--  Título y Subtítulo - Row 1  -->
+        <Grid
+            Grid.Row="1"
+            Padding="15,0"
+            HorizontalOptions="Center"
+            RowSpacing="5">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <!-- Main title -->
-            <Label Grid.Row="0"
-                   HorizontalOptions="Center"
-                   HorizontalTextAlignment="Center">
+            <!--  Main title  -->
+            <Label
+                Grid.Row="0"
+                HorizontalOptions="Center"
+                HorizontalTextAlignment="Center">
                 <Label.FormattedText>
                     <FormattedString>
-                        <Span Text="¡Estamos generando tu " 
-                              Style="{DynamicResource label-h1-white}"
-                              FontSize="24"/>
-                        <Span Text="rutina personalizada!"
-                              Style="{DynamicResource label-h1-yellow}" 
-                              FontSize="24" />
+                        <Span
+                            FontSize="24"
+                            Style="{DynamicResource label-h1-white}"
+                            Text="¡Estamos generando tu " />
+                        <Span
+                            FontSize="24"
+                            Style="{DynamicResource label-h1-yellow}"
+                            Text="rutina personalizada!" />
                     </FormattedString>
                 </Label.FormattedText>
             </Label>
 
-            <!-- Subtitle -->
-            <Label Grid.Row="1"
-                   Text="Esto puede llevar un rato"
-                   HorizontalOptions="Center"
-                   Style="{DynamicResource label-p-white}" />
+            <!--  Subtitle  -->
+            <Label
+                Grid.Row="1"
+                HorizontalOptions="Center"
+                Style="{DynamicResource label-p-white}"
+                Text="Esto puede llevar un rato" />
         </Grid>
 
-        <!-- Body - Row 2 -->
+        <!--  Body - Row 2  -->
         <Grid Grid.Row="2">
-            <!-- Aquí irá tu contenido principal -->
+            <!--  Aquí irá tu contenido principal  -->
         </Grid>
 
-        <!-- Footer - Row 3 -->
-        <Grid Grid.Row="3">
-            <!-- Aquí irá tu footer -->
-        </Grid>
+        <!--  Footer - Row 3  -->
+        <Grid Grid.Row="3" />
 
     </Grid>
 </ContentPage>
