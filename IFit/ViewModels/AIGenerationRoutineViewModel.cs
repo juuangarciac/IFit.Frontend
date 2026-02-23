@@ -55,7 +55,7 @@ public partial class AIGenerationRoutineViewModel : ObservableObject
     private string _statusMessage = "Cargando...";
 
     [ObservableProperty]
-    private RoutineDto? _generatedRoutine;
+    private RoutineResponseDto? _generatedRoutine;
 
     #endregion
 

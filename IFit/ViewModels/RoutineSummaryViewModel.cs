@@ -22,7 +22,7 @@ namespace IFit.ViewModels
         #region Properties
 
         [ObservableProperty]
-        private RoutineDto? _routine;
+        private RoutineResponseDto? _routine;
 
         [ObservableProperty]
         private string _messageAI = string.Empty;
@@ -46,7 +46,7 @@ namespace IFit.ViewModels
         /// <summary>
         /// Carga la rutina desde Preferences si no se recibió por navegación
         /// </summary>
-        partial void OnRoutineChanged(RoutineDto? value)
+        partial void OnRoutineChanged(RoutineResponseDto? value)
         {
             if (value != null)
             {

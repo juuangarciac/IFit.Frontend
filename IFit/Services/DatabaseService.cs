@@ -80,6 +80,7 @@ namespace IFit.Services
                 // Check if user already exists by ID
                 if (await GetAppUserAsyncById(appUser.Id) == null)
                 {
+                    Preferences.Set("UserId", appUser.Id);
                     await _db.InsertAsync(appUser);
                 }
                 else

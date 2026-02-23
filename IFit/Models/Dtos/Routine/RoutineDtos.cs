@@ -18,15 +18,6 @@ namespace IFit.Models.Dtos.AI
         [JsonPropertyName("message")]
         public string Message { get; set; } = string.Empty;
 
-        [JsonPropertyName("routine")]
-        public RoutineDto? Routine { get; set; }
-    }
-
-    public class RoutineDto
-    {
-        [JsonPropertyName("userId")]
-        public string UserId { get; set; } = string.Empty;
-
         [JsonPropertyName("description")]
         public string Description { get; set; } = string.Empty;
 
@@ -54,22 +45,22 @@ namespace IFit.Models.Dtos.AI
 
     public class ExerciseDto
     {
-        [JsonPropertyName("exerciseId")]
-        public string ExerciseId { get; set; } = string.Empty;
-
         [JsonPropertyName("exerciseName")]
         public string ExerciseName { get; set; } = string.Empty;
 
         [JsonPropertyName("sets")]
-        public int Sets { get; set; }
+        public int? Sets { get; set; }
 
         [JsonPropertyName("reps")]
-        public string Reps { get; set; } = string.Empty;
+        public string? Reps { get; set; }
 
         [JsonPropertyName("restSeconds")]
-        public int RestSeconds { get; set; }
+        public int? RestSeconds { get; set; }
 
         [JsonPropertyName("notes")]
         public string Notes { get; set; } = string.Empty;
+
+        [JsonPropertyName("orderIndex")]
+        public int OrderIndex { get; set; }
     }
 }

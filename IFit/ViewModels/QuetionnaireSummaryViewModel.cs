@@ -46,7 +46,7 @@ namespace IFit.ViewModels
         private string _statusMessage = "Cargando...";
 
         [ObservableProperty]
-        private RoutineDto? _generatedRoutine;
+        private RoutineResponseDto? _generatedRoutine;
 
         #endregion
 

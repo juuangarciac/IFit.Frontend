@@ -94,7 +94,7 @@
                         <Span
                             FontSize="24"
                             Style="{DynamicResource label-h1-white}"
-                            Text="¡Estamos generando tu " />
+                            Text="¡Estamos gerndo tu " />
                         <Span
                             FontSize="24"
                             Style="{DynamicResource label-h1-yellow}"
@@ -108,7 +108,7 @@
                 Grid.Row="1"
                 HorizontalOptions="Center"
                 Style="{DynamicResource label-p-white}"
-                Text="Esto puede llevar un rato" />
+                Text="Esto puedllevar un rato" />
         </Grid>
 
         <!--  Body - Row 2  -->

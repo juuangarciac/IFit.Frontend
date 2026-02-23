@@ -80,7 +80,7 @@ namespace IFit.Services
         /// <param name="userId">ID del usuario (String, ej: "user_12345")</param>
         /// <param name="responseId">ID de la respuesta del cuestionario completado</param>
         /// <returns>RoutineResponseDto con la rutina generada o null si hay error</returns>
-        public async Task<RoutineDto?> GenerateRoutineAsync(string userId, long responseId)
+        public async Task<RoutineResponseDto?> GenerateRoutineAsync(string userId, long responseId)
         {
             try
             {
@@ -111,7 +111,7 @@ namespace IFit.Services
                 Debug.WriteLine($"→ Llamando a POST /api/routines/generate");
 
                 // Llamar al endpoint del backend
-                var response = await _webService.PostAsync<GenerateRoutineRequestDto, RoutineDto>(
+                var response = await _webService.PostAsync<GenerateRoutineRequestDto, RoutineResponseDto>(
                     "/routines/generate",
                     request
                 );
@@ -145,9 +145,9 @@ namespace IFit.Services
         /// Método de prueba para editar la vista de rutinas en la aplicacion.
         /// </summary>
         /// <returns></returns>
-        public RoutineDto GenerateTestRoutine()
+        /* public RoutineResponseDto GenerateTestRoutine()
         {
-            return new RoutineDto
+            return new RoutineResponseDto
             {
                 UserId = "test-user-123",
                 Description = "Rutina de fuerza de 3 días para nivel intermedio, enfocada en los principales grupos musculares.",
@@ -300,7 +300,7 @@ namespace IFit.Services
             }
         }
             };
-        }
+        } */
 
         #endregion
 
