@@ -13,16 +13,49 @@ namespace IFit.Models.Dtos.AI
         public long ResponseId { get; set; }
     }
 
+    /// <summary>
+    /// DTO para la creación de una nueva rutina de entrenamiento.
+    /// </summary>
+    public class CreateRoutineRequestDto
+    {
+        [JsonPropertyName("userId")]
+        public long UserId { get; set; }
+
+        [JsonPropertyName("description")]
+        public string? Description { get; set; }
+
+        [JsonPropertyName("trainingDays")]
+        public int TrainingDays { get; set; }
+
+        [JsonPropertyName("days")]
+        public List<TrainingDayDto> Days { get; set; } = new();
+    }
+
     public class RoutineResponseDto
     {
+        [JsonPropertyName("id")]
+        public int? Id { get; set; }
+
+        [JsonPropertyName("userId")]
+        public int? UserId { get; set; }
+
         [JsonPropertyName("message")]
         public string Message { get; set; } = string.Empty;
 
         [JsonPropertyName("description")]
         public string Description { get; set; } = string.Empty;
 
+        [JsonPropertyName("createdAt")]
+        public DateTime? CreatedAt { get; set; }
+
+        [JsonPropertyName("updatedAt")]
+        public DateTime? UpdatedAt { get; set; }  // corregido el typo
+
         [JsonPropertyName("trainingDays")]
         public int TrainingDays { get; set; }
+
+        [JsonPropertyName("isActive")]
+        public bool IsActive { get; set; }
 
         [JsonPropertyName("days")]
         public List<TrainingDayDto> Days { get; set; } = new();

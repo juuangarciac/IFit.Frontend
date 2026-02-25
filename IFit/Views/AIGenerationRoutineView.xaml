@@ -108,7 +108,7 @@
                 Grid.Row="1"
                 HorizontalOptions="Center"
                 Style="{DynamicResource label-p-white}"
-                Text="Esto puedllevar un rato" />
+                Text="Esto puede llevar un rat" />
         </Grid>
 
         <!--  Body - Row 2  -->

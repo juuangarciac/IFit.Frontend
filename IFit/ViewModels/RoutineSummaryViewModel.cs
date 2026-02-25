@@ -15,8 +15,8 @@ namespace IFit.ViewModels
     public partial class RoutineSummaryViewModel : ObservableObject
     {
         #region Services
-        // TODO: Descomentar cuando RoutineService esté implementado
-        // private readonly RoutineService _routineService;
+        private readonly TrainingService _trainingService;
+
         #endregion
 
         #region Properties
@@ -34,9 +34,15 @@ namespace IFit.ViewModels
 
         #region Constructor
 
-        public RoutineSummaryViewModel()
+        public RoutineSummaryViewModel(TrainingService trainingService)
         {
+            _trainingService = trainingService;
+        }
 
+        public RoutineSummaryViewModel() : this(
+            App.GetService<TrainingService>() ?? throw new InvalidOperationException("TrainingService no registrado"))
+        {
+            
         }
 
         #endregion
@@ -66,7 +72,7 @@ namespace IFit.ViewModels
         {
             try
             {
-                await Shell.Current.GoToAsync("//AIGenerationRoutineView");
+                await Shell.Current.GoToAsync($"AIGenerationRoutineView");
             }
             catch (Exception ex)
             {
@@ -91,12 +97,19 @@ namespace IFit.ViewModels
             try
             {
                 IsSaving = true;
+                long userId = Preferences.Get("UserId", 0);
 
-                // TODO: Descomentar cuando RoutineService esté implementado
-                // await _routineService.SaveRoutineAsync(Routine);
+                var response = await _trainingService.createRoutineAsync(userId, Routine);
 
-                // Simulación temporal
-                await Task.Delay(1000);
+                if (response == null)
+                {
+                    await Shell.Current.DisplayAlert(
+                        "Error",
+                        "No se pudo guardar tu rutina. Por favor, intenta nuevamente.",
+                        "OK"
+                    );
+                    return;
+                }
 
                 await Shell.Current.DisplayAlert(
                     "¡Éxito!",
@@ -105,7 +118,7 @@ namespace IFit.ViewModels
                 );
 
                 // Navegar a la página principal o a la vista de rutinas guardadas
-                await Shell.Current.GoToAsync("///HomeView");
+                await Shell.Current.GoToAsync("$HomeView");
             }
             catch (Exception ex)
             {

@@ -98,7 +98,7 @@ namespace IFit.Services
         {
             if (userId == null || experienceLevel == null || userId <= 0 || experienceLevel <= 0)
             {
-                Debug.WriteLine("User ID o Experience Level ID inválido");
+                Debug.WriteLine("User ID o Experience Level ID inválido"); 
                 return null;
             }
 
