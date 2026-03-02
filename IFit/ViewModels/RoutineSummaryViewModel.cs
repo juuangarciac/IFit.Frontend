@@ -97,7 +97,7 @@ namespace IFit.ViewModels
             try
             {
                 IsSaving = true;
-                long userId = Preferences.Get("UserId", 0);
+                long userId = Preferences.Get("UserId", 0L);
 
                 var response = await _trainingService.createRoutineAsync(userId, Routine);
 
@@ -118,7 +118,7 @@ namespace IFit.ViewModels
                 );
 
                 // Navegar a la página principal o a la vista de rutinas guardadas
-                await Shell.Current.GoToAsync("$HomeView");
+                await Shell.Current.GoToAsync("///HomeView");
             }
             catch (Exception ex)
             {

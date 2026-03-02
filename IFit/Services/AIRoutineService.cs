@@ -536,7 +536,7 @@ namespace IFit.Services
                 }
 
                 // Enviar solicitud
-                var endpoint = $"/chat/{normalizedCoachName}";
+                var endpoint = $"/{normalizedCoachName}/chat";
                 var content = new ChatMessageDto { MemoryId = memoryId, Message = message };
 
                 Debug.WriteLine($"→ Llamando a coach '{normalizedCoachName}' con memoryId {memoryId}");

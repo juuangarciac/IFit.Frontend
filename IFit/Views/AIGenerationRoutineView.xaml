@@ -94,11 +94,11 @@
                         <Span
                             FontSize="24"
                             Style="{DynamicResource label-h1-white}"
-                            Text="¡Estamos gerndo tu " />
+                            Text="¡Estamos generando tu " />
                         <Span
                             FontSize="24"
                             Style="{DynamicResource label-h1-yellow}"
-                            Text="rutina personalizada!" />
+                            Text="Tú rutina personalizada!" />
                     </FormattedString>
                 </Label.FormattedText>
             </Label>
@@ -108,7 +108,7 @@
                 Grid.Row="1"
                 HorizontalOptions="Center"
                 Style="{DynamicResource label-p-white}"
-                Text="Esto puede llevar un rat" />
+                Text="Esto puede llevar un rato" />
         </Grid>
 
         <!--  Body - Row 2  -->

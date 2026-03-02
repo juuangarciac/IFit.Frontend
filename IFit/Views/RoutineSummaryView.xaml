@@ -72,6 +72,11 @@
 
             <!--  Título "Rutina"  -->
             <Label Style="{StaticResource label-h1-yellow}" Text="Rutina" />
+            
+            <!-- Informacion adicional - Mensaje del Entrenador -->
+            <Label Style="{StaticResource label-p-white}"
+                   Text="{Binding MessageAI}" />
+            
         </VerticalStackLayout>
 
         <!--  Scroll horizontal de días de entrenamiento  -->
@@ -118,6 +123,8 @@
                                                        Style="{StaticResource label-h3-white}"
                                                        FontSize="16"
                                                        FontAttributes="Bold"/>
+                                                <Label Text="{Binding Notes}"
+                                                       Style="{StaticResource label-p-white}"/> 
                                                 <Label Style="{StaticResource label-p-white}" Opacity="0.75">
                                                     <Label.FormattedText>
                                                         <FormattedString>
