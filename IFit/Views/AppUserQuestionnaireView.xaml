@@ -46,7 +46,7 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
-                    <!-- Back Button (disabled by default in your ViewModel) -->
+                    <!-- Back Button -->
                     <Button Grid.Column="0"
                             HorizontalOptions="Start"
                             VerticalOptions="Center"

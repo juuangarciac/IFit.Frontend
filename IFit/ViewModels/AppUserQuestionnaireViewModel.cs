@@ -462,6 +462,18 @@ namespace IFit.ViewModels
 
         #region Navigation Methods
 
+        private void UpdateNavigationState()
+        {
+            CanGoBack = CurrentQuestionIndex > 0;
+            CanGoNext = HasSelectedOption;
+            IsLastQuestion = CurrentQuestionIndex >= TotalQuestions - 1;
+
+            ((Command)GoBackCommand).ChangeCanExecute();
+            ((Command)GoNextCommand).ChangeCanExecute();
+
+            Debug.WriteLine($"Estado navegación - CanGoBack: {CanGoBack}, CanGoNext: {CanGoNext}, IsLastQuestion: {IsLastQuestion}");
+        }
+
         /// <summary>
         /// Avanza a la siguiente pregunta o finaliza el cuestionario
         /// </summary>
@@ -559,36 +571,59 @@ namespace IFit.ViewModels
         }
 
         /// <summary>
-        /// Retrocede a la pregunta anterior (si el backend lo soporta)
-        /// NOTA: El flujo actual del backend no soporta retroceder.
-        /// Esta funcionalidad requeriría cambios en el backend.
+        /// Retrocede a la pregunta anterior deshaciendo la última respuesta registrada
         /// </summary>
         private async Task GoBackAsync()
         {
-            // TODO: Implementar retroceso si el backend lo soporta
-            // Por ahora, el flujo del QuestionnaireService no permite retroceder
+            try
+            {
+                IsLoading = true;
+                HasError = false;
+                ErrorMessage = string.Empty;
 
-            await ErrorHandler.HandleErrorAsync(
-                "Función No Disponible",
-                "No es posible retroceder a preguntas anteriores en este momento."
-            );
-        }
+                Debug.WriteLine($"Retrocediendo en sesión {_responseId}, pregunta actual: {CurrentQuestionNumber}");
 
-        /// <summary>
-        /// Actualiza el estado de navegación (botones habilitados/deshabilitados)
-        /// </summary>
-        private void UpdateNavigationState()
-        {
-            // Por ahora, no se puede retroceder
-            CanGoBack = false; // Cambiar a true si el backend soporta retroceso
+                var response = await _questionnaireService.GoToPreviousQuestion(_responseId);
 
-            // Se puede avanzar si hay una opción seleccionada
-            CanGoNext = HasSelectedOption;
+                if (response == null)
+                {
+                    HasError = true;
+                    ErrorMessage = "No se pudo retroceder a la pregunta anterior.";
 
-            // Verificar si es la última pregunta
-            IsLastQuestion = CurrentQuestionIndex >= TotalQuestions - 1;
+                    await ErrorHandler.HandleErrorAsync(
+                        "Error",
+                        "No se pudo retroceder. Por favor, intenta nuevamente."
+                    );
+                    return;
+                }
 
-            Debug.WriteLine($"Estado navegación - CanGoBack: {CanGoBack}, CanGoNext: {CanGoNext}, IsLastQuestion: {IsLastQuestion}");
+                // Cargar la pregunta anterior
+                CurrentQuestion = response.CurrentQuestion;
+                CurrentQuestionIndex = response.TotalQuestionsAnswered; // El servidor ya nos dice cuántas quedan respondidas
+
+                // Limpiar selección para que el usuario elija de nuevo
+                SelectedOption = null;
+                AdditionalText = string.Empty;
+
+                Debug.WriteLine($"Retroceso exitoso. Pregunta anterior: {CurrentQuestion?.Text}");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error en GoBackAsync: {ex.Message}");
+
+                HasError = true;
+                ErrorMessage = "Error al retroceder.";
+
+                await ErrorHandler.HandleErrorAsync(
+                    "Error Inesperado",
+                    "No se pudo retroceder. Por favor, intenta nuevamente."
+                );
+            }
+            finally
+            {
+                IsLoading = false;
+                UpdateNavigationState();
+            }
         }
 
         #endregion

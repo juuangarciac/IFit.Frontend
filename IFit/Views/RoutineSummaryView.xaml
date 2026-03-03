@@ -74,8 +74,8 @@
             <Label Style="{StaticResource label-h1-yellow}" Text="Rutina" />
             
             <!-- Informacion adicional - Mensaje del Entrenador -->
-            <Label Style="{StaticResource label-p-white}"
-                   Text="{Binding MessageAI}" />
+            <!--<Label Style="{StaticResource label-p-white}"
+                   Text="{Binding MessageAI}" /> -->
             
         </VerticalStackLayout>
 

@@ -253,6 +253,42 @@ namespace IFit.Services
         #region Sesiones de Usuario (Respuestas)
 
         /// <summary>
+        /// Retrocede a la pregunta anterior en una sesión de cuestionario.
+        /// Deshace la última respuesta registrada y devuelve esa pregunta para que el usuario pueda corregirla.
+        /// </summary>
+        /// <param name="responseId">ID de la sesión de cuestionario</param>
+        /// <returns>DTO con la pregunta anterior y el estado actualizado de la sesión, o null si hay error</returns>
+        public async Task<QuestionnaireResponseDTO?> GoToPreviousQuestion(long responseId)
+        {
+            try
+            {
+                if (responseId <= 0)
+                {
+                    Debug.WriteLine("Error: responseId inválido");
+                    return null;
+                }
+
+                var response = await _webService.PostAsync<object, QuestionnaireResponseDTO>(
+                    $"/questionnaires/responses/{responseId}/previous",
+                    new { } // Body vacío, el servidor solo necesita el responseId de la URL
+                );
+
+                if (!response.Success)
+                {
+                    Debug.WriteLine($"Error retrocediendo pregunta en sesión {responseId}: {response.ErrorMessage}");
+                    return null;
+                }
+
+                return response.Data;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Excepción en GoToPreviousQuestion: {ex.Message}");
+                return null;
+            }
+        }
+
+        /// <summary>
         /// Inicia una nueva sesión de cuestionario para un usuario
         /// Retorna el ID de sesión (responseId) y la primera pregunta
         /// </summary>
