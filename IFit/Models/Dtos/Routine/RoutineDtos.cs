@@ -57,6 +57,9 @@ namespace IFit.Models.Dtos.AI
         [JsonPropertyName("isActive")]
         public bool IsActive { get; set; }
 
+        [JsonPropertyName("currentDay")]
+        public int? CurrentDay { get; set; }
+
         [JsonPropertyName("days")]
         public List<TrainingDayDto> Days { get; set; } = new();
     }
@@ -95,5 +98,53 @@ namespace IFit.Models.Dtos.AI
 
         [JsonPropertyName("orderIndex")]
         public int OrderIndex { get; set; }
+    }
+    // Añadir a RoutineDtos.cs (IFit.Models.Dtos.AI)
+
+    /// <summary>
+    /// DTO para la actualización parcial de una rutina existente.
+    /// Equivalente a UpdateRoutineRequestDto.java
+    /// </summary>
+    public class UpdateRoutineRequestDto
+    {
+        [JsonPropertyName("description")]
+        public string? Description { get; set; }
+
+        [JsonPropertyName("trainingDays")]
+        public int? TrainingDays { get; set; }
+
+        [JsonPropertyName("isActive")]
+        public bool? IsActive { get; set; }
+
+        [JsonPropertyName("days")]
+        public List<TrainingDayDto>? Days { get; set; }
+    }
+
+    /// <summary>
+    /// DTO genérico para respuestas paginadas del backend Spring (Page<T>).
+    /// Mapea los campos principales que devuelve Spring Data.
+    /// </summary>
+    public class PagedResponseDto<T>
+    {
+        [JsonPropertyName("content")]
+        public List<T> Content { get; set; } = new();
+
+        [JsonPropertyName("totalElements")]
+        public long TotalElements { get; set; }
+
+        [JsonPropertyName("totalPages")]
+        public int TotalPages { get; set; }
+
+        [JsonPropertyName("number")]
+        public int PageNumber { get; set; }
+
+        [JsonPropertyName("size")]
+        public int PageSize { get; set; }
+
+        [JsonPropertyName("first")]
+        public bool First { get; set; }
+
+        [JsonPropertyName("last")]
+        public bool Last { get; set; }
     }
 }

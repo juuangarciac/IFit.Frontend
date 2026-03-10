@@ -15,82 +15,97 @@
               HorizontalOptions="Fill"
               Margin="0, 5, 0, 5"
               Padding="0, 5, 0, 5">
-            
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
 
-        <!-- Home icon -->
-        <Grid Grid.Column="0"
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Home icon -->
+            <Grid Grid.Column="0"
               RowDefinitions="Auto, Auto"
               HorizontalOptions="Center"
-              VerticalOptions="Center" >
-
-            <Image  Grid.Row="0"
+              VerticalOptions="Center">
+                <Grid.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding GoToHomeClicked}" />
+                </Grid.GestureRecognizers>
+                <Image  Grid.Row="0"
                     Source="home_ifit_white.png"
                     Style="{DynamicResource navbar_image}" />
-
-            <Label  Grid.Row="1"
+                <Label  Grid.Row="1"
                     Text="Hoy"
                     Style="{DynamicResource navbar-p-white}" />
-        </Grid>
-        <!-- Plan icon -->
-        <Grid Grid.Column="1"
+            </Grid>
+
+            <!-- Plan icon -->
+            <Grid Grid.Column="1"
               RowDefinitions="Auto, Auto"
               HorizontalOptions="Center"
               VerticalOptions="Center">
-
-            <Image  Grid.Row="0"
+                <Grid.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding GoToPlanClicked}" />
+                </Grid.GestureRecognizers>
+                <Image  Grid.Row="0"
                     Source="plan_ifit_white.png"
                     Style="{DynamicResource navbar_image}" />
-            <Label  Grid.Row="1"
+                <Label  Grid.Row="1"
                     Text="Plan"
                     Style="{DynamicResource navbar-p-white}" />
-        </Grid>
-        <!-- Workouts icon -->
-        <Grid Grid.Column="2"
+            </Grid>
+
+            <!-- Workouts icon -->
+            <Grid Grid.Column="2"
               RowDefinitions="Auto, Auto"
               HorizontalOptions="Center"
               VerticalOptions="Center">
-            <Image  Grid.Row="0"
+                <Grid.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding GoToWorkoutsClicked}" />
+                </Grid.GestureRecognizers>
+                <Image  Grid.Row="0"
                     Source="workouts_ifit_white.png"
                     Style="{DynamicResource navbar_image}" />
-            <Label  Grid.Row="1"
+                <Label  Grid.Row="1"
                     Text="Actividades"
                     Style="{DynamicResource navbar-p-white}" />
-        </Grid>
-        <!-- Community icon -->
-        <Grid Grid.Column="3"
+            </Grid>
+
+            <!-- Community icon -->
+            <Grid Grid.Column="3"
               RowDefinitions="Auto, Auto"
               HorizontalOptions="Center"
               VerticalOptions="Center">
-            <Image  Grid.Row="0"
+                <Grid.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding GoToCommunityClicked}" />
+                </Grid.GestureRecognizers>
+                <Image  Grid.Row="0"
                     Source="community_ifit_white.png"
                     Style="{DynamicResource navbar_image}" />
-
-            <Label  Grid.Row="1"
+                <Label  Grid.Row="1"
                     Text="Comunidad"
                     Style="{DynamicResource navbar-p-white}"
                     LineBreakMode="TailTruncation"/>
-        </Grid>
-        <!-- Help -->
+            </Grid>
+
+            <!-- Help -->
             <Grid Grid.Column="4"
               RowDefinitions="Auto, Auto"
               HorizontalOptions="Center"
               VerticalOptions="Center">
+                <Grid.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding GoToHelpClicked}" />
+                </Grid.GestureRecognizers>
                 <Image  Grid.Row="0"
                     Source="help_ifit_white.png"
                     Style="{DynamicResource navbar_image}" />
-
                 <Label  Grid.Row="1"
                     Text="Ayuda"
                     Style="{DynamicResource navbar-p-white}"
                     LineBreakMode="TailTruncation"/>
             </Grid>
+
         </Grid>
     </Border>
 </ContentView>

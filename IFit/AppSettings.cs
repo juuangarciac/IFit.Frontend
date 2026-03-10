@@ -11,7 +11,7 @@ namespace IFit
         public static string AppName = "IFit";
 
         // Base address for the HTTP client, depending on the platform
-        public static string ApiGatewayBaseUrl = "http://192.168.1.25:8080/ifit/api/v1";
+        public static string ApiGatewayBaseUrl = "http://192.168.1.76:8080/ifit/api/v1";
         public static string RefreshTokenEndpoint = "/auth/refresh";
 
         public static string BaseAddress = DeviceInfo.Platform == DevicePlatform.Android ? ApiGatewayBaseUrl : ApiGatewayBaseUrl;
