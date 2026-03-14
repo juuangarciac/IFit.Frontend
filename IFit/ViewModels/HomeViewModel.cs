@@ -63,8 +63,6 @@ public partial class HomeViewModel : ObservableObject
 
     public HomeViewModel() : this(
         App.GetService<TrainingService>() ?? throw new InvalidOperationException("TrainingService no registrado")) {
-
-        _ = InitializeAsync();
     }
 
 
@@ -105,6 +103,12 @@ public partial class HomeViewModel : ObservableObject
     #endregion
 
     #region Methods
+
+    [RelayCommand]
+    public async Task AppearingAsync()
+    {
+        await InitializeAsync();
+    }
 
     [RelayCommand]
     public async Task OpenTrainingDayDetailAsync()

@@ -1,20 +1,21 @@
 ﻿using IFit.Services;
 using Microsoft.Extensions.Logging;
+using CommunityToolkit.Maui;
 
 namespace IFit;
+
 public static class MauiProgram
 {
     public static MauiApp CreateMauiApp()
     {
         var builder = MauiApp.CreateBuilder();
-
         builder
-            .UseMauiApp<App>() 
+            .UseMauiApp<App>()
+            .UseMauiCommunityToolkit()
             .ConfigureFonts(fonts =>
             {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
             });
-
 
         // Register services
         builder.Services.AddSingleton<DatabaseService>();
@@ -24,13 +25,8 @@ public static class MauiProgram
         builder.Services.AddSingleton<ExperienceLevelService>();
         builder.Services.AddSingleton<QuestionnaireService>();
         builder.Services.AddSingleton<AIRoutineService>();
-        builder.Services.AddSingleton<QuestionnaireService>();
         builder.Services.AddSingleton<TrainingService>();
-
-
-        // Register WebService with necessary parameters from AppSettings
         builder.Services.AddSingleton<ISecureStorageService, SecureStorageService>();
-
         builder.Services.AddSingleton<WebService>(sp =>
             new WebService(AppSettings._HttpClient, AppSettings.ApiGatewayBaseUrl, AppSettings.RefreshTokenEndpoint)
         );
