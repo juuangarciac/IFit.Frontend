@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using IFit.Models.Dtos;
 using IFit.Models.Dtos.AI;
 using IFit.Resources.Items;
@@ -73,18 +74,22 @@ public partial class HomeViewModel : ObservableObject
 
         StatusMessage = "Cargando tu rutina actual...";
 
-        var routineId = Preferences.Get("CurrentRoutineId", 0L);
+        var userId = Preferences.Get("UserId", 0L);
 
-        Routine = await _trainingService.getRoutineByIdAsync(routineId);
+        List<RoutineResponseDto>? allActivesRoutines = await _trainingService
+            .getActivesRoutinesByUserIdAsync(userId);
 
-        if(Routine == null)
+        if(allActivesRoutines == null)
         {
             StatusMessage = "No se ha encontrado la rutina actual.";
             return;
         }
 
+        Routine = allActivesRoutines.FirstOrDefault();
+
         TrainingDayDto = await _trainingService
-            .getRoutineDayAsync(routineId, (int)Routine.CurrentDay);
+            .getRoutineDayAsync( (long)Routine.Id, (int)Routine.CurrentDay);
+
         if(TrainingDayDto == null)
         {
             StatusMessage = "No se ha encontrado una sesión activa para hoy.";
@@ -100,6 +105,18 @@ public partial class HomeViewModel : ObservableObject
     #endregion
 
     #region Methods
+
+    [RelayCommand]
+    public async Task OpenTrainingDayDetailAsync()
+    {
+        var navigationParameter = new Dictionary<String, Object>()
+            {
+                {"Routine", Routine },
+                {"TrainingDay", TrainingDayDto }
+            };
+
+        await Shell.Current.GoToAsync($"//TrainingDayDetailView", navigationParameter);
+    }
 
     #endregion
 }

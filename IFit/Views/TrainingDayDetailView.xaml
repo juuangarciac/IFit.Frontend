@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="IFit.Views.TrainingDayDetailView"
+             xmlns:vm="clr-namespace:IFit.ViewModels"
+             xmlns:views="clr-namespace:IFit.Views.Templates"
+             xmlns:dto="clr-namespace:IFit.Models.Dtos.AI"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{StaticResource BackgroundPrimaryDark}">
+    <ContentPage.BindingContext>
+        <vm:TrainingDayDetailViewModel />
+    </ContentPage.BindingContext>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <!-- Header -->
+            <RowDefinition Height="*" />
+            <!-- Body scrollable -->
+            <RowDefinition Height="Auto" />
+            <!-- Button fijo -->
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Grid Grid.Row="0"
+              ColumnSpacing="15"
+              VerticalOptions="Start"
+              Background="{DynamicResource CardPremiumGradientColor}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <!-- Ifit navbar -->
+            <Grid Grid.Row="0" Margin="15">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Back Button -->
+                <Button Grid.Column="0"
+            HorizontalOptions="Start"
+            VerticalOptions="Center"
+            BackgroundColor="Transparent"
+            ImageSource="arrow.png"
+            Clicked="BackToHome" />
+
+                <!-- Center: ifit logo -->
+                <Image Grid.Column="0"
+           Grid.ColumnSpan="2"
+           Source="ifit_logo_white.png"
+           HeightRequest="20"
+           WidthRequest="120"
+           HorizontalOptions="Center"
+           VerticalOptions="Center" />
+            </Grid>
+
+            <!-- Title/Day -->
+            <VerticalStackLayout Grid.Row="1" Margin="15">
+                <Label Text="{Binding DateNowFormatted}"
+                       Style="{DynamicResource label-p-white}" />
+                <Label Text="{Binding TrainingDay.DayName}"
+                       Style="{DynamicResource label-Title-white}" />
+                <HorizontalStackLayout Spacing="10">
+                    <Image Source="clock64.png"
+                           HeightRequest="18"
+                           WidthRequest="18"
+                           VerticalOptions="Center" />
+
+                    <Label Text="Duración aproximada: "
+                           Style="{StaticResource label-p-white}"
+                           FontAttributes="Bold" />
+
+                    <Label Text="{Binding EstimatedDuration}"
+                           Style="{DynamicResource label-p-white}"
+                           FontAttributes="Bold"/>
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
+        </Grid>
+
+        <!-- Body scrollable -->
+        <ScrollView Grid.Row="1">
+            <Grid RowSpacing="10" Margin="15">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <!-- Separator -->
+                    <RowDefinition Height="Auto" />
+                    <!-- Descripción -->
+                    <RowDefinition Height="Auto" />
+                    <!-- Ejercicios label -->
+                    <RowDefinition Height="Auto" />
+                    <!-- CollectionView -->
+                </Grid.RowDefinitions>
+
+                <!-- Separator -->
+                <BoxView Grid.Row="0"
+                         HeightRequest="1"
+                         BackgroundColor="{StaticResource TextSecondaryColorLight}"
+                         VerticalOptions="Center" />
+
+                <!-- Description -->
+                <Grid Grid.Row="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Label Grid.Row="0"
+                           Text="Descripcion"
+                           Style="{StaticResource label-h2-white}" />
+
+                    <Border Grid.Row="1"
+                            Stroke="{StaticResource BackgroundPrimaryLight}"
+                            StrokeThickness="1">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="8" />
+                        </Border.StrokeShape>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <Border Grid.Row="0"
+                                    StrokeThickness="0"
+                                    Margin="0"
+                                    Background="{DynamicResource CardPremiumGradientColor}"
+                                    HeightRequest="18"
+                                    HorizontalOptions="Fill">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="8, 8, 0, 0" />
+                                </Border.StrokeShape>
+                            </Border>
+                            <Grid Grid.Row="1"
+                                  ColumnSpacing="10"
+                                  Margin="10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Label Grid.Column="0"
+                                       HorizontalTextAlignment="Center"
+                                       VerticalTextAlignment="Center"
+                                       Text="{Binding TrainingDay.DayNumber}"
+                                       Style="{DynamicResource label-Title-white}"
+                                       FontAttributes="Italic"
+                                       Padding="10" />
+                                <BoxView Grid.Column="1"
+                                         WidthRequest="1"
+                                         BackgroundColor="{StaticResource TextSecondaryColorLight}"
+                                         VerticalOptions="Fill" />
+                                <Label Grid.Column="2"
+                                       VerticalTextAlignment="Center"
+                                       Text="{Binding TrainingDay.Description}"
+                                       Style="{DynamicResource label-p-white}" />
+                            </Grid>
+                        </Grid>
+                    </Border>
+                </Grid>
+
+                <!-- Exercises title -->
+                <Label Grid.Row="2"
+                       Text="Ejercicios"
+                       Style="{StaticResource label-h2-white}" />
+
+                <!-- Exercises list -->
+                <CollectionView Grid.Row="3"
+                                ItemsSource="{Binding TrainingDay.Exercises}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="dto:ExerciseDto">
+                            <Border StrokeThickness="2"
+                                    Stroke="{DynamicResource BackgroundPrimaryLight}"
+                                    BackgroundColor="{DynamicResource PrimaryColorLightOpacity}"
+                                    Margin="0,0,0,15">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="{DynamicResource CornerRadiusRectangle}" />
+                                </Border.StrokeShape>
+                                <Border.Shadow>
+                                    <Shadow Brush="{DynamicResource BackgroundPrimaryLight}"
+                                            Opacity="0.35"
+                                            Radius="{DynamicResource CornerRadiusRectangle}" />
+                                </Border.Shadow>
+                                <Grid Margin="10"
+                                      RowSpacing="5"
+                                      BackgroundColor="Transparent">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <Label Grid.Row="0"
+                                           Text="{Binding ExerciseName}"
+                                           Style="{DynamicResource label-h3-white}" />
+                                    <Label Grid.Row="1"
+                                           Text="{Binding Notes}"
+                                           Style="{DynamicResource label-p-white}" />
+                                    <Grid Grid.Row="2">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Label Grid.Column="0">
+                                            <Label.FormattedText>
+                                                <FormattedString>
+                                                    <Span Text="Sets: " 
+                                                          Style="{DynamicResource label-p-white}"
+                                                          FontAttributes="Bold"/>
+                                                    <Span Text="{Binding Sets}" Style="{DynamicResource label-p-white}" />
+                                                </FormattedString>
+                                            </Label.FormattedText>
+                                        </Label>
+                                        <Label Grid.Column="1">
+                                            <Label.FormattedText>
+                                                <FormattedString>
+                                                    <Span Text="Reps: " 
+                                                          Style="{DynamicResource label-p-white}" 
+                                                          FontAttributes="Bold"/>
+                                                    <Span Text="{Binding Reps}" Style="{DynamicResource label-p-white}" />
+                                                </FormattedString>
+                                            </Label.FormattedText>
+                                        </Label>
+                                        <Label Grid.Column="2">
+                                            <Label.FormattedText>
+                                                <FormattedString>
+                                                    <Span Text="Descanso: " 
+                                                          Style="{DynamicResource label-p-white}"
+                                                          FontAttributes="Bold"/>
+                                                    <Span Text="{Binding RestSeconds}" Style="{DynamicResource label-p-white}" />
+                                                </FormattedString>
+                                            </Label.FormattedText>
+                                        </Label>
+                                    </Grid>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+            </Grid>
+        </ScrollView>
+
+        <!-- Botón fijo abajo -->
+        <Button Grid.Row="2"
+                Margin="15"
+                Text="Finalizar sesión"
+                Style="{StaticResource ButtonBold-XL-yellow}"
+                CornerRadius="{StaticResource CornerRadiusRectangle}"
+                Command="{Binding EndSessionCommand}" />
+    </Grid>
+</ContentPage>

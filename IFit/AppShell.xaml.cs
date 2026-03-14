@@ -22,6 +22,7 @@ namespace IFit
             Routing.RegisterRoute("AIGenerationRoutineView", typeof(AIGenerationRoutineView));
             Routing.RegisterRoute("QuestionnaireSummaryView", typeof(QuestionnaireSummaryView));
             Routing.RegisterRoute("RoutineSummaryView", typeof(RoutineSummaryView));
+            Routing.RegisterRoute("TrainingDayDetailView", typeof(TrainingDayDetailView));
         }
     }
 }

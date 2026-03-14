@@ -73,4 +73,10 @@
     ContentTemplate="{DataTemplate views:RoutineSummaryView}" 
     Route="RoutineSummaryView" />
 
+
+    <ShellContent
+    Title="TrainingDayDetailView" 
+    ContentTemplate="{DataTemplate views:TrainingDayDetailView}" 
+    Route="TrainingDayDetailView" />
+
 </Shell>

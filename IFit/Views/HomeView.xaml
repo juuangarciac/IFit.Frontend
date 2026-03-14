@@ -154,6 +154,10 @@
                             <RoundRectangle CornerRadius="8"/>
                         </Border.StrokeShape>
 
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding OpenTrainingDayDetailCommand}" />
+                        </Border.GestureRecognizers>
+
                         <Grid >
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="24"/>
@@ -163,17 +167,12 @@
                             <!-- Barra degradado verde izquierda -->
                             <Border Grid.Column="0"
                                     StrokeThickness="0"
-                                    Margin="0">
+                                    Margin="0"
+                                    Background="{DynamicResource CardPremiumGradientColor}">
 
                                 <Border.StrokeShape>
                                     <RoundRectangle CornerRadius="8, 0, 8, 0"/>
                                 </Border.StrokeShape>
-                                <Border.Background>
-                                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                                        <GradientStop Color="#00BCD4" Offset="0.0"/>
-                                        <GradientStop Color="#00796B" Offset="1.0"/>
-                                    </LinearGradientBrush>
-                                </Border.Background>
                             </Border>
 
                             <!-- Contenido -->

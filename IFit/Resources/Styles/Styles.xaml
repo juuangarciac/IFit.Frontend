@@ -54,6 +54,12 @@
         <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource TextPrimaryColorLight}, Dark={StaticResource TextPrimaryColorDark}}" />
     </Style>
 
+    <Style x:Key="label-Title-white" TargetType="Label">
+        <Setter Property="FontFamily" Value="Montserrat-Bold" />
+        <Setter Property="FontSize" Value="26" />
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource TextPrimaryColorLight}, Dark={StaticResource TextPrimaryColorDark}}" />
+    </Style>
+    
     <Style x:Key="label-h1-white" TargetType="Label">
         <Setter Property="FontFamily" Value="Montserrat-Bold" />
         <Setter Property="FontSize" Value="18" />
@@ -182,6 +188,7 @@
     <Color x:Key="SecondGradientColor">#F2153A5B</Color>
     <Color x:Key="ThirdGradientColor">#FF303840</Color>
 
+
     <!-- Modern premium LinearGradientBrush (vertical) -->
     <LinearGradientBrush x:Key="PremiumGradient" StartPoint="0,0" EndPoint="0,1">
         <GradientStop Color="{StaticResource FirtGradientColor}" Offset="0.1" />
@@ -189,6 +196,17 @@
         <GradientStop Color="{StaticResource ThirdGradientColor}" Offset="1.0" />
     </LinearGradientBrush>
 
+
+    <!-- Cards color -->
+    <Color x:Key="CardFirstGradientColor">#00BCD4</Color>
+    <Color x:Key="CardSecondGradientColor">#00796B</Color>
+    <Color x:Key="CardThirdGradientColor">#FF222831</Color>
+
+    <LinearGradientBrush x:Key="CardPremiumGradientColor" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="{StaticResource CardFirstGradientColor}" Offset="0.0" />
+        <GradientStop Color="{StaticResource CardSecondGradientColor}" Offset="0.4" />
+        <GradientStop Color="{StaticResource CardThirdGradientColor}" Offset="1.0" />
+    </LinearGradientBrush>
 
     <!-- Dark surface background (slightly lighter than black for legibility) -->
     <SolidColorBrush x:Key="SurfaceDark" Color="#141516" />
