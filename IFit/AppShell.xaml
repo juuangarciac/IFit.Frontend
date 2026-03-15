@@ -69,14 +69,18 @@
         Route="QuestionnaireSummaryView" />
 
     <ShellContent
-    Title="RoutineSummaryView" 
-    ContentTemplate="{DataTemplate views:RoutineSummaryView}" 
-    Route="RoutineSummaryView" />
-
+        Title="RoutineSummaryView" 
+        ContentTemplate="{DataTemplate views:RoutineSummaryView}" 
+        Route="RoutineSummaryView" />
 
     <ShellContent
-    Title="TrainingDayDetailView" 
-    ContentTemplate="{DataTemplate views:TrainingDayDetailView}" 
-    Route="TrainingDayDetailView" />
+        Title="TrainingDayDetailView" 
+        ContentTemplate="{DataTemplate views:TrainingDayDetailView}" 
+        Route="TrainingDayDetailView" />
+
+    <ShellContent
+        Title="ChatAIView" 
+        ContentTemplate="{DataTemplate views:ChatAIView}" 
+        Route="ChatAIView" />
 
 </Shell>

@@ -284,12 +284,15 @@
 
             <!-- Registrar entrenamiento -->
             <Button Grid.Row="2"
-            Text="Registrar entrenamiento"
-            Style="{DynamicResource ButtonBold-XL-dark-white}"
-            CornerRadius="6"
-            BorderColor="{DynamicResource BorderButtonLightColor}"
-            BorderWidth="0.25"
-            VerticalOptions="End"/>
+                Text="{Binding ButtonContent}"
+                Style="{DynamicResource ButtonBold-XL-dark-white}"
+                CornerRadius="6"
+                BorderColor="{DynamicResource BorderButtonLightColor}"
+                BorderWidth="0.25"
+                VerticalOptions="End"
+                IsVisible="{Binding IsLoading, Converter={StaticResource InvertedBoolConverter}}"
+                IsEnabled="{Binding IsLoading, Converter={StaticResource InvertedBoolConverter}}"
+                Command="{Binding GoToChatViewCommand}"/>
         </Grid>
 
         <!--  Nav Menu -->

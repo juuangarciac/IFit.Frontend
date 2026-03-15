@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using IFit.Models;
 using IFit.Models.Dtos;
 using IFit.Models.Dtos.AI;
 using IFit.Resources.Items;
@@ -48,23 +49,29 @@ public partial class HomeViewModel : ObservableObject
     [ObservableProperty]
     public partial String StatusMessage { get; set; } = string.Empty;
 
+    [ObservableProperty]
+    public partial String ButtonContent { get; set; } = "Pregunta a tu coach";
+
     #endregion
 
     #region Services
+    private AppUserService _appUserService;
     private TrainingService _trainingService;
 
     #endregion
 
     #region Constructor
 
-    public HomeViewModel(TrainingService trainingService) { 
+    public HomeViewModel(TrainingService trainingService,
+        AppUserService appUserService) { 
         _trainingService = trainingService;
+        _appUserService = appUserService;
     }
 
     public HomeViewModel() : this(
-        App.GetService<TrainingService>() ?? throw new InvalidOperationException("TrainingService no registrado")) {
+        App.GetService<TrainingService>() ?? throw new InvalidOperationException("TrainingService no registrado"),
+        App.GetService<AppUserService>() ?? throw new InvalidOperationException("AppUserService no esta registrado")) {
     }
-
 
     private async Task InitializeAsync()
     {
@@ -73,6 +80,15 @@ public partial class HomeViewModel : ObservableObject
         StatusMessage = "Cargando tu rutina actual...";
 
         var userId = Preferences.Get("UserId", 0L);
+
+        AppUserResponseDto? currentUser = await _appUserService.findUserById(userId);
+
+        if(currentUser == null)
+        {
+            StatusMessage = "No se ha encontrado el usuario actual.";
+            return;
+        }
+        ButtonContent = "Pregunta a " + currentUser.CoachModelTypeName;
 
         List<RoutineResponseDto>? allActivesRoutines = await _trainingService
             .getActivesRoutinesByUserIdAsync(userId);
@@ -120,6 +136,12 @@ public partial class HomeViewModel : ObservableObject
             };
 
         await Shell.Current.GoToAsync($"//TrainingDayDetailView", navigationParameter);
+    }
+
+    [RelayCommand]
+    public async Task GoToChatViewAsync()
+    {
+        await Shell.Current.GoToAsync($"ChatAIView");
     }
 
     #endregion
