@@ -16,7 +16,7 @@ public partial class HomeFooterView : ContentView
     // Navega a la pantalla de Plan de entrenamiento
     private async void OnPlanClicked(object sender, EventArgs e)
     {
-        await Shell.Current.GoToAsync("//PlanPage");
+        await Shell.Current.GoToAsync("//PlanSummaryView");
     }
 
     // Navega a la pantalla de Actividades / Workouts

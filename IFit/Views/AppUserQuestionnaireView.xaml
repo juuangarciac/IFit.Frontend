@@ -17,7 +17,7 @@
 
         <!-- Loading Overlay -->
         <components:LoadingOverlay IsLoading="{Binding IsLoading}"
-                                   Message="{Binding StatusMessage}"
+                                   Message="{Binding  StatusMessage}"
                                     ZIndex="999"/>
 
         <!-- Main Content -->
@@ -52,9 +52,7 @@
                             VerticalOptions="Center"
                             BackgroundColor="Transparent"
                             ImageSource="arrow.png"
-                            Command="{Binding GoBackCommand}"
-                            IsEnabled="{Binding CanGoBack}"
-                            Opacity="{Binding CanGoBack, Converter={StaticResource BoolToOpacityConverter}}" />
+                            Command="{Binding GoBackCommand}"/>
 
                     <!-- Center line / Questionnaire Name -->
                     <Label Grid.Column="1"
@@ -93,6 +91,23 @@
                                     Stroke="{DynamicResource BackgroundPrimaryLight}"
                                     BackgroundColor="{DynamicResource PrimaryColorLightOpacity}"
                                     Margin="0,0,0,15">
+
+                                <VisualStateManager.VisualStateGroups>
+                                    <VisualStateGroupList>
+                                        <VisualStateGroup x:Name="CommonStates">
+                                            <VisualState x:Name="Normal">
+                                                <VisualState.Setters>
+                                                    <Setter Property="BackgroundColor" Value="{DynamicResource BackgroundPrimaryDark}" />
+                                                </VisualState.Setters>
+                                            </VisualState>
+                                            <VisualState x:Name="Selected">
+                                                <VisualState.Setters>
+                                                    <Setter Property="BackgroundColor" Value="{DynamicResource BackgroundSecondaryDark}" />
+                                                </VisualState.Setters>
+                                            </VisualState>
+                                        </VisualStateGroup>
+                                    </VisualStateGroupList>
+                                </VisualStateManager.VisualStateGroups>
 
                                 <!-- Triggers para cambiar el estilo cuando está seleccionada -->
                                 <Border.Triggers>
@@ -245,17 +260,19 @@
                                MaxLength="500"
                                VerticalOptions="Start"
                                VerticalTextAlignment="Start"
+                               ReturnType="Done"
                                IsSpellCheckEnabled="False"
                                IsTextPredictionEnabled="False"
                                HandlerChanged="OnEntryHandlerChanged"
                                Margin="10" />
+                        
                     </Border>
 
                     <!-- Save Button -->
                     <Button Grid.Row="3"
                             Text="Guardar"
                             Style="{StaticResource ButtonBold-XL-dark-yellow}"
-                            Command="{Binding CloseInputCommand}"
+                            Command="{Binding SaveTextInputCommand}"
                             HorizontalOptions="Fill"
                             Margin="0,10,0,0" />
                 </Grid>

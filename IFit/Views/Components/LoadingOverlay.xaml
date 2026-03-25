@@ -4,35 +4,34 @@
              x:Class="IFit.Views.Components.LoadingOverlay"
              x:Name="loadingOverlay">
     <Grid IsVisible="{Binding IsLoading, Source={x:Reference loadingOverlay}}"
-          BackgroundColor="#40000000">
+      BackgroundColor="#40000000"
+      HorizontalOptions="Fill"
+      VerticalOptions="Fill">
 
-        <VerticalStackLayout VerticalOptions="Center"
-                             Margin="15"
-                            HorizontalOptions="Center">
-
-            <Border BackgroundColor="White"
-                    Padding="40,30"
-                    StrokeThickness="0">
-                <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="15"/>
-                </Border.StrokeShape>
-
-                <VerticalStackLayout Spacing="15">
-                    <!-- Spinner -->
-                    <ActivityIndicator IsRunning="{Binding IsLoading, Source={x:Reference loadingOverlay}}"
-                                      Color="{StaticResource TertiaryColor}"
-                                      HeightRequest="50"
-                                      WidthRequest="50"/>
-
-                    <!-- Mensaje -->
-                    <Label Text="{Binding Message, Source={x:Reference loadingOverlay}}"
-                           FontFamily="Montserrat-Regular"
-                           FontSize="16"
-                           TextColor="Black"
-                           HorizontalTextAlignment="Center"
-                           IsVisible="{Binding HasMessage, Source={x:Reference loadingOverlay}}"/>
-                </VerticalStackLayout>
-            </Border>
-        </VerticalStackLayout>
+        <Border BackgroundColor="White"
+            Padding="40,30"
+            StrokeThickness="0"
+            VerticalOptions="Center"
+            HorizontalOptions="Center">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="15"/>
+            </Border.StrokeShape>
+            <VerticalStackLayout Spacing="15"
+                             MinimumWidthRequest="150">
+                <!-- Spinner -->
+                <ActivityIndicator IsRunning="{Binding IsLoading, Source={x:Reference loadingOverlay}}"
+                               Color="{StaticResource TertiaryColor}"
+                               HeightRequest="50"
+                               WidthRequest="50"
+                               HorizontalOptions="Center"/>
+                <!-- Mensaje -->
+                <Label Text="{Binding Message, Source={x:Reference loadingOverlay}}"
+                   FontFamily="Montserrat-Regular"
+                   FontSize="16"
+                   TextColor="Black"
+                   HorizontalTextAlignment="Center"
+                   IsVisible="{Binding HasMessage, Source={x:Reference loadingOverlay}}"/>
+            </VerticalStackLayout>
+        </Border>
     </Grid>
 </ContentView>

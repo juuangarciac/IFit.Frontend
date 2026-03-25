@@ -24,6 +24,9 @@ namespace IFit
             Routing.RegisterRoute("RoutineSummaryView", typeof(RoutineSummaryView));
             Routing.RegisterRoute("TrainingDayDetailView", typeof(TrainingDayDetailView));
             Routing.RegisterRoute("ChatAIView", typeof(ChatAIView));
+            Routing.RegisterRoute("WeeklySummaryView", typeof(WeeklySummaryView));
+            Routing.RegisterRoute("PlanView", typeof(PlanView));
+            Routing.RegisterRoute("PlanSummaryView", typeof (PlanView));
         }
     }
 }

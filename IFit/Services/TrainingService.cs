@@ -142,6 +142,15 @@ namespace IFit.Services
         }
 
         /// <summary>
+        /// Obtiene la rutina activa más reciente de un usuario (mayor Id).
+        /// </summary>
+        public async Task<RoutineResponseDto?> getLatestActiveRoutineByUserIdAsync(long userId)
+        {
+            List<RoutineResponseDto>? routines = await getActivesRoutinesByUserIdAsync(userId);
+            return routines?.MaxBy(r => r.Id);
+        }
+
+        /// <summary>
         /// Obtiene las rutinas de un usuario con paginación y ordenamiento.
         /// GET /routines/user/{userId}/paginated?page=0&size=10&sortBy=createdAt&sortDir=desc
         /// </summary>

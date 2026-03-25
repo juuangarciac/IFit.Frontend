@@ -42,18 +42,26 @@
 
             <!-- Plan icon -->
             <Grid Grid.Column="1"
-              RowDefinitions="Auto, Auto"
-              HorizontalOptions="Center"
-              VerticalOptions="Center">
-                <Grid.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding GoToPlanClicked}" />
-                </Grid.GestureRecognizers>
-                <Image  Grid.Row="0"
-                    Source="plan_ifit_white.png"
-                    Style="{DynamicResource navbar_image}" />
-                <Label  Grid.Row="1"
-                    Text="Plan"
-                    Style="{DynamicResource navbar-p-white}" />
+      RowDefinitions="Auto, Auto"
+      HorizontalOptions="Center"
+      VerticalOptions="Center">
+
+                <Image Grid.Row="0"
+           Source="plan_ifit_white.png"
+           Style="{DynamicResource navbar_image}" />
+                <Label Grid.Row="1"
+           Text="Plan"
+           Style="{DynamicResource navbar-p-white}"
+                       HorizontalOptions="Center"/>
+
+                <!-- Botón invisible superpuesto -->
+                <Button Grid.Row="0"
+                    Grid.RowSpan="2"
+                    BackgroundColor="Transparent"
+                    BorderColor="Transparent"
+                    Clicked="OnPlanClicked"
+                    HorizontalOptions="Fill"
+                    VerticalOptions="Fill" />
             </Grid>
 
             <!-- Workouts icon -->

@@ -7,7 +7,7 @@ public partial class TrainingDayDetailView : ContentPage
 		InitializeComponent();
 	}
 
-	public async void BackToHome(object sender, EventArgs e)
+	public async void Back(object sender, EventArgs e)
 	{
 		await Shell.Current.GoToAsync($"///HomeView");
 	}

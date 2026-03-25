@@ -83,4 +83,19 @@
         ContentTemplate="{DataTemplate views:ChatAIView}" 
         Route="ChatAIView" />
 
+    <ShellContent
+        Title="WeeklySummaryView" 
+        ContentTemplate="{DataTemplate views:WeeklySummaryView}" 
+        Route="WeeklySummaryView" />
+
+    <ShellContent
+        Title="PlanView" 
+        ContentTemplate="{DataTemplate views:PlanView}" 
+        Route="PlanView" />
+
+    <ShellContent
+        Title="PlanSummaryView"
+        ContentTemplate="{DataTemplate views:PlanSummaryView}"
+        Route="PlanSummaryView" />
+
 </Shell>

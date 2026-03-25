@@ -155,6 +155,23 @@
                             IsEnabled="{Binding IsLoading, Converter={StaticResource InvertedBoolConverter}}"
                             BackgroundColor="{DynamicResource BackgroundPrimaryDark}">
 
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroupList>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal">
+                                        <VisualState.Setters>
+                                            <Setter Property="BackgroundColor" Value="{DynamicResource BackgroundPrimaryDark}" />
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                    <VisualState x:Name="Selected">
+                                        <VisualState.Setters>
+                                            <Setter Property="BackgroundColor" Value="{DynamicResource BackgroundSecondaryDark}" />
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateGroupList>
+                        </VisualStateManager.VisualStateGroups>
+
                         <Border.StrokeShape>
                             <RoundRectangle CornerRadius="8"/>
                         </Border.StrokeShape>
@@ -224,10 +241,31 @@
                             IsEnabled="{Binding IsLoading, Converter={StaticResource InvertedBoolConverter}}"
                             BackgroundColor="{DynamicResource BackgroundPrimaryDark}">
 
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroupList>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal">
+                                        <VisualState.Setters>
+                                            <Setter Property="BackgroundColor" Value="{DynamicResource BackgroundPrimaryDark}" />
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                    <VisualState x:Name="Selected">
+                                        <VisualState.Setters>
+                                            <Setter Property="BackgroundColor" Value="{DynamicResource BackgroundSecondaryDark}" />
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateGroupList>
+                        </VisualStateManager.VisualStateGroups>
+
                         <Border.StrokeShape>
                             <RoundRectangle CornerRadius="8"/>
                         </Border.StrokeShape>
 
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding GoToWeeklySummaryCommand}" />
+                        </Border.GestureRecognizers>
+                            
                         <Grid RowSpacing="10"
                                 Padding="12,10">
                             <Grid.RowDefinitions>

@@ -49,7 +49,6 @@ namespace IFit.ViewModels
         private string _additionalText = string.Empty;
 
         // Navegación
-        private bool _canGoBack;
         private bool _canGoNext;
         private bool _isLastQuestion;
 
@@ -68,7 +67,6 @@ namespace IFit.ViewModels
                 if (SetProperty(ref _isLoading, value))
                 {
                     OnPropertyChanged(nameof(CanGoNext));
-                    OnPropertyChanged(nameof(CanGoBack));
                 }
             }
         }
@@ -255,14 +253,6 @@ namespace IFit.ViewModels
         /// </summary>
         public string ProgressText => $"Pregunta {CurrentQuestionNumber} de {TotalQuestions}";
 
-        /// <summary>
-        /// Indica si se puede ir a la pregunta anterior
-        /// </summary>
-        public bool CanGoBack
-        {
-            get => _canGoBack;
-            set => SetProperty(ref _canGoBack, value);
-        }
 
         /// <summary>
         /// Indica si se puede ir a la siguiente pregunta
@@ -273,25 +263,11 @@ namespace IFit.ViewModels
             set => SetProperty(ref _canGoNext, value);
         }
 
-        /// <summary>
-        /// Indica si es la última pregunta
-        /// </summary>
-        public bool IsLastQuestion
-        {
-            get => _isLastQuestion;
-            set
-            {
-                if (SetProperty(ref _isLastQuestion, value))
-                {
-                    OnPropertyChanged(nameof(NextButtonText));
-                }
-            }
-        }
 
         /// <summary>
         /// Texto del botón "Siguiente" (cambia en la última pregunta)
         /// </summary>
-        public string NextButtonText => IsLastQuestion ? "Finalizar" : "Siguiente";
+        public string NextButtonText => "Siguiente";
 
         #endregion
 
@@ -299,6 +275,7 @@ namespace IFit.ViewModels
 
         public ICommand GoNextCommand { get; }
         public ICommand GoBackCommand { get; }
+        public ICommand SaveTextInputCommand { get; }
         public ICommand CloseInputCommand { get; }
 
         #endregion
@@ -325,13 +302,20 @@ namespace IFit.ViewModels
 
             GoBackCommand = new Command(
                 execute: async () => await GoBackAsync(),
-                canExecute: () => CanGoBack && !IsLoading
+                canExecute: () => !IsLoading
             );
+
+            SaveTextInputCommand = new Command(() =>
+            {
+                RequiresTextInput = false;
+            });
 
             // Comando para cerrar el overlay del input de texto
             CloseInputCommand = new Command(() =>
             {
                 RequiresTextInput = false;
+                _selectedOption = null;
+                OnPropertyChanged(nameof(SelectedOption));
             });
 
             // Cargar datos iniciales
@@ -361,7 +345,7 @@ namespace IFit.ViewModels
             try
             {
                 IsLoading = true;
-                StatusMessage = "Creando cuestinario personalizado...";
+                StatusMessage = "Personalizando cuestionario...";
 
                 HasError = false;
                 ErrorMessage = string.Empty;
@@ -464,14 +448,10 @@ namespace IFit.ViewModels
 
         private void UpdateNavigationState()
         {
-            CanGoBack = CurrentQuestionIndex > 0;
             CanGoNext = HasSelectedOption;
-            IsLastQuestion = CurrentQuestionIndex >= TotalQuestions - 1;
 
             ((Command)GoBackCommand).ChangeCanExecute();
             ((Command)GoNextCommand).ChangeCanExecute();
-
-            Debug.WriteLine($"Estado navegación - CanGoBack: {CanGoBack}, CanGoNext: {CanGoNext}, IsLastQuestion: {IsLastQuestion}");
         }
 
         /// <summary>
@@ -489,6 +469,7 @@ namespace IFit.ViewModels
                 }
 
                 IsLoading = true;
+                StatusMessage = string.Empty;
                 HasError = false;
                 ErrorMessage = string.Empty;
 
@@ -582,6 +563,12 @@ namespace IFit.ViewModels
                 ErrorMessage = string.Empty;
 
                 Debug.WriteLine($"Retrocediendo en sesión {_responseId}, pregunta actual: {CurrentQuestionNumber}");
+
+                if(CurrentQuestionIndex <= 0)
+                {
+                    await Shell.Current.GoToAsync($"CoachModelTypeSelectionView");
+                    return;
+                }
 
                 var response = await _questionnaireService.GoToPreviousQuestion(_responseId);
 

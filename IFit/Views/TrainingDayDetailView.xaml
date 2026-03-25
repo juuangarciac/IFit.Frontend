@@ -25,7 +25,7 @@
         <Grid Grid.Row="0"
               ColumnSpacing="15"
               VerticalOptions="Start"
-              Background="{DynamicResource CardPremiumGradientColor}">
+              Background="{Binding Background}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
@@ -44,7 +44,7 @@
             VerticalOptions="Center"
             BackgroundColor="Transparent"
             ImageSource="arrow.png"
-            Clicked="BackToHome" />
+            Command="{Binding GoBackCommand}" />
 
                 <!-- Center: ifit logo -->
                 <Image Grid.Column="0"
@@ -124,7 +124,7 @@
                             <Border Grid.Row="0"
                                     StrokeThickness="0"
                                     Margin="0"
-                                    Background="{DynamicResource CardPremiumGradientColor}"
+                                    Background="{Binding Background}"
                                     HeightRequest="18"
                                     HorizontalOptions="Fill">
                                 <Border.StrokeShape>
@@ -247,6 +247,8 @@
                 Text="Finalizar sesión"
                 Style="{StaticResource ButtonBold-XL-yellow}"
                 CornerRadius="{StaticResource CornerRadiusRectangle}"
-                Command="{Binding EndSessionCommand}" />
+                Command="{Binding EndSessionCommand}"
+                IsEnabled="{Binding CanEndSession}"
+                IsVisible="{Binding CanEndSession}"/>
     </Grid>
 </ContentPage>

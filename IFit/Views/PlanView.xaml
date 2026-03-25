@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:IFit.ViewModels"
+             xmlns:dtos="clr-namespace:IFit.Models.Dtos.AI"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             x:Class="IFit.Views.PlanView"
+             Title="PlanView"
+             Shell.NavBarIsVisible="False">
+
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior
+            EventName="Appearing"
+            Command="{Binding AppearingCommand}" />
+    </ContentPage.Behaviors>
+    
+    <ContentPage.BindingContext>
+        <vm:PlanViewModel/>
+    </ContentPage.BindingContext>
+    
+    <Grid BackgroundColor="{StaticResource BackgroundPrimaryDark}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Header -->
+        <Grid Grid.Row="0"
+              Background="{StaticResource CardPremiumYellowGradientColor}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <!-- Ifit navbar -->
+            <Grid Grid.Row="0" Margin="15">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0"
+                HorizontalOptions="Start"
+                VerticalOptions="Center"
+                BackgroundColor="Transparent"
+                ImageSource="arrow.png"
+                Clicked="BackToHome" />
+                <Image Grid.Column="0"
+               Grid.ColumnSpan="2"
+               Source="ifit_logo_white.png"
+               HeightRequest="20"
+               WidthRequest="120"
+               HorizontalOptions="Center"
+               VerticalOptions="Center" />
+
+            </Grid>
+
+            <!-- Texto con más jerarquía -->
+            <VerticalStackLayout Grid.Row="1"
+                 Margin="15,0,15,20"
+                 Spacing="6"
+                 VerticalOptions="End">
+                <Label Text="PLAN PERSONALIZADO"
+       FontSize="11"
+       CharacterSpacing="2"
+       Opacity="0.7"
+       Style="{StaticResource label-p-white}" />
+                <Label Text="Tu plan de entreno personalizado"
+       Style="{StaticResource label-Title-white}" />
+                <Label Text="A continuación te presentamos tu plan de entreno personalizado"
+       Style="{StaticResource label-p-white}"
+       Opacity="0.8"
+       LineBreakMode="WordWrap" />
+            </VerticalStackLayout>
+            
+        </Grid>
+        
+        <!-- Content -->
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout  Margin="15"
+                                  Spacing="10">
+
+                <!-- CoachMessage -->
+                <Border StrokeThickness="2"
+     Stroke="{DynamicResource BackgroundPrimaryLight}"
+     BackgroundColor="{DynamicResource PrimaryColorLightOpacity}"
+     Margin="0,0,0,15">
+
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="{DynamicResource CornerRadiusRectangle}" />
+                    </Border.StrokeShape>
+
+                    <Border.Shadow>
+                        <Shadow Brush="{DynamicResource BackgroundPrimaryLight}"
+                    Opacity="0.35"
+                    Radius="{DynamicResource CornerRadiusRectangle}" />
+                    </Border.Shadow>
+
+                    <Label Margin="10">
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <Span Text="Mensaje de "
+                            Style="{StaticResource label-p-yellow}"
+                            FontAttributes="Bold"/>
+                                <Span Text="{Binding User.CoachModelTypeName}"
+          Style="{StaticResource label-p-yellow}"
+          FontAttributes="Bold"/>
+                                <Span Text="&#10;"
+          Style="{StaticResource label-p-white}" />
+                                <Span Text="¡Hola, "
+          Style="{StaticResource label-p-white}" />
+                                <Span Text="{Binding User.Name}"
+          Style="{StaticResource label-p-white}"
+          FontAttributes="Bold" />
+                                <Span Text="! "
+          Style="{StaticResource label-p-white}" />
+                                <Span Text="&#10;"
+          Style="{StaticResource label-p-white}" />
+                                <Span Text="Tu plan de entrenamiento para nivel "
+          Style="{StaticResource label-p-white}" />
+                                <Span Text="{Binding User.ExperienceLevelName}"
+          Style="{StaticResource label-p-yellow}"
+          FontAttributes="Bold" />
+                                <Span Text=" ya está listo. ¡Vamos a por ello!"
+          Style="{StaticResource label-p-white}" />
+                                <Span Text="&#10;&#10;"
+          Style="{StaticResource label-p-white}" />
+                                <Span Text="A continuación te muestro el plan de rutina semanal que preparé para ti cuando comenzaste en IFit."
+          Style="{StaticResource label-p-white}"
+          FontAttributes="Italic" />
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
+                </Border>
+
+                <!-- Separator -->
+                <BoxView HeightRequest="1"
+       BackgroundColor="{StaticResource TextSecondaryColorLight}"
+       VerticalOptions="Center"
+       Margin="15, 0, 15, 0"/>
+
+                <!-- Description -->
+                <VerticalStackLayout  Spacing="4">
+                    <Label Text="Descripción"
+   Style="{StaticResource label-h2-white}" />
+                    <Label Text="{Binding Routine.Description}"
+   Style="{StaticResource label-p-white}" />
+                </VerticalStackLayout>
+
+                <!-- CollectionView TrainingDayDto -->
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Sesiones"
+                       Style="{StaticResource label-h2-white}"
+                       VerticalOptions="Center"/>
+
+                    <CollectionView ItemsSource="{Binding Days}"
+                                    SelectionMode="None">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="dtos:TrainingDayDto">
+                                <Border Stroke="{StaticResource BackgroundPrimaryLight}"
+                                        StrokeThickness="1"
+                                        Margin="0,0,0,10">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="14" />
+                                    </Border.StrokeShape>
+                                    <Border.Shadow>
+                                        <Shadow Brush="Black"
+                                                Opacity="0.2"
+                                                Radius="10"
+                                                Offset="0,3"/>
+                                    </Border.Shadow>
+
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="*" />
+                                        </Grid.RowDefinitions>
+
+                                        <!-- Accent strip -->
+                                        <Border Grid.Row="0"
+                                                StrokeThickness="0"
+                                                Background="{DynamicResource CardPremiumYellowGradientColor}"
+                                                HeightRequest="3"
+                                                HorizontalOptions="Fill">
+                                            <Border.StrokeShape>
+                                                <RoundRectangle CornerRadius="14,14,0,0" />
+                                            </Border.StrokeShape>
+                                        </Border>
+
+                                        <!-- Contenido día -->
+                                        <Grid Grid.Row="1"
+                                              ColumnSpacing="12"
+                                              Margin="12,10,12,12">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="48" />
+                                                <ColumnDefinition Width="1" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <!-- Número de día en círculo -->
+                                            <VerticalStackLayout Grid.Column="0"
+                                                                 VerticalOptions="Center"
+                                                                 HorizontalOptions="Center"
+                                                                 Spacing="2">
+                                                <Label Text="DÍA"
+                                                       FontSize="9"
+                                                       CharacterSpacing="1"
+                                                       TextColor="White"
+                                                       Opacity="0.5"
+                                                       HorizontalTextAlignment="Center"/>
+                                                <Label Text="{Binding DayNumber}"
+                                                       Style="{DynamicResource label-Title-white}"
+                                                       FontSize="28"
+                                                       FontAttributes="Bold,Italic"
+                                                       HorizontalTextAlignment="Center" />
+                                            </VerticalStackLayout>
+
+                                            <!-- Separador -->
+                                            <BoxView Grid.Column="1"
+                                                     BackgroundColor="{StaticResource TextSecondaryColorLight}"
+                                                     Opacity="0.3"
+                                                     VerticalOptions="Fill"
+                                                     WidthRequest="1" />
+
+                                            <!-- Nombre + descripción -->
+                                            <VerticalStackLayout Grid.Column="2"
+                                                                 VerticalOptions="Center"
+                                                                 Margin="8,0,0,0"
+                                                                 Spacing="4">
+                                                <Label Text="{Binding DayName}"
+                                                       Style="{DynamicResource label-h2-white}"
+                                                       FontSize="15"/>
+                                                <Label Text="{Binding Description}"
+                                                       Style="{DynamicResource label-p-white}"
+                                                       Opacity="0.7"
+                                                       LineBreakMode="WordWrap"
+                                                       FontSize="13"/>
+                                            </VerticalStackLayout>
+                                        </Grid>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+    </Grid>
+    
+</ContentPage>

@@ -15,6 +15,7 @@ namespace IFit.ViewModels
 {
     [QueryProperty(nameof(Routine), "Routine")]
     [QueryProperty(nameof(TrainingDay), "TrainingDay")]
+    [QueryProperty(nameof(PreviousPage), "PreviousPage")]
     public partial class TrainingDayDetailViewModel : ObservableObject
     {
         #region Services
@@ -35,10 +36,34 @@ namespace IFit.ViewModels
         [ObservableProperty]
         public partial string EstimatedDuration { get; set; }
 
+        [ObservableProperty]
+        public partial Boolean CanEndSession { get; set; } = false;
+
         partial void OnTrainingDayChanged(TrainingDayDto value)
         {
             EstimatedDuration = CalculateEstimatedDuration(value);
+            CanEndSession = Routine.CurrentDay == value.DayNumber;
+            Background = GetBrush(Routine.CurrentDay >= value.DayNumber 
+                ? "CardPremiumGradientColor" 
+                : "CardPremiumRedGradientColor");
         }
+
+        private static Brush GetBrush(string resourceKey)
+        {
+            if (Application.Current!.Resources.TryGetValue(resourceKey, out var resource) && resource is Brush brush)
+                return brush;
+            return new SolidColorBrush(Colors.Transparent);
+        }
+
+        [ObservableProperty]
+        public partial Brush? Background { get; set; }
+
+        #endregion
+
+        #region Navigation Parameters
+
+        [ObservableProperty]
+        public partial string PreviousPage { get; set; } = string.Empty;
 
         #endregion
 
@@ -85,6 +110,18 @@ namespace IFit.ViewModels
             await Shell.Current.GoToAsync("///HomeView");
         }
 
+        [RelayCommand]
+        public async Task GoBackAsync()
+        {
+            if (!string.IsNullOrEmpty(PreviousPage))
+            {
+                await Shell.Current.GoToAsync($"//{PreviousPage}");
+            }
+            else
+            {
+                await Shell.Current.GoToAsync("//HomeView");
+            }
+        }
         #endregion
 
         #region Methods

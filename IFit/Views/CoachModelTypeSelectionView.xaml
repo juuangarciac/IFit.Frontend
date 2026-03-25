@@ -79,6 +79,23 @@
                     BackgroundColor="{DynamicResource PrimaryColorLightOpacity}"
                     Margin="0,0,0,15">
 
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroupList>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal">
+                                        <VisualState.Setters>
+                                            <Setter Property="BackgroundColor" Value="{DynamicResource BackgroundPrimaryDark}" />
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                    <VisualState x:Name="Selected">
+                                        <VisualState.Setters>
+                                            <Setter Property="BackgroundColor" Value="{DynamicResource BackgroundSecondaryDark}" />
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateGroupList>
+                        </VisualStateManager.VisualStateGroups>
+                        
                         <Border.StrokeShape>
                             <RoundRectangle CornerRadius="{DynamicResource CornerRadiusRectangle}" />
                         </Border.StrokeShape>

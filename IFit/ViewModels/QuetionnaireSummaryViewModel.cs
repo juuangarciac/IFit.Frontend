@@ -84,7 +84,7 @@ namespace IFit.ViewModels
             // Obtener resumen del cuestionario para mostrar en la UI
             try
             {
-                StatusMessage = "Obteniendo resumen de tu cuestionario...";
+                StatusMessage = "Obteniendo respuestas...";
                 IsLoading = true;
 
                 QuestionnaireResponseSummaryDTO? summary = await _questionnaireService.GetResponseSummary(_responseId);
@@ -124,7 +124,7 @@ namespace IFit.ViewModels
         [RelayCommand]
         private async Task StartGenerationAsync()
         {
-            await Shell.Current.GoToAsync("/AIGenerationRoutineView");
+            await Shell.Current.GoToAsync($"AIGenerationRoutineView");
         }
 
         #endregion

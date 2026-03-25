@@ -208,6 +208,26 @@
         <GradientStop Color="{StaticResource CardThirdGradientColor}" Offset="1.0" />
     </LinearGradientBrush>
 
+    <!-- Cards color - Red variant -->
+    <Color x:Key="CardFirstRedGradientColor">#EF5350</Color>
+    <Color x:Key="CardSecondRedGradientColor">#B71C1C</Color>
+    <Color x:Key="CardThirdRedGradientColor">#FF1A1A2E</Color>
+    <LinearGradientBrush x:Key="CardPremiumRedGradientColor" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="{StaticResource CardFirstRedGradientColor}" Offset="0.0" />
+        <GradientStop Color="{StaticResource CardSecondRedGradientColor}" Offset="0.4" />
+        <GradientStop Color="{StaticResource CardThirdRedGradientColor}" Offset="1.0" />
+    </LinearGradientBrush>
+
+    <!-- Cards color - Yellow variant -->
+    <Color x:Key="CardFirstYellowGradientColor">#FFD369</Color>
+    <Color x:Key="CardSecondYellowGradientColor">#E6A817</Color>
+    <Color x:Key="CardThirdYellowGradientColor">#FF222831</Color>
+    <LinearGradientBrush x:Key="CardPremiumYellowGradientColor" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="{StaticResource CardFirstYellowGradientColor}" Offset="0.0" />
+        <GradientStop Color="{StaticResource CardSecondYellowGradientColor}" Offset="0.4" />
+        <GradientStop Color="{StaticResource CardThirdYellowGradientColor}" Offset="1.0" />
+    </LinearGradientBrush>
+
     <!-- Dark surface background (slightly lighter than black for legibility) -->
     <SolidColorBrush x:Key="SurfaceDark" Color="#141516" />
 

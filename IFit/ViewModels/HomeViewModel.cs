@@ -17,6 +17,13 @@ public partial class HomeViewModel : ObservableObject
     private List<IFitCard?> informationCarrousel = new List<IFitCard?>()
     {
         new IFitCard(
+            "ai_coach_ifit.png",
+            "Tu entrenador personal de IA",
+            "Pregunta a tu entrenador personal de IA cualquier duda que tengas sobre tu entrenamiento, nutrición o recuperación.",
+            "Entendido",
+            "Mejor después"
+        ),
+        new IFitCard(
             "smart_watch_ifit.png",
             "Conecta tus aplicaciones y relojes",
             "Conecta tus aplicaciones y relojes a IFit para\r\nsacar el máximo partido a tu entrenamiento.",
@@ -90,16 +97,13 @@ public partial class HomeViewModel : ObservableObject
         }
         ButtonContent = "Pregunta a " + currentUser.CoachModelTypeName;
 
-        List<RoutineResponseDto>? allActivesRoutines = await _trainingService
-            .getActivesRoutinesByUserIdAsync(userId);
+        Routine = await _trainingService.getLatestActiveRoutineByUserIdAsync(userId);
 
-        if(allActivesRoutines == null)
+        if (Routine == null)
         {
             StatusMessage = "No se ha encontrado la rutina actual.";
             return;
         }
-
-        Routine = allActivesRoutines.FirstOrDefault();
 
         TrainingDayDto = await _trainingService
             .getRoutineDayAsync( (long)Routine.Id, (int)Routine.CurrentDay);
@@ -140,8 +144,13 @@ public partial class HomeViewModel : ObservableObject
 
     [RelayCommand]
     public async Task GoToChatViewAsync()
+    {   await Shell.Current.GoToAsync($"ChatAIView");
+    }
+
+    [RelayCommand]
+    public async Task GoToWeeklySummaryAsync()
     {
-        await Shell.Current.GoToAsync($"ChatAIView");
+        await Shell.Current.GoToAsync($"WeeklySummaryView");
     }
 
     #endregion
