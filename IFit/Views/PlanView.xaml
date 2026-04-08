@@ -4,6 +4,7 @@
              xmlns:vm="clr-namespace:IFit.ViewModels"
              xmlns:dtos="clr-namespace:IFit.Models.Dtos.AI"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:components="clr-namespace:IFit.Views.Components"
              x:Class="IFit.Views.PlanView"
              Title="PlanView"
              Shell.NavBarIsVisible="False">
@@ -17,14 +18,14 @@
     <ContentPage.BindingContext>
         <vm:PlanViewModel/>
     </ContentPage.BindingContext>
-    
+
     <Grid BackgroundColor="{StaticResource BackgroundPrimaryDark}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        
+
         <!-- Header -->
         <Grid Grid.Row="0"
               Background="{StaticResource CardPremiumYellowGradientColor}">
@@ -67,14 +68,14 @@
        Style="{StaticResource label-p-white}" />
                 <Label Text="Tu plan de entreno personalizado"
        Style="{StaticResource label-Title-white}" />
-                <Label Text="A continuación te presentamos tu plan de entreno personalizado"
+                <Label Text="A continuación te presentamos tu plan de entreno personalizado "
        Style="{StaticResource label-p-white}"
        Opacity="0.8"
        LineBreakMode="WordWrap" />
             </VerticalStackLayout>
-            
+
         </Grid>
-        
+
         <!-- Content -->
         <ScrollView Grid.Row="1">
             <VerticalStackLayout  Margin="15"
@@ -82,9 +83,9 @@
 
                 <!-- CoachMessage -->
                 <Border StrokeThickness="2"
-     Stroke="{DynamicResource BackgroundPrimaryLight}"
-     BackgroundColor="{DynamicResource PrimaryColorLightOpacity}"
-     Margin="0,0,0,15">
+        Stroke="{DynamicResource BackgroundPrimaryLight}"
+        BackgroundColor="{DynamicResource PrimaryColorLightOpacity}"
+        Margin="0,0,0,15">
 
                     <Border.StrokeShape>
                         <RoundRectangle CornerRadius="{DynamicResource CornerRadiusRectangle}" />
@@ -92,42 +93,28 @@
 
                     <Border.Shadow>
                         <Shadow Brush="{DynamicResource BackgroundPrimaryLight}"
-                    Opacity="0.35"
-                    Radius="{DynamicResource CornerRadiusRectangle}" />
+                Opacity="0.35"
+                Radius="{DynamicResource CornerRadiusRectangle}" />
                     </Border.Shadow>
 
                     <Label Margin="10">
                         <Label.FormattedText>
                             <FormattedString>
-                                <Span Text="Mensaje de "
-                            Style="{StaticResource label-p-yellow}"
-                            FontAttributes="Bold"/>
+                                <Span Text="Tu entrenador "
+                      Style="{StaticResource label-p-yellow}"
+                      FontAttributes="Bold"/>
                                 <Span Text="{Binding User.CoachModelTypeName}"
-          Style="{StaticResource label-p-yellow}"
-          FontAttributes="Bold"/>
-                                <Span Text="&#10;"
-          Style="{StaticResource label-p-white}" />
+                      Style="{StaticResource label-p-yellow}"
+                      FontAttributes="Bold"/>
+                                <Span Text=" te dice:&#10;&#10;"
+                      Style="{StaticResource label-p-white}"/>
                                 <Span Text="¡Hola, "
-          Style="{StaticResource label-p-white}" />
+                      Style="{StaticResource label-p-white}"/>
                                 <Span Text="{Binding User.Name}"
-          Style="{StaticResource label-p-white}"
-          FontAttributes="Bold" />
-                                <Span Text="! "
-          Style="{StaticResource label-p-white}" />
-                                <Span Text="&#10;"
-          Style="{StaticResource label-p-white}" />
-                                <Span Text="Tu plan de entrenamiento para nivel "
-          Style="{StaticResource label-p-white}" />
-                                <Span Text="{Binding User.ExperienceLevelName}"
-          Style="{StaticResource label-p-yellow}"
-          FontAttributes="Bold" />
-                                <Span Text=" ya está listo. ¡Vamos a por ello!"
-          Style="{StaticResource label-p-white}" />
-                                <Span Text="&#10;&#10;"
-          Style="{StaticResource label-p-white}" />
-                                <Span Text="A continuación te muestro el plan de rutina semanal que preparé para ti cuando comenzaste en IFit."
-          Style="{StaticResource label-p-white}"
-          FontAttributes="Italic" />
+                      Style="{StaticResource label-p-white}"
+                      FontAttributes="Bold"/>
+                                <Span Text="! Me alegra verte por aquí. 💪"
+                      Style="{StaticResource label-p-white}"/>
                             </FormattedString>
                         </Label.FormattedText>
                     </Label>
@@ -153,9 +140,9 @@
                        Style="{StaticResource label-h2-white}"
                        VerticalOptions="Center"/>
 
-                    <CollectionView ItemsSource="{Binding Days}"
-                                    SelectionMode="None">
-                        <CollectionView.ItemTemplate>
+                    <VerticalStackLayout Spacing="10"
+                     BindableLayout.ItemsSource="{Binding Days}">
+                        <BindableLayout.ItemTemplate>
                             <DataTemplate x:DataType="dtos:TrainingDayDto">
                                 <Border Stroke="{StaticResource BackgroundPrimaryLight}"
                                         StrokeThickness="1"
@@ -169,6 +156,12 @@
                                                 Radius="10"
                                                 Offset="0,3"/>
                                     </Border.Shadow>
+                                    
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer 
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.SelectDayCommand}"
+                                            CommandParameter="{Binding .}"/>
+                                    </Border.GestureRecognizers>
 
                                     <Grid>
                                         <Grid.RowDefinitions>
@@ -240,13 +233,45 @@
                                     </Grid>
                                 </Border>
                             </DataTemplate>
-                        </CollectionView.ItemTemplate>
-                    </CollectionView>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
                 </VerticalStackLayout>
 
             </VerticalStackLayout>
         </ScrollView>
 
+
+        <Button Grid.Row="2"
+                Margin="15"
+                Text="Rutina completada"
+                Style="{DynamicResource ButtonBold-XL-dark-yellow}"
+                Command="{Binding SetRoutineAsCompletedCommand}"
+                CornerRadius="{DynamicResource CornerRadiusRectangle}"
+                IsVisible="{Binding IsRoutineCompleted}"/>
+
+        <!-- Day Detail Modal -->
+        <Grid Grid.RowSpan="3"
+          IsVisible="{Binding IsDetailVisible}"
+          ZIndex="998">
+
+            <!-- Fondo oscuro que bloquea toques -->
+            <BoxView BackgroundColor="#CC000000"
+             VerticalOptions="Fill">
+                <BoxView.GestureRecognizers>
+                    <TapGestureRecognizer />
+                </BoxView.GestureRecognizers>
+            </BoxView>
+
+            <components:PlanDayDetailView
+                x:Name="DayDetailView"
+                VerticalOptions="End"
+                TrainingDayDto="{Binding SelectedDay}" />
+        </Grid>
+        
+        
+        <components:LoadingOverlay  Grid.RowSpan="3"
+                                    IsLoading="{Binding IsLoading}"
+                                    Message="{Binding StatusMessage}"
+                                    ZIndex="999"/>
     </Grid>
-    
 </ContentPage>

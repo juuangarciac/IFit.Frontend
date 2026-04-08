@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:IFit.ViewModels"
+             xmlns:views="clr-namespace:IFit.Views.Templates"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             x:Class="IFit.Views.ProfileView"
+             Shell.NavBarIsVisible="False">
+
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior
+            EventName="Appearing"
+            Command="{Binding AppearingCommand}" />
+    </ContentPage.Behaviors>
+
+    <ContentPage.BindingContext>
+        <vm:ProfileViewModel />
+    </ContentPage.BindingContext>
+
+    <Grid Background="{DynamicResource PremiumGradient}"
+          RowSpacing="0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Grid Grid.Row="0"
+              Padding="20,50,20,15"
+              ColumnSpacing="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <ImageButton Grid.Column="0"
+                         Source="arrow_icon_white.png"
+                         HeightRequest="20"
+                         WidthRequest="20"
+                         VerticalOptions="Center"
+                         Command="{Binding GoToHomeCommand}"
+                         Rotation="180" />
+
+            <Label Grid.Column="1"
+                   Text="Mi perfil"
+                   Style="{DynamicResource label-h1-white}"
+                   VerticalOptions="Center" />
+        </Grid>
+
+        <!-- Body -->
+        <ScrollView Grid.Row="1"
+                    Margin="15,0">
+            <Grid RowSpacing="15"
+                  Padding="0,10,0,20">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <!-- Avatar + nombre -->
+                <Border Grid.Row="0"
+                        BackgroundColor="{DynamicResource BackgroundPrimaryDark}"
+                        StrokeThickness="0"
+                        Padding="20">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="{DynamicResource CornerRadiusRectangle}" />
+                    </Border.StrokeShape>
+
+                    <Grid ColumnSpacing="15">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Círculo con iniciales -->
+                        <Border Grid.Column="0"
+                                HeightRequest="65"
+                                WidthRequest="65"
+                                BackgroundColor="{DynamicResource QuaternaryColor}"
+                                StrokeThickness="0"
+                                VerticalOptions="Center">
+                            <Border.StrokeShape>
+                                <Ellipse />
+                            </Border.StrokeShape>
+                            <Label Text="{Binding UserInitials}"
+                                   HorizontalOptions="Center"
+                                   VerticalOptions="Center"
+                                   FontSize="24"
+                                   FontAttributes="Bold"
+                                   Style="{DynamicResource label-h1-white}" />
+                        </Border>
+
+                        <!-- Nombre y email -->
+                        <Grid Grid.Column="1"
+                              RowSpacing="4"
+                              VerticalOptions="Center">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <Label Grid.Row="0"
+                                   Text="{Binding UserName}"
+                                   Style="{DynamicResource label-h2-white}"
+                                   LineBreakMode="TailTruncation" />
+
+                            <Label Grid.Row="1"
+                                   Text="{Binding UserEmail}"
+                                   Style="{DynamicResource label-p-white}"
+                                   Opacity="0.7"
+                                   LineBreakMode="TailTruncation" />
+                        </Grid>
+                    </Grid>
+                </Border>
+
+                <!-- Información del perfil -->
+                <Border Grid.Row="1"
+                        BackgroundColor="{DynamicResource BackgroundPrimaryDark}"
+                        StrokeThickness="0"
+                        Padding="20">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="{DynamicResource CornerRadiusRectangle}" />
+                    </Border.StrokeShape>
+
+                    <Grid RowSpacing="16">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <!-- Título sección -->
+                        <Label Grid.Row="0"
+                               Text="Información"
+                               Style="{DynamicResource label-h2-white}" />
+
+                        <!-- Separador -->
+                        <BoxView Grid.Row="1"
+                                 HeightRequest="1"
+                                 Color="{DynamicResource QuaternaryColor}"
+                                 Opacity="0.3"
+                                 HorizontalOptions="Fill" />
+
+                        <!-- Nivel de experiencia -->
+                        <Grid Grid.Row="2" ColumnSpacing="10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Column="0"
+                                   Text="Nivel de experiencia"
+                                   Style="{DynamicResource label-p-white}"
+                                   Opacity="0.7" />
+                            <Label Grid.Column="1"
+                                   Text="{Binding ExperienceLevel}"
+                                   Style="{DynamicResource label-p-white}"
+                                   HorizontalOptions="End" />
+                        </Grid>
+
+                        <!-- Separador -->
+                        <BoxView Grid.Row="3"
+                                 HeightRequest="1"
+                                 Color="{DynamicResource QuaternaryColor}"
+                                 Opacity="0.15"
+                                 HorizontalOptions="Fill" />
+
+                        <!-- Coach asignado -->
+                        <Grid Grid.Row="4" ColumnSpacing="10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Column="0"
+                                   Text="Coach IA"
+                                   Style="{DynamicResource label-p-white}"
+                                   Opacity="0.7" />
+                            <Label Grid.Column="1"
+                                   Text="{Binding CoachModel}"
+                                   Style="{DynamicResource label-p-white}"
+                                   HorizontalOptions="End" />
+                        </Grid>
+
+                        <!-- Separador -->
+                        <BoxView Grid.Row="5"
+                                 HeightRequest="1"
+                                 Color="{DynamicResource QuaternaryColor}"
+                                 Opacity="0.15"
+                                 HorizontalOptions="Fill" />
+
+                        <!-- Miembro desde -->
+                        <Grid Grid.Row="6" ColumnSpacing="10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Column="0"
+                                   Text="Miembro desde"
+                                   Style="{DynamicResource label-p-white}"
+                                   Opacity="0.7" />
+                            <Label Grid.Column="1"
+                                   Text="{Binding MemberSince}"
+                                   Style="{DynamicResource label-p-white}"
+                                   HorizontalOptions="End" />
+                        </Grid>
+                    </Grid>
+                </Border>
+
+                <!-- Cerrar sesión -->
+                <Button Grid.Row="3"
+                        Text="Cerrar sesión"
+                        Style="{DynamicResource ButtonBold-XL-dark-white}"
+                        CornerRadius="6"
+                        BorderColor="{DynamicResource BorderButtonLightColor}"
+                        BorderWidth="0.25"
+                        Command="{Binding LogoutCommand}" />
+            </Grid>
+        </ScrollView>
+
+        <!-- Footer -->
+        <views:HomeFooterView Grid.Row="2" />
+    </Grid>
+</ContentPage>

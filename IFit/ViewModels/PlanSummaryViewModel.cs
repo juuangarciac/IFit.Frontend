@@ -34,9 +34,6 @@ namespace IFit.ViewModels
         public partial List<RoutineResponseDto> ActiveRoutines { get; set; }
 
         [ObservableProperty]
-        public partial RoutineResponseDto SelectedRoutine { get; set; }
-
-        [ObservableProperty]
         public partial Boolean IsLoading { get; set; } = false;
 
         [ObservableProperty]
@@ -47,6 +44,19 @@ namespace IFit.ViewModels
 
         [ObservableProperty]
         public partial String ActiveRoutinesMessage { get; set; }
+
+        private RoutineResponseDto _selectedRoutine;
+        public RoutineResponseDto SelectedRoutine
+        {
+            get => _selectedRoutine;
+            set
+            {
+                if (SetProperty(ref _selectedRoutine, value) && value != null)
+                {
+                    _ = OnSelectedRoutineAsync();
+                }
+            }
+        }
 
         #endregion
 
@@ -110,17 +120,27 @@ namespace IFit.ViewModels
             catch (Exception ex)
             {
                 Debug.WriteLine($"[ERROR] AppearingAsync => {ex.Message}");
-                StatusMessage = "Ha ocurrido un error al cargar los datos.";
             }
             finally
             {
                 IsLoading = false;
+                StatusMessage = string.Empty;
             }
         }
 
         [RelayCommand]
-        public async Task OnSelectedRoutineAsync()
+        public async Task GenerateNewRoutineAsync()
         {
+            await Shell.Current.GoToAsync($"CoachModelTypeSelectionView");
+        }
+
+        #endregion
+
+        #region Methods
+
+        private async Task OnSelectedRoutineAsync()
+        {
+
             var parameters = new Dictionary<string, object>
                 {
                     { "Routine", SelectedRoutine },
@@ -128,6 +148,7 @@ namespace IFit.ViewModels
                 };
 
             await Shell.Current.GoToAsync($"PlanView", parameters);
+
         }
 
         #endregion

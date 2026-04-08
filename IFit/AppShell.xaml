@@ -98,4 +98,9 @@
         ContentTemplate="{DataTemplate views:PlanSummaryView}"
         Route="PlanSummaryView" />
 
+    <ShellContent
+        Title="ProfileView"
+        ContentTemplate="{DataTemplate views:ProfileView}"
+        Route="ProfileView" />
+
 </Shell>

@@ -59,6 +59,10 @@ public partial class HomeViewModel : ObservableObject
     [ObservableProperty]
     public partial String ButtonContent { get; set; } = "Pregunta a tu coach";
 
+
+    [ObservableProperty]
+    public partial Boolean DoesntHaveRoutine { get; set; } = false;
+
     #endregion
 
     #region Services
@@ -102,6 +106,7 @@ public partial class HomeViewModel : ObservableObject
         if (Routine == null)
         {
             StatusMessage = "No se ha encontrado la rutina actual.";
+            DoesntHaveRoutine = true;
             return;
         }
 
@@ -151,6 +156,12 @@ public partial class HomeViewModel : ObservableObject
     public async Task GoToWeeklySummaryAsync()
     {
         await Shell.Current.GoToAsync($"WeeklySummaryView");
+    }
+
+    [RelayCommand]
+    public async Task GoToPlanAsync()
+    {
+        await Shell.Current.GoToAsync($"PlanSummaryView");
     }
 
     #endregion

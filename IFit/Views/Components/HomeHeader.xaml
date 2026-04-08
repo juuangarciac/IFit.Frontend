@@ -40,8 +40,13 @@
                  Spacing="20"
                  HorizontalOptions="Start">
                     <!-- Profile Icon -->
-                    <Image Source="profile_icon_white.png"
-                           Style="{DynamicResource navbar_image}"/>
+                    <Grid>
+                        <Image Source="profile_icon_white.png"
+                               Style="{DynamicResource navbar_image}"/>
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding GoToProfileCommand}" />
+                        </Grid.GestureRecognizers>
+                    </Grid>
                     <!-- Notif Icon -->
                     <Image Source="notification_icon_white.png"
                            Style="{DynamicResource navbar_image}"/>

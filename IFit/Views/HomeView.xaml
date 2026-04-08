@@ -317,6 +317,62 @@
                             </Label>
                         </Grid>
                     </Border>
+
+                    <Border Grid.Row="2" 
+                        IsEnabled="{Binding DoesntHaveRoutine}"
+                            IsVisible="{Binding DoesntHaveRoutine}"
+                            StrokeThickness="0"
+                            Stroke="{DynamicResource BackgroundPrimaryLight}"
+                            BackgroundColor="{DynamicResource BackgroundPrimaryDark}">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="8"/>
+                        </Border.StrokeShape>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="24"/>
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Barra degradado izquierda -->
+                            <Border Grid.Column="0"
+                                StrokeThickness="0"
+                                Background="{DynamicResource CardPremiumYellowGradientColor}">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="8,0,8,0"/>
+                                </Border.StrokeShape>
+                            </Border>
+
+                            <!-- Contenido -->
+                            <Grid Grid.Column="1"
+                                  Padding="12,14"
+                                  RowSpacing="8">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <Label Grid.Row="0"
+                               Text="¿Todavía sin rutina? 💪"
+                               Style="{DynamicResource label-h2-white}"/>
+
+                                <Label Grid.Row="1"
+                               Text="¿A qué estás esperando? Genera tu plan personalizado ahora y empieza a entrenar."
+                               Style="{DynamicResource label-p-white}"
+                               Opacity="0.7"
+                               LineBreakMode="WordWrap"/>
+
+                                <Button Grid.Row="2"
+                                    Text="Generar mi rutina"
+                                    Style="{DynamicResource ButtonBold-XL-dark-yellow}"
+                                    HorizontalOptions="Start"
+                                    FontSize="14"
+                                    Command="{Binding GoToPlanCommand}"/>
+                            </Grid>
+                        </Grid>
+                    </Border>
+                    
                 </Grid>
             </ScrollView>
 

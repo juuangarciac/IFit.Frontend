@@ -40,6 +40,30 @@ namespace IFit.ViewModels
         [ObservableProperty]
         public partial String StatusMessage { get; set; } = string.Empty;
 
+        [ObservableProperty]
+        public partial Boolean IsLoading { get; set; } = false;
+
+        [ObservableProperty]
+        public partial Boolean IsRoutineCompleted { get; set; } = false;
+
+        /// <summary>
+        /// Propiedad para controlar la visibilidad del detalle del día de entrenamiento seleccionado. Se establece en true cuando se selecciona un día, lo que muestra el detalle correspondiente en la interfaz de usuario.
+        /// </summary>
+        [ObservableProperty]
+        public partial Boolean IsDetailVisible { get; set; } = false;
+
+        private TrainingDayDto? _selectedDay;
+        public TrainingDayDto? SelectedDay
+        {
+            get => _selectedDay;
+            set
+            {
+                if (value != null)
+                    MainThread.BeginInvokeOnMainThread(() => IsDetailVisible = true);
+                SetProperty(ref _selectedDay, value);
+            }
+        }
+
         #endregion
 
         #region Constructor
@@ -62,7 +86,10 @@ namespace IFit.ViewModels
 
         private async Task InitializeAsync()
         {
-            if(User == null)
+            IsLoading = true;
+            StatusMessage = "Cargando rutina...";
+
+            if (User == null)
             {
                 var userId = Preferences.Get("UserId", 0L);
                 User = await appUserService.findUserById(userId);
@@ -83,9 +110,12 @@ namespace IFit.ViewModels
                     StatusMessage = "No se ha encontrado la rutina actual.";
                     return;
                 }
-
-                Days = Routine.Days.OrderBy(d => d.DayNumber).ToList();
             }
+            Days = Routine.Days.OrderBy(d => d.DayNumber).ToList();
+            IsRoutineCompleted = !Routine.IsActive;
+
+            IsLoading = false;
+            StatusMessage = string.Empty;
         }
 
         #endregion
@@ -107,17 +137,35 @@ namespace IFit.ViewModels
         [RelayCommand]
         public async Task SetRoutineAsCompleted()
         {
+            IsLoading = true;
+
             if (Routine == null || User == null) return;
             var result = await trainingService.completeRoutineAsync((long)Routine.Id);
             if (result != null)
             {
                 StatusMessage = "¡Rutina marcada como completada!";
-                await InitializeAsync();
+                await Shell.Current.GoToAsync($"//PlanSummaryView");
             }
             else
             {
                 StatusMessage = "Error al marcar la rutina como completada.";
             }
+
+            IsLoading = false;
+        }
+
+        [RelayCommand]
+        public void SelectDay(TrainingDayDto day)
+        {
+            SelectedDay = day;
+            IsDetailVisible = true;
+        }
+
+        public void CloseDetail()
+        {
+            IsDetailVisible = false;
+            _selectedDay = null;
+            OnPropertyChanged(nameof(SelectedDay));
         }
 
         #endregion

@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:models="clr-namespace:IFit.Models.Dtos.AI"
+             x:Class="IFit.Views.Components.PlanDayDetailView"
+             x:Name="this"
+             BackgroundColor="Transparent">
+
+    <Border BackgroundColor="{DynamicResource BackgroundPrimaryDark}"
+            StrokeThickness="0"
+            Margin="0,60,0,0">
+        <Border.StrokeShape>
+            <RoundRectangle CornerRadius="24,24,0,0" />
+        </Border.StrokeShape>
+
+        <Grid RowDefinitions="Auto,*">
+
+            <!-- Handle + Header -->
+            <VerticalStackLayout Grid.Row="0" Spacing="0">
+
+                <!-- Handle -->
+                <BoxView WidthRequest="40"
+                         HeightRequest="4"
+                         CornerRadius="2"
+                         BackgroundColor="{StaticResource TextSecondaryColorLight}"
+                         Opacity="0.4"
+                         HorizontalOptions="Center"
+                         Margin="0,12,0,0"/>
+
+                <!-- Header -->
+                <Grid ColumnDefinitions="*,Auto"
+                      Margin="20,16,16,0">
+                    <VerticalStackLayout Grid.Column="0" Spacing="4">
+                        <Label Text="{Binding TrainingDayDto.DayName, Source={x:Reference this}}"
+                               Style="{DynamicResource label-Title-white}"
+                               FontSize="22"/>
+                        <Label Text="{Binding TrainingDayDto.Description, Source={x:Reference this}}"
+                               Style="{DynamicResource label-p-yellow}"
+                               FontAttributes="Bold"
+                               FontSize="13"/>
+                    </VerticalStackLayout>
+                    <Button Grid.Column="1"
+                            BackgroundColor="Transparent"
+                            ImageSource="cancel.svg"
+                            VerticalOptions="Start"
+                            Clicked="onCancelClicked" />
+                </Grid>
+
+                <!-- Separador -->
+                <BoxView HeightRequest="1"
+                         BackgroundColor="{StaticResource TextSecondaryColorLight}"
+                         Opacity="0.15"
+                         Margin="20,16,20,0"/>
+            </VerticalStackLayout>
+
+            <!-- Ejercicios scrolleables -->
+            <ScrollView Grid.Row="1"
+                        Margin="0,0,0,0">
+                <VerticalStackLayout Padding="20,16,20,40" Spacing="12">
+                    <BindableLayout.ItemsSource>
+                        <Binding Path="TrainingDayDto.Exercises"
+                                 Source="{x:Reference this}"/>
+                    </BindableLayout.ItemsSource>
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="models:ExerciseDto">
+                            <Border BackgroundColor="{DynamicResource BackgroundSecondaryDark}"
+                                    StrokeThickness="1"
+                                    Stroke="{DynamicResource BackgroundPrimaryLight}">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="14"/>
+                                </Border.StrokeShape>
+
+                                <Grid RowDefinitions="Auto,*"
+                                      Padding="0">
+
+                                    <!-- Accent strip -->
+                                    <Border Grid.Row="0"
+                                            StrokeThickness="0"
+                                            Background="{DynamicResource CardPremiumYellowGradientColor}"
+                                            HeightRequest="3"
+                                            HorizontalOptions="Fill">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="14,14,0,0"/>
+                                        </Border.StrokeShape>
+                                    </Border>
+
+                                    <!-- Contenido ejercicio -->
+                                    <VerticalStackLayout Grid.Row="1"
+                                                         Padding="14,10,14,14"
+                                                         Spacing="6">
+                                        <Label Text="{Binding ExerciseName}"
+                                               Style="{StaticResource label-h3-white}"
+                                               FontSize="15"
+                                               FontAttributes="Bold"/>
+                                        <Label Text="{Binding Notes}"
+                                               Style="{StaticResource label-p-white}"
+                                               Opacity="0.7"
+                                               FontSize="13"
+                                               LineBreakMode="WordWrap"/>
+
+                                        <!-- Series x Reps badge -->
+                                        <HorizontalStackLayout Spacing="8" Margin="0,4,0,0">
+                                            <Border BackgroundColor="{DynamicResource PrimaryColorLightOpacity}"
+                                                    StrokeThickness="0"
+                                                    Padding="10,4">
+                                                <Border.StrokeShape>
+                                                    <RoundRectangle CornerRadius="20"/>
+                                                </Border.StrokeShape>
+                                                <Label Style="{StaticResource label-p-yellow}"
+                                                       FontAttributes="Bold"
+                                                       FontSize="12">
+                                                    <Label.FormattedText>
+                                                        <FormattedString>
+                                                            <Span Text="{Binding Sets}"
+                                                                  Style="{StaticResource label-p-yellow}"
+                                                                  FontAttributes="Bold"/>
+                                                            <Span Text=" series × "
+                                                                  Style="{StaticResource label-p-white}"/>
+                                                            <Span Text="{Binding Reps}"
+                                                                  Style="{StaticResource label-p-yellow}"
+                                                                  FontAttributes="Bold"/>
+                                                            <Span Text=" reps"
+                                                                  Style="{StaticResource label-p-white}"/>
+                                                        </FormattedString>
+                                                    </Label.FormattedText>
+                                                </Label>
+                                            </Border>
+                                        </HorizontalStackLayout>
+                                    </VerticalStackLayout>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+            </ScrollView>
+
+        </Grid>
+    </Border>
+</ContentView>
