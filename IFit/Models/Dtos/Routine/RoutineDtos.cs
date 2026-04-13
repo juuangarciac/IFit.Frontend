@@ -11,6 +11,10 @@ namespace IFit.Models.Dtos.AI
 
         [JsonPropertyName("responseId")]
         public long ResponseId { get; set; }
+
+        [JsonPropertyName("coachType")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? CoachType { get; set; }
     }
 
     /// <summary>

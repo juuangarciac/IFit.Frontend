@@ -12,7 +12,8 @@
             Padding="40,30"
             StrokeThickness="0"
             VerticalOptions="Center"
-            HorizontalOptions="Center">
+            HorizontalOptions="Center"
+            MaximumWidthRequest="320">
             <Border.StrokeShape>
                 <RoundRectangle CornerRadius="15"/>
             </Border.StrokeShape>
@@ -30,6 +31,7 @@
                    FontSize="16"
                    TextColor="Black"
                    HorizontalTextAlignment="Center"
+                   LineBreakMode="WordWrap"
                    IsVisible="{Binding HasMessage, Source={x:Reference loadingOverlay}}"/>
             </VerticalStackLayout>
         </Border>

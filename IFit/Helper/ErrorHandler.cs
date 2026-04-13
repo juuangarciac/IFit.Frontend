@@ -1,14 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using IFit.Services;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace IFit.Helper
 {
-   public static class ErrorHandler
+    public static class ErrorHandler
     {
+        /// <summary>
+        /// Muestra un toast de error (si se facilita alertMessage) y navega opcionalmente.
+        /// Los parámetros alertTitle y alertMessage se mantienen por compatibilidad;
+        /// alertTitle ya no se usa porque los toasts no tienen título.
+        /// </summary>
         public static async Task HandleErrorAsync(
             string debugMessage,
             string? navigationRoute = null,
@@ -17,11 +18,9 @@ namespace IFit.Helper
         {
             Debug.WriteLine(debugMessage);
 
-            if (!string.IsNullOrEmpty(alertTitle) &&
-                !string.IsNullOrEmpty(alertMessage) &&
-                App.Current?.MainPage != null)
+            if (!string.IsNullOrEmpty(alertMessage))
             {
-                await App.Current.MainPage.DisplayAlert(alertTitle, alertMessage, "OK");
+                await NotificationService.ShowErrorAsync(alertMessage);
             }
 
             if (!string.IsNullOrEmpty(navigationRoute))
@@ -30,6 +29,6 @@ namespace IFit.Helper
             }
         }
     }
-
 }
+
 

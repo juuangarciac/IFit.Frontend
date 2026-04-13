@@ -19,14 +19,14 @@ public partial class HomeViewModel : ObservableObject
         new IFitCard(
             "ai_coach_ifit.png",
             "Tu entrenador personal de IA",
-            "Pregunta a tu entrenador personal de IA cualquier duda que tengas sobre tu entrenamiento, nutrición o recuperación.",
+            "Pregunta a tu entrenador personal de IA cualquier duda que tengas sobre tu entrenamiento, nutriciï¿½n o recuperaciï¿½n.",
             "Entendido",
-            "Mejor después"
+            "Mejor despuï¿½s"
         ),
         new IFitCard(
             "smart_watch_ifit.png",
             "Conecta tus aplicaciones y relojes",
-            "Conecta tus aplicaciones y relojes a IFit para\r\nsacar el máximo partido a tu entrenamiento.",
+            "Conecta tus aplicaciones y relojes a IFit para\r\nsacar el mï¿½ximo partido a tu entrenamiento.",
             "Conectar",
             "Descartar")
     };
@@ -71,6 +71,9 @@ public partial class HomeViewModel : ObservableObject
 
     #endregion
 
+    private bool _isInitialized = false;
+    private AppUserResponseDto? _currentUser;
+
     #region Constructor
 
     public HomeViewModel(TrainingService trainingService,
@@ -87,42 +90,46 @@ public partial class HomeViewModel : ObservableObject
     private async Task InitializeAsync()
     {
         IsLoading = true;
-
         StatusMessage = "Cargando tu rutina actual...";
 
         var userId = Preferences.Get("UserId", 0L);
 
-        AppUserResponseDto? currentUser = await _appUserService.findUserById(userId);
+        // Fetch user and routine in parallel
+        var userTask    = _appUserService.findUserById(userId);
+        var routineTask = _trainingService.getLatestActiveRoutineByUserIdAsync(userId);
+        await Task.WhenAll(userTask, routineTask);
 
-        if(currentUser == null)
+        _currentUser = await userTask;
+        Routine      = await routineTask;
+
+        if (_currentUser == null)
         {
             StatusMessage = "No se ha encontrado el usuario actual.";
+            IsLoading = false;
             return;
         }
-        ButtonContent = "Pregunta a " + currentUser.CoachModelTypeName;
-
-        Routine = await _trainingService.getLatestActiveRoutineByUserIdAsync(userId);
+        ButtonContent = "Pregunta a " + _currentUser.CoachModelTypeName;
 
         if (Routine == null)
         {
             StatusMessage = "No se ha encontrado la rutina actual.";
             DoesntHaveRoutine = true;
+            IsLoading = false;
             return;
         }
 
         TrainingDayDto = await _trainingService
-            .getRoutineDayAsync( (long)Routine.Id, (int)Routine.CurrentDay);
+            .getRoutineDayAsync((long)Routine.Id, (int)Routine.CurrentDay);
 
-        if(TrainingDayDto == null)
+        if (TrainingDayDto == null)
         {
-            StatusMessage = "No se ha encontrado una sesión activa para hoy.";
+            StatusMessage = "No se ha encontrado una sesiÃ³n activa para hoy.";
+            IsLoading = false;
             return;
         }
 
         Debug.WriteLine("TrainingDayDto: " + TrainingDayDto);
-
         IsLoading = false;
-        return;
     }
 
     #endregion
@@ -132,7 +139,9 @@ public partial class HomeViewModel : ObservableObject
     [RelayCommand]
     public async Task AppearingAsync()
     {
+        if (_isInitialized) return;
         await InitializeAsync();
+        _isInitialized = true;
     }
 
     [RelayCommand]
@@ -144,7 +153,7 @@ public partial class HomeViewModel : ObservableObject
                 {"TrainingDay", TrainingDayDto }
             };
 
-        await Shell.Current.GoToAsync($"//TrainingDayDetailView", navigationParameter);
+        await Shell.Current.GoToAsync("TrainingDayDetailView", navigationParameter);
     }
 
     [RelayCommand]
@@ -161,7 +170,17 @@ public partial class HomeViewModel : ObservableObject
     [RelayCommand]
     public async Task GoToPlanAsync()
     {
-        await Shell.Current.GoToAsync($"PlanSummaryView");
+        await Shell.Current.GoToAsync("//PlanSummaryView");
+    }
+
+    [RelayCommand]
+    public async Task GoToProfileAsync()
+    {
+        var parameters = new Dictionary<string, object>();
+        if (_currentUser != null)
+            parameters["User"] = _currentUser;
+
+        await Shell.Current.GoToAsync("ProfileView", parameters);
     }
 
     #endregion

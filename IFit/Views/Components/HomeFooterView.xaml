@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="IFit.Views.Templates.HomeFooterView" >
+             x:Class="IFit.Views.Templates.HomeFooterView">
     <Border BackgroundColor="{DynamicResource BackgroundPrimaryDark}"
-        Stroke="{DynamicResource BackgroundPrimaryDark}"
-        StrokeThickness="0"
-        StrokeShape="RoundRectangle 10, 10, 0, 0">
+            Stroke="{DynamicResource BackgroundPrimaryDark}"
+            StrokeThickness="0"
+            StrokeShape="RoundRectangle 10, 10, 0, 0">
         <Border.Shadow>
             <Shadow Opacity="0.4"
-                     Brush="Black"
-                     Offset="5, 5" />
+                    Brush="Black"
+                    Offset="5, 5" />
         </Border.Shadow>
         <Grid BackgroundColor="{DynamicResource BackgroundPrimaryDark}"
               HorizontalOptions="Fill"
@@ -26,92 +26,110 @@
 
             <!-- Home icon -->
             <Grid Grid.Column="0"
-              RowDefinitions="Auto, Auto"
-              HorizontalOptions="Center"
-              VerticalOptions="Center">
-                <Grid.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding GoToHomeClicked}" />
-                </Grid.GestureRecognizers>
-                <Image  Grid.Row="0"
-                    Source="home_ifit_white.png"
-                    Style="{DynamicResource navbar_image}" />
-                <Label  Grid.Row="1"
-                    Text="Hoy"
-                    Style="{DynamicResource navbar-p-white}" />
+                  RowDefinitions="Auto, Auto"
+                  HorizontalOptions="Center"
+                  VerticalOptions="Center">
+                <Image Grid.Row="0"
+                       Source="home_ifit_white.png"
+                       Style="{DynamicResource navbar_image}" />
+                <Label Grid.Row="1"
+                       Text="Hoy"
+                       Style="{DynamicResource navbar-p-white}" />
+                <!-- Botón invisible superpuesto -->
+                <Button Grid.Row="0"
+                        Grid.RowSpan="2"
+                        BackgroundColor="Transparent"
+                        BorderColor="Transparent"
+                        Clicked="OnHomeClicked"
+                        HorizontalOptions="Fill"
+                        VerticalOptions="Fill" />
             </Grid>
 
             <!-- Plan icon -->
             <Grid Grid.Column="1"
-      RowDefinitions="Auto, Auto"
-      HorizontalOptions="Center"
-      VerticalOptions="Center">
-
+                  RowDefinitions="Auto, Auto"
+                  HorizontalOptions="Center"
+                  VerticalOptions="Center">
                 <Image Grid.Row="0"
-           Source="plan_ifit_white.png"
-           Style="{DynamicResource navbar_image}" />
+                       Source="plan_ifit_white.png"
+                       Style="{DynamicResource navbar_image}" />
                 <Label Grid.Row="1"
-           Text="Plan"
-           Style="{DynamicResource navbar-p-white}"
-                       HorizontalOptions="Center"/>
-
+                       Text="Plan"
+                       Style="{DynamicResource navbar-p-white}"
+                       HorizontalOptions="Center" />
                 <!-- Botón invisible superpuesto -->
                 <Button Grid.Row="0"
-                    Grid.RowSpan="2"
-                    BackgroundColor="Transparent"
-                    BorderColor="Transparent"
-                    Clicked="OnPlanClicked"
-                    HorizontalOptions="Fill"
-                    VerticalOptions="Fill" />
+                        Grid.RowSpan="2"
+                        BackgroundColor="Transparent"
+                        BorderColor="Transparent"
+                        Clicked="OnPlanClicked"
+                        HorizontalOptions="Fill"
+                        VerticalOptions="Fill" />
             </Grid>
 
             <!-- Workouts icon -->
             <Grid Grid.Column="2"
-              RowDefinitions="Auto, Auto"
-              HorizontalOptions="Center"
-              VerticalOptions="Center">
-                <Grid.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding GoToWorkoutsClicked}" />
-                </Grid.GestureRecognizers>
-                <Image  Grid.Row="0"
-                    Source="workouts_ifit_white.png"
-                    Style="{DynamicResource navbar_image}" />
-                <Label  Grid.Row="1"
-                    Text="Actividades"
-                    Style="{DynamicResource navbar-p-white}" />
+                  RowDefinitions="Auto, Auto"
+                  HorizontalOptions="Center"
+                  VerticalOptions="Center">
+                <Image Grid.Row="0"
+                       Source="workouts_ifit_white.png"
+                       Style="{DynamicResource navbar_image}" />
+                <Label Grid.Row="1"
+                       Text="Actividades"
+                       Style="{DynamicResource navbar-p-white}" />
+                <!-- Botón invisible superpuesto -->
+                <Button Grid.Row="0"
+                        Grid.RowSpan="2"
+                        BackgroundColor="Transparent"
+                        BorderColor="Transparent"
+                        Clicked="OnWorkoutsClicked"
+                        HorizontalOptions="Fill"
+                        VerticalOptions="Fill" />
             </Grid>
 
             <!-- Community icon -->
             <Grid Grid.Column="3"
-              RowDefinitions="Auto, Auto"
-              HorizontalOptions="Center"
-              VerticalOptions="Center">
-                <Grid.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding GoToCommunityClicked}" />
-                </Grid.GestureRecognizers>
-                <Image  Grid.Row="0"
-                    Source="community_ifit_white.png"
-                    Style="{DynamicResource navbar_image}" />
-                <Label  Grid.Row="1"
-                    Text="Comunidad"
-                    Style="{DynamicResource navbar-p-white}"
-                    LineBreakMode="TailTruncation"/>
+                  RowDefinitions="Auto, Auto"
+                  HorizontalOptions="Center"
+                  VerticalOptions="Center">
+                <Image Grid.Row="0"
+                       Source="community_ifit_white.png"
+                       Style="{DynamicResource navbar_image}" />
+                <Label Grid.Row="1"
+                       Text="Comunidad"
+                       Style="{DynamicResource navbar-p-white}"
+                       LineBreakMode="TailTruncation" />
+                <!-- Botón invisible superpuesto -->
+                <Button Grid.Row="0"
+                        Grid.RowSpan="2"
+                        BackgroundColor="Transparent"
+                        BorderColor="Transparent"
+                        Clicked="OnCommunityClicked"
+                        HorizontalOptions="Fill"
+                        VerticalOptions="Fill" />
             </Grid>
 
-            <!-- Help -->
+            <!-- Help icon -->
             <Grid Grid.Column="4"
-              RowDefinitions="Auto, Auto"
-              HorizontalOptions="Center"
-              VerticalOptions="Center">
-                <Grid.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding GoToHelpClicked}" />
-                </Grid.GestureRecognizers>
-                <Image  Grid.Row="0"
-                    Source="help_ifit_white.png"
-                    Style="{DynamicResource navbar_image}" />
-                <Label  Grid.Row="1"
-                    Text="Ayuda"
-                    Style="{DynamicResource navbar-p-white}"
-                    LineBreakMode="TailTruncation"/>
+                  RowDefinitions="Auto, Auto"
+                  HorizontalOptions="Center"
+                  VerticalOptions="Center">
+                <Image Grid.Row="0"
+                       Source="help_ifit_white.png"
+                       Style="{DynamicResource navbar_image}" />
+                <Label Grid.Row="1"
+                       Text="Ayuda"
+                       Style="{DynamicResource navbar-p-white}"
+                       LineBreakMode="TailTruncation" />
+                <!-- Botón invisible superpuesto -->
+                <Button Grid.Row="0"
+                        Grid.RowSpan="2"
+                        BackgroundColor="Transparent"
+                        BorderColor="Transparent"
+                        Clicked="OnHelpClicked"
+                        HorizontalOptions="Fill"
+                        VerticalOptions="Fill" />
             </Grid>
 
         </Grid>

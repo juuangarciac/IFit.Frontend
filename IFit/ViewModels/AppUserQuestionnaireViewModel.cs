@@ -566,7 +566,7 @@ namespace IFit.ViewModels
 
                 if(CurrentQuestionIndex <= 0)
                 {
-                    await Shell.Current.GoToAsync($"CoachModelTypeSelectionView");
+                    await Shell.Current.GoToAsync("//CoachModelTypeSelectionView");
                     return;
                 }
 
@@ -631,7 +631,9 @@ namespace IFit.ViewModels
 
                 // Pasar el responseId a la siguiente vista para generar rutina
                 Preferences.Set("responseId", _responseId);
-                await Shell.Current.GoToAsync("///QuestionnaireSummaryView");
+                // Push suave hacia el resumen — sin triple slash para evitar el salto brusco
+                // del reset de stack. El botón Cancelar de QuestionnaireSummaryView gestiona la salida.
+                await Shell.Current.GoToAsync("//QuestionnaireSummaryView");
             }
             catch (Exception ex)
             {

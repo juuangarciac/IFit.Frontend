@@ -44,6 +44,8 @@ namespace IFit.ViewModels
         private TrainingService _trainingService;
         #endregion
 
+        private bool _isInitialized = false;
+
         #region Constructor
         public WeeklySummaryViewModel(TrainingService trainingService,
             AppUserService appUserService)
@@ -65,23 +67,29 @@ namespace IFit.ViewModels
 
             var userId = Preferences.Get("UserId", 0L);
 
-            AppUserResponseDto? currentUser = await _appUserService.findUserById(userId);
+            // Fetch user and routine in parallel
+            var userTask    = _appUserService.findUserById(userId);
+            var routineTask = _trainingService.getLatestActiveRoutineByUserIdAsync(userId);
+            await Task.WhenAll(userTask, routineTask);
+
+            var currentUser = await userTask;
+            Routine         = await routineTask;
+
             if (currentUser == null)
             {
                 StatusMessage = "No se ha encontrado el usuario actual.";
+                IsLoading = false;
                 return;
             }
-
-            Routine = await _trainingService.getLatestActiveRoutineByUserIdAsync(userId);
 
             if (Routine == null)
             {
                 StatusMessage = "No se ha encontrado la rutina actual.";
+                IsLoading = false;
                 return;
             }
 
             BuildSessionLists();
-
             IsLoading = false;
         }
         #endregion
@@ -113,7 +121,9 @@ namespace IFit.ViewModels
         [RelayCommand]
         public async Task AppearingAsync()
         {
+            if (_isInitialized) return;
             await InitializeAsync();
+            _isInitialized = true;
         }
 
         [RelayCommand]
@@ -124,7 +134,7 @@ namespace IFit.ViewModels
                 {"Routine", Routine },
                 {"TrainingDay", TrainingDayDto }
             };
-            await Shell.Current.GoToAsync($"//TrainingDayDetailView", navigationParameter);
+            await Shell.Current.GoToAsync("TrainingDayDetailView", navigationParameter);
         }
 
         private async Task NavigateToDetailAsync(TrainingDayDto value)
@@ -132,10 +142,9 @@ namespace IFit.ViewModels
             var navigationParameter = new Dictionary<string, object>()
             {
                 { "Routine", Routine },
-                { "TrainingDay", value },
-                { "PreviousPage", "WeeklySummaryView" }
+                { "TrainingDay", value }
             };
-            await Shell.Current.GoToAsync($"//TrainingDayDetailView", navigationParameter);
+            await Shell.Current.GoToAsync("TrainingDayDetailView", navigationParameter);
         }
 
         #endregion

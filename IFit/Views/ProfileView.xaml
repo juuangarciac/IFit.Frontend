@@ -75,23 +75,36 @@
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
 
-                        <!-- Círculo con iniciales -->
-                        <Border Grid.Column="0"
-                                HeightRequest="65"
-                                WidthRequest="65"
-                                BackgroundColor="{DynamicResource QuaternaryColor}"
-                                StrokeThickness="0"
-                                VerticalOptions="Center">
-                            <Border.StrokeShape>
-                                <Ellipse />
-                            </Border.StrokeShape>
-                            <Label Text="{Binding UserInitials}"
-                                   HorizontalOptions="Center"
-                                   VerticalOptions="Center"
-                                   FontSize="24"
-                                   FontAttributes="Bold"
-                                   Style="{DynamicResource label-h1-white}" />
-                        </Border>
+                        <!-- Avatar: imagen del coach o círculo con iniciales -->
+                        <Grid Grid.Column="0"
+                              HeightRequest="65"
+                              WidthRequest="65"
+                              VerticalOptions="Center">
+
+                            <!-- Imagen del coach (visible si hay avatar) -->
+                            <Image Source="{Binding AvatarSource}"
+                                   HeightRequest="45"
+                                   WidthRequest="45"
+                                   Aspect="AspectFit"
+                                   IsVisible="{Binding HasAvatar}" />
+
+                            <!-- Círculo con iniciales (fallback) -->
+                            <Border HeightRequest="65"
+                                    WidthRequest="65"
+                                    BackgroundColor="{DynamicResource QuaternaryColor}"
+                                    StrokeThickness="0"
+                                    IsVisible="{Binding HasAvatar, Converter={StaticResource InvertedBoolConverter}}">
+                                <Border.StrokeShape>
+                                    <Ellipse />
+                                </Border.StrokeShape>
+                                <Label Text="{Binding UserInitials}"
+                                       HorizontalOptions="Center"
+                                       VerticalOptions="Center"
+                                       FontSize="24"
+                                       FontAttributes="Bold"
+                                       Style="{DynamicResource label-h1-white}" />
+                            </Border>
+                        </Grid>
 
                         <!-- Nombre y email -->
                         <Grid Grid.Column="1"

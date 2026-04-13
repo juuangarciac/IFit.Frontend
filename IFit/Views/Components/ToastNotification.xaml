@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="IFit.Views.Components.ToastNotification">
+
+    <Border x:Name="toastBorder"
+            BackgroundColor="{StaticResource BackgroundSecondaryDark}"
+            Padding="15,14"
+            StrokeThickness="0"
+            Margin="15,0,15,40"
+            VerticalOptions="End"
+            HorizontalOptions="Fill">
+
+        <Border.StrokeShape>
+            <RoundRectangle CornerRadius="12"/>
+        </Border.StrokeShape>
+
+        <Border.Shadow>
+            <Shadow Brush="Black"
+                    Opacity="0.55"
+                    Radius="18"
+                    Offset="0,5"/>
+        </Border.Shadow>
+
+        <Grid ColumnSpacing="0"
+              ColumnDefinitions="4,14,Auto,10,*">
+
+            <!-- Barra de acento de color -->
+            <BoxView Grid.Column="0"
+                     x:Name="accentBar"
+                     VerticalOptions="Fill"
+                     CornerRadius="2"/>
+
+            <!-- Icono -->
+            <Label Grid.Column="2"
+                   x:Name="iconLabel"
+                   FontSize="18"
+                   FontAttributes="Bold"
+                   VerticalOptions="Center"/>
+
+            <!-- Mensaje -->
+            <Label Grid.Column="4"
+                   x:Name="messageLabel"
+                   FontFamily="Montserrat-Medium"
+                   FontSize="14"
+                   TextColor="{StaticResource TextPrimaryColorLight}"
+                   VerticalOptions="Center"
+                   LineBreakMode="WordWrap"/>
+        </Grid>
+    </Border>
+</ContentView>

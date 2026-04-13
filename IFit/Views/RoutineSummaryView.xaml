@@ -5,7 +5,6 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:models="clr-namespace:IFit.Models.Dtos.AI"
     xmlns:viewModels="clr-namespace:IFit.ViewModels"
-    Title="Rutina Personalizada"
     x:DataType="viewModels:RoutineSummaryViewModel"
     BackgroundColor="{DynamicResource BackgroundPrimaryDark}"
     Shell.NavBarIsVisible="False">
@@ -14,171 +13,198 @@
         <viewModels:RoutineSummaryViewModel />
     </ContentPage.BindingContext>
 
-    <Grid Margin="15" RowSpacing="15">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
+    <Grid Margin="15" RowSpacing="10"
+          RowDefinitions="Auto,Auto,Auto,*,Auto">
 
-        <!--  Header - Row 0 
-        <Grid
-            Grid.Row="0"
-            Padding="15"
-            HorizontalOptions="Fill">
+        <!-- Row 0: Header (back + línea decorativa + cancel) -->
+        <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-           
-            <Button
-                Grid.Column="0"
-                BackgroundColor="Transparent"
-                Clicked="onCancelClicked"
-                HorizontalOptions="Center"
-                ImageSource="arrow.png"
-                VerticalOptions="Center" />
+            <!-- Go Back -->
+            <Button Grid.Column="0"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    BackgroundColor="Transparent"
+                    ImageSource="arrow.png"
+                    Clicked="onCancelClicked" />
 
-            
-            <Border
-                Grid.Column="1"
-                BackgroundColor="{StaticResource TextSecondaryColorLight}"
-                HeightRequest="1"
-                HorizontalOptions="Center"
-                StrokeThickness="0"
-                VerticalOptions="Center"
-                WidthRequest="120" />
+            <!-- Línea decorativa central -->
+            <Border Grid.Column="1"
+                    BackgroundColor="{StaticResource TextSecondaryColorLight}"
+                    VerticalOptions="Center"
+                    WidthRequest="120"
+                    StrokeThickness="1" />
 
-           
-            <Button
-                Grid.Column="2"
-                BackgroundColor="Transparent"
-                Clicked="onCancelClicked"
-                HorizontalOptions="Center"
-                ImageSource="cancel.svg"
-                VerticalOptions="Center" />
-        </Grid>  -->
+            <!-- Cancel -->
+            <Button Grid.Column="2"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    BackgroundColor="Transparent"
+                    ImageSource="cancel.svg"
+                    Clicked="onCancelClicked" />
+        </Grid>
 
-        <VerticalStackLayout Grid.Row="1">
-            <!--  Título principal  -->
-            <Label
-                FontSize="28"
-                HorizontalTextAlignment="Center"
-                Style="{StaticResource label-h1-white}"
-                Text="Tú rutina personalizada" />
-
-            <!--  Título "Rutina"  -->
-            <Label Style="{StaticResource label-h1-yellow}" Text="Rutina" />
-            
-            <!-- Informacion adicional - Mensaje del Entrenador -->
-            <!--<Label Style="{StaticResource label-p-white}"
-                   Text="{Binding MessageAI}" /> -->
-            
+        <!-- Row 1: Título principal -->
+        <VerticalStackLayout Grid.Row="1" Spacing="2">
+            <Label FontSize="28"
+                   HorizontalTextAlignment="Center"
+                   Style="{StaticResource label-h1-white}"
+                   Text="Tú rutina personalizada" />
+            <Label Style="{StaticResource label-h1-yellow}"
+                   HorizontalTextAlignment="Center"
+                   Text="Rutina" />
         </VerticalStackLayout>
 
-        <!--  Scroll horizontal de días de entrenamiento  -->
-        <ScrollView Grid.Row="2" 
-                    Orientation="Horizontal"
-                    VerticalOptions="Fill">
-            <HorizontalStackLayout BindableLayout.ItemsSource="{Binding Routine.Days}" Spacing="15">
-                <BindableLayout.ItemTemplate>
-                    <DataTemplate x:DataType="models:TrainingDayDto">
-                        <Border StrokeThickness="2"
-                        Stroke="{DynamicResource BackgroundPrimaryLight}"
-                        BackgroundColor="{DynamicResource PrimaryColorLightOpacity}"
-                        WidthRequest="300">
+        <!-- Row 2: Indicador de día (solo visible si hay más de un día) -->
+        <HorizontalStackLayout Grid.Row="2"
+                               HorizontalOptions="Center">
 
-                            <Border.StrokeShape>
-                                <RoundRectangle CornerRadius="{DynamicResource CornerRadiusRectangle}" />
-                            </Border.StrokeShape>
+            <!-- Botón anterior (overlay izquierda) -->
+            <Button Command="{Binding GoToPreviousDayCommand}"
+                    IsVisible="{Binding HasMultipleDays}"
+                    BackgroundColor="Transparent"
+                    Text="◀"
+                    TextColor="{StaticResource TertiaryColor}"
+                    FontSize="26"
+                    HorizontalOptions="Start"
+                    VerticalOptions="Center"
+                    WidthRequest="26"
+                    Padding="0" />
 
-                            <Border.Shadow>
-                                <Shadow Brush="{DynamicResource BackgroundPrimaryLight}"
-                                Opacity="0.35"
-                                Radius="{DynamicResource CornerRadiusRectangle}" />
-                            </Border.Shadow>
+            
+            <Label 
+               Text="{Binding DayIndicatorText}"
+               IsVisible="{Binding HasMultipleDays}"
+               HorizontalOptions="Center"
+               VerticalOptions="Center"
+               Style="{StaticResource label-p-white}"
+               Opacity="0.65" />
 
-                            <Grid Padding="15" 
-                                  RowSpacing="5"
-                                  RowDefinitions="Auto,Auto,*,Auto">
+            <!-- Botón siguiente (overlay derecha) -->
+            <Button Command="{Binding GoToNextDayCommand}"
+                    IsVisible="{Binding HasMultipleDays}"
+                    BackgroundColor="Transparent"
+                    Text="▶"
+                    TextColor="{StaticResource TertiaryColor}"
+                    FontSize="26"
+                    HorizontalOptions="End"
+                    VerticalOptions="Center"
+                    WidthRequest="26"
+                    Padding="0" />
+            
+        </HorizontalStackLayout>
 
-                                <Label Grid.Row="0"
-                               Style="{StaticResource label-h1-white}"
-                               Text="{Binding DayName}" />
+        <!-- Row 3: Tarjeta del día actual (ancho completo) + botones nav en overlay -->
+        <Grid Grid.Row="3">
 
-                                <Label Grid.Row="1"
-                               Style="{StaticResource label-p-white}"
-                               Text="{Binding Description}" />
+            <!-- Tarjeta del día actual -->
+            <Border StrokeThickness="2"
+                    Stroke="{DynamicResource BackgroundPrimaryLight}"
+                    BackgroundColor="{DynamicResource PrimaryColorLightOpacity}">
 
-                                <VerticalStackLayout Grid.Row="2"
-                                                     Margin="5"
-                                                    BindableLayout.ItemsSource="{Binding Exercises}" Spacing="12">
-                                    <BindableLayout.ItemTemplate>
-                                        <DataTemplate x:DataType="models:ExerciseDto">
-                                            <VerticalStackLayout Spacing="2">
-                                                <Label Text="{Binding ExerciseName}"
-                                                       Style="{StaticResource label-h3-white}"
-                                                       FontSize="16"
-                                                       FontAttributes="Bold"/>
-                                                <Label Text="{Binding Notes}"
-                                                       Style="{StaticResource label-p-white}"/> 
-                                                <Label Style="{StaticResource label-p-white}" Opacity="0.75">
-                                                    <Label.FormattedText>
-                                                        <FormattedString>
-                                                            <Span Text="{Binding Sets, StringFormat='{0} series'}"
-                                                                    Style="{StaticResource label-p-white}"/>
-                                                            <Span Text=" × " Style="{StaticResource label-p-white}"/>
-                                                            <Span Text="{Binding Reps, StringFormat='{0} reps'}"
-                                                                    Style="{StaticResource label-p-white}"/>
-                                                        </FormattedString>
-                                                    </Label.FormattedText>
-                                                </Label>
-                                            </VerticalStackLayout>
-                                        </DataTemplate>
-                                    </BindableLayout.ItemTemplate>
-                                </VerticalStackLayout>
-                                
-                                <!-- Logo de ifit -->
-                                <Image Grid.Row="3"
-                                       Margin="0, 0, 0, -15"
-                                        Source="ifit_logo_white.png"
-                                        HorizontalOptions="End"
-                                        VerticalOptions="End"
-                                        HeightRequest="55"
-                                        WidthRequest="55"/>
-                            </Grid>
-                        </Border>
-                    </DataTemplate>
-                </BindableLayout.ItemTemplate>
-            </HorizontalStackLayout>
-        </ScrollView>
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="{DynamicResource CornerRadiusRectangle}" />
+                </Border.StrokeShape>
+                <Border.Shadow>
+                    <Shadow Brush="{DynamicResource BackgroundPrimaryLight}"
+                            Opacity="0.35"
+                            Radius="{DynamicResource CornerRadiusRectangle}" />
+                </Border.Shadow>
 
-        <!--  Botones de acción  -->
-        <Grid
-            Grid.Row="3"
-            Margin="0,20,0,20"
-            ColumnDefinitions="*,Auto"
-            ColumnSpacing="10">
+                <Grid Padding="15"
+                      RowSpacing="6"
+                      RowDefinitions="Auto,Auto,Auto,*,Auto">
 
-            <!--  Botón Probar de nuevo  -->
-            <Button
-                Grid.Column="0"
-                Command="{Binding TryAgainCommand}"
-                CornerRadius="{DynamicResource CornerRadiusRectangle}"
-                HorizontalOptions="Fill"
-                Style="{DynamicResource ButtonBold-XL-dark-yellow}"
-                Text="Probar de nuevo" />
+                    <!-- Nombre del día -->
+                    <Label Grid.Row="0"
+                           Style="{StaticResource label-h1-white}"
+                           Text="{Binding CurrentDay.DayName}" />
 
-            <!--  Botón Me gusta  -->
-            <Button
-                Grid.Column="1"
-                Command="{Binding SaveRoutineCommand}"
-                CornerRadius="{DynamicResource CornerRadiusRectangle}"
-                Style="{DynamicResource ButtonBold-XL-yellow}"
-                Text="¡Me gusta!" />
+                    <!-- Descripción -->
+                    <Label Grid.Row="1"
+                           Style="{StaticResource label-p-white}"
+                           Text="{Binding CurrentDay.Description}"
+                           LineBreakMode="WordWrap" />
+
+                    <!-- Indicador de scroll (solo si hay más ejercicios de los que caben) -->
+                    <Label Grid.Row="2"
+                           IsVisible="{Binding ShowScrollIndicator}"
+                           Text="▼  desliza para ver todos los ejercicios"
+                           TextColor="{StaticResource TertiaryColor}"
+                           FontFamily="Montserrat-Medium"
+                           FontSize="11"
+                           Opacity="0.85"
+                           Margin="0,2,0,2" />
+
+                    <!-- Lista de ejercicios con scroll vertical -->
+                    <ScrollView Grid.Row="3" Orientation="Vertical">
+                        <VerticalStackLayout Margin="0,4,0,0"
+                                             BindableLayout.ItemsSource="{Binding CurrentDay.Exercises}"
+                                             Spacing="14">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="models:ExerciseDto">
+                                    <VerticalStackLayout Spacing="2">
+                                        <Label Text="{Binding ExerciseName}"
+                                               Style="{StaticResource label-h3-white}"
+                                               FontSize="15"
+                                               FontAttributes="Bold"
+                                               LineBreakMode="WordWrap" />
+                                        <Label Text="{Binding Notes}"
+                                               Style="{StaticResource label-p-white}"
+                                               LineBreakMode="WordWrap" />
+                                        <Label Style="{StaticResource label-p-white}"
+                                               Opacity="0.75">
+                                            <Label.FormattedText>
+                                                <FormattedString>
+                                                    <Span Text="{Binding Sets, StringFormat='{0} series'}"
+                                                          Style="{StaticResource label-p-white}" />
+                                                    <Span Text=" × "
+                                                          Style="{StaticResource label-p-white}" />
+                                                    <Span Text="{Binding Reps, StringFormat='{0} reps'}"
+                                                          Style="{StaticResource label-p-white}" />
+                                                </FormattedString>
+                                            </Label.FormattedText>
+                                        </Label>
+                                    </VerticalStackLayout>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </VerticalStackLayout>
+                    </ScrollView>
+
+                    <!-- Logo ifit anclado al pie de la tarjeta -->
+                    <Image Grid.Row="4"
+                           Margin="0,6,0,-15"
+                           Source="ifit_logo_white.png"
+                           HorizontalOptions="End"
+                           VerticalOptions="End"
+                           HeightRequest="50"
+                           WidthRequest="50" />
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- Row 4: Botones de acción -->
+        <Grid Grid.Row="4"
+              Margin="0,4,0,8"
+              ColumnDefinitions="*,Auto"
+              ColumnSpacing="10">
+
+            <Button Grid.Column="0"
+                    Command="{Binding TryAgainCommand}"
+                    CornerRadius="{DynamicResource CornerRadiusRectangle}"
+                    HorizontalOptions="Fill"
+                    Style="{DynamicResource ButtonBold-XL-dark-yellow}"
+                    Text="Probar de nuevo" />
+
+            <Button Grid.Column="1"
+                    Command="{Binding SaveRoutineCommand}"
+                    CornerRadius="{DynamicResource CornerRadiusRectangle}"
+                    Style="{DynamicResource ButtonBold-XL-yellow}"
+                    Text="¡Me gusta!" />
         </Grid>
     </Grid>
 </ContentPage>

@@ -43,9 +43,11 @@
                     <Grid>
                         <Image Source="profile_icon_white.png"
                                Style="{DynamicResource navbar_image}"/>
-                        <Grid.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding GoToProfileCommand}" />
-                        </Grid.GestureRecognizers>
+                        <Button BackgroundColor="Transparent"
+                                BorderColor="Transparent"
+                                HorizontalOptions="Fill"
+                                VerticalOptions="Fill"
+                                Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.GoToProfileCommand}" />
                     </Grid>
                     <!-- Notif Icon -->
                     <Image Source="notification_icon_white.png"

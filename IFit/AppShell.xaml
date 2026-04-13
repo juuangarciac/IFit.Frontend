@@ -73,22 +73,7 @@
         ContentTemplate="{DataTemplate views:RoutineSummaryView}" 
         Route="RoutineSummaryView" />
 
-    <ShellContent
-        Title="TrainingDayDetailView" 
-        ContentTemplate="{DataTemplate views:TrainingDayDetailView}" 
-        Route="TrainingDayDetailView" />
-
-    <ShellContent
-        Title="ChatAIView" 
-        ContentTemplate="{DataTemplate views:ChatAIView}" 
-        Route="ChatAIView" />
-
-    <ShellContent
-        Title="WeeklySummaryView" 
-        ContentTemplate="{DataTemplate views:WeeklySummaryView}" 
-        Route="WeeklySummaryView" />
-
-    <ShellContent
+<ShellContent
         Title="PlanView" 
         ContentTemplate="{DataTemplate views:PlanView}" 
         Route="PlanView" />
@@ -98,9 +83,5 @@
         ContentTemplate="{DataTemplate views:PlanSummaryView}"
         Route="PlanSummaryView" />
 
-    <ShellContent
-        Title="ProfileView"
-        ContentTemplate="{DataTemplate views:ProfileView}"
-        Route="ProfileView" />
 
 </Shell>

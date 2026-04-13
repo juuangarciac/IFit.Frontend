@@ -49,10 +49,14 @@ namespace IFit.ViewModels
         [RelayCommand]
         public async Task AppearingAsync()
         {
-            var userId = Preferences.Get("UserId", 0L);
-            CurrentUser = await _appUserService.findUserById(userId);
+            // Fetch user only once; re-show welcome on every visit
             if (CurrentUser == null)
-                return;
+            {
+                var userId = Preferences.Get("UserId", 0L);
+                CurrentUser = await _appUserService.findUserById(userId);
+                if (CurrentUser == null)
+                    return;
+            }
 
             var welcomeText = $"¡Hola {CurrentUser.Name}! 💪 Soy {CurrentUser.CoachModelTypeName}, tu entrenador personal. " +
                 $"Estoy aquí para ayudarte a sacar el máximo de tu rutina — cualquier duda que tengas, pregúntame sin miedo. " +

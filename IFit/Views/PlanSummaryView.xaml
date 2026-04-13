@@ -182,7 +182,8 @@
                                                         <Label Text="{Binding Description}"
                                                        Style="{DynamicResource label-h2-white}"
                                                        Opacity="0.7"
-                                                       LineBreakMode="WordWrap"
+                                                       MaxLines="2"
+                                                       LineBreakMode="TailTruncation"
                                                        FontSize="13"/>
                                                         <HorizontalStackLayout Spacing="4"
                                                                        IsVisible="{Binding CurrentDay, Converter={StaticResource IsNotNullConverter}}">
@@ -318,7 +319,8 @@
                                                         <Label Text="{Binding Description}"
                                                        Style="{DynamicResource label-h2-white}"
                                                        Opacity="0.7"
-                                                       LineBreakMode="WordWrap"
+                                                       MaxLines="2"
+                                                        LineBreakMode="TailTruncation"
                                                        FontSize="13"/>
                                                         <HorizontalStackLayout Spacing="4"
                                                                        IsVisible="{Binding CurrentDay, Converter={StaticResource IsNotNullConverter}}">

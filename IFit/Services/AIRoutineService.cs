@@ -80,7 +80,7 @@ namespace IFit.Services
         /// <param name="userId">ID del usuario (String, ej: "user_12345")</param>
         /// <param name="responseId">ID de la respuesta del cuestionario completado</param>
         /// <returns>RoutineResponseDto con la rutina generada o null si hay error</returns>
-        public async Task<RoutineResponseDto?> GenerateRoutineAsync(string userId, long responseId)
+        public async Task<RoutineResponseDto?> GenerateRoutineAsync(string userId, long responseId, string? coachType = null)
         {
             try
             {
@@ -105,7 +105,8 @@ namespace IFit.Services
                 var request = new GenerateRoutineRequestDto
                 {
                     UserId = userId,
-                    ResponseId = responseId
+                    ResponseId = responseId,
+                    CoachType = string.IsNullOrWhiteSpace(coachType) ? null : coachType.ToUpper().Trim()
                 };
 
                 Debug.WriteLine($"→ Llamando a POST /api/routines/generate");

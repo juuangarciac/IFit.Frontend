@@ -24,7 +24,7 @@ public partial class GetStartedViewModel : ObservableObject
     [RelayCommand]
     public async Task GetStartedAsync()
     {
-        await Shell.Current.GoToAsync("ExperienceLevelSelectionView");
+        await Shell.Current.GoToAsync("//ExperienceLevelSelectionView");
     }
 
     #endregion

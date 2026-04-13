@@ -257,7 +257,7 @@ namespace IFit.ViewModels
                 CurrentState = RegistrationState.Success;
 
                 Debug.WriteLine("Navegando a VerificationView");
-                await Shell.Current.GoToAsync("/VerificationView", new Dictionary<string, object>
+                await Shell.Current.GoToAsync("//VerificationView", new Dictionary<string, object>
                 {
                     { "Email", Email }
                 });

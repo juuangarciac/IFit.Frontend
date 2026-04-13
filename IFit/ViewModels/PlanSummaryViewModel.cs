@@ -60,6 +60,8 @@ namespace IFit.ViewModels
 
         #endregion
 
+        private bool _isInitialized = false;
+
         #region Constructor
 
         public PlanSummaryViewModel(TrainingService trainingService, AppUserService appUserService)
@@ -81,6 +83,8 @@ namespace IFit.ViewModels
         [RelayCommand]
         public async Task AppearingAsync()
         {
+            if (_isInitialized) return;
+
             try
             {
                 IsLoading = true;
@@ -88,16 +92,14 @@ namespace IFit.ViewModels
 
                 var userId = Preferences.Get("UserId", 0L);
 
-                var currentUser = await _appUserService.findUserById(userId);
-                if (currentUser is null)
-                {
-                    StatusMessage = "No se ha encontrado el usuario actual.";
-                    IsLoading = false;
-                    return;
-                }
+                // Fetch all routines and active routine in parallel
+                var allRoutinesTask   = _trainingService.getRoutinesByUserIdAsync(userId);
+                var activeRoutineTask = _trainingService.getLatestActiveRoutineByUserIdAsync(userId);
+                await Task.WhenAll(allRoutinesTask, activeRoutineTask);
 
-                // Todas las rutinas
-                var allRoutines = await _trainingService.getRoutinesByUserIdAsync(userId);
+                var allRoutines   = await allRoutinesTask;
+                var activeRoutine = await activeRoutineTask;
+
                 AllRoutines = allRoutines is { Count: > 0 }
                     ? allRoutines
                     : new List<RoutineResponseDto>();
@@ -105,17 +107,14 @@ namespace IFit.ViewModels
                 if (AllRoutines.Count == 0)
                     AllRoutinesMessage = "No se han encontrado rutinas para este usuario.";
 
-                // Rutina activa
-                ActiveRoutines = new List<RoutineResponseDto>();
-
-                var activeRoutine = await _trainingService.getLatestActiveRoutineByUserIdAsync(userId);
-
                 ActiveRoutines = activeRoutine is not null
                     ? new List<RoutineResponseDto> { activeRoutine }
                     : new List<RoutineResponseDto>();
 
                 if (ActiveRoutines.Count == 0)
                     ActiveRoutinesMessage = "No se han encontrado rutinas activas para este usuario.";
+
+                _isInitialized = true;
             }
             catch (Exception ex)
             {
@@ -131,7 +130,7 @@ namespace IFit.ViewModels
         [RelayCommand]
         public async Task GenerateNewRoutineAsync()
         {
-            await Shell.Current.GoToAsync($"CoachModelTypeSelectionView");
+            await Shell.Current.GoToAsync("//CoachModelTypeSelectionView");
         }
 
         #endregion
@@ -147,7 +146,7 @@ namespace IFit.ViewModels
                     { "User", User }
                 };
 
-            await Shell.Current.GoToAsync($"PlanView", parameters);
+            await Shell.Current.GoToAsync("//PlanView", parameters);
 
         }
 

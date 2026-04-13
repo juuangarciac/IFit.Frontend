@@ -33,8 +33,6 @@ public class HomeHeaderViewModel : INotifyPropertyChanged
 
     public ICommand ExpandCalendarSelected { get { return new Command(OnExpandCalendarSelected); } }
 
-    public ICommand GoToProfileCommand { get { return new Command(async () => await Shell.Current.GoToAsync($"ProfileView")); } }
-
     private void OnExpandCalendarSelected()
     {
         if(selectedLayout == WeekLayout.Week)

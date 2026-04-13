@@ -15,7 +15,6 @@ namespace IFit.ViewModels
 {
     [QueryProperty(nameof(Routine), "Routine")]
     [QueryProperty(nameof(TrainingDay), "TrainingDay")]
-    [QueryProperty(nameof(PreviousPage), "PreviousPage")]
     public partial class TrainingDayDetailViewModel : ObservableObject
     {
         #region Services
@@ -60,13 +59,6 @@ namespace IFit.ViewModels
 
         #endregion
 
-        #region Navigation Parameters
-
-        [ObservableProperty]
-        public partial string PreviousPage { get; set; } = string.Empty;
-
-        #endregion
-
         #region Constructor
 
         public TrainingDayDetailViewModel(TrainingService trainingService) 
@@ -91,36 +83,20 @@ namespace IFit.ViewModels
         {
             Debug.Write($"End Session");
             var response = await _trainingService.setRoutineDayAsCompletedAsync((long)Routine.Id, (int)Routine.CurrentDay);
-            if(response == null)
+            if (response == null)
             {
-                await Shell.Current.DisplayAlert(
-                        "Error",
-                        "No se pudo finalizar la sesión.",
-                        "OK"
-                    );
+                await NotificationService.ShowErrorAsync("No se pudo finalizar la sesión.");
                 return;
             }
 
-            await Shell.Current.DisplayAlert(
-                        "Exito",
-                        "Se ha guardado correctamente la sesión.",
-                        "OK"
-                    );
-
-            await Shell.Current.GoToAsync("///HomeView");
+            await NotificationService.ShowSuccessAsync("¡Sesión guardada correctamente!");
+            await Shell.Current.GoToAsync("//HomeView", false);
         }
 
         [RelayCommand]
         public async Task GoBackAsync()
         {
-            if (!string.IsNullOrEmpty(PreviousPage))
-            {
-                await Shell.Current.GoToAsync($"//{PreviousPage}");
-            }
-            else
-            {
-                await Shell.Current.GoToAsync("//HomeView");
-            }
+            await Shell.Current.GoToAsync("..");
         }
         #endregion
 

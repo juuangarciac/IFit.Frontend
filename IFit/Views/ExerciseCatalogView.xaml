@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:IFit.ViewModels"
+             xmlns:views="clr-namespace:IFit.Views.Templates"
+             xmlns:components="clr-namespace:IFit.Views.Components"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:dtos="clr-namespace:IFit.Models.Dtos.Exercise"
+             x:Class="IFit.Views.ExerciseCatalogView"
+             x:Name="ExerciseCatalogPage"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{DynamicResource BackgroundPrimaryDark}">
+
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior
+            EventName="Appearing"
+            Command="{Binding AppearingCommand}" />
+    </ContentPage.Behaviors>
+
+    <ContentPage.BindingContext>
+        <vm:ExerciseCatalogViewModel />
+    </ContentPage.BindingContext>
+
+    <Grid BackgroundColor="{DynamicResource BackgroundPrimaryDark}"
+          RowSpacing="0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Loading Overlay -->
+        <components:LoadingOverlay Grid.RowSpan="4"
+                                   IsLoading="{Binding IsLoading}"
+                                   Message="{Binding StatusMessage}"
+                                   ZIndex="999" />
+
+        <!-- Row 0: Header -->
+        <Grid Grid.Row="0"
+              Padding="20,50,20,15"
+              ColumnSpacing="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <ImageButton Grid.Column="0"
+                         Source="arrow_icon_white.png"
+                         HeightRequest="16"
+                         WidthRequest="16"
+                         VerticalOptions="Center"
+                         Command="{Binding GoToHomeCommand}"
+                         Rotation="180" />
+
+            <VerticalStackLayout Grid.Column="1"
+                                 Spacing="1"
+                                 VerticalOptions="Center">
+                <Label Text="Catálogo de"
+                       Style="{DynamicResource label-h1-white}"
+                       FontSize="22" />
+                <Label Text="Ejercicios"
+                       Style="{DynamicResource label-h1-yellow}"
+                       FontSize="22" />
+            </VerticalStackLayout>
+        </Grid>
+
+        <!-- Row 1: Barra de búsqueda -->
+        <Border Grid.Row="1"
+                Margin="15,0,15,15"
+                BackgroundColor="{DynamicResource BackgroundPrimaryLight}"
+                StrokeThickness="0">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="10" />
+            </Border.StrokeShape>
+
+            <Grid ColumnDefinitions="*,Auto"
+                  Padding="12,0">
+
+                <!-- Campo de texto -->
+                <Entry Grid.Column="0"
+                       Text="{Binding SearchText}"
+                       Placeholder="Buscar por músculo, ej: pecho"
+                       PlaceholderColor="{DynamicResource BackgroundPrimaryDark}"
+                       TextColor="{DynamicResource BackgroundPrimaryDark}"
+                       BackgroundColor="Transparent"
+                       ReturnType="Search"
+                       ReturnCommand="{Binding SearchCommand}"
+                       ClearButtonVisibility="WhileEditing" />
+
+                <!-- Botón buscar -->
+                <Button Grid.Column="1"
+                        Text="Buscar"
+                        Command="{Binding SearchCommand}"
+                        Style="{DynamicResource ButtonBold-XL-yellow}"
+                        FontSize="12"
+                        Padding="15,0"
+                        VerticalOptions="Center"
+                        CornerRadius="8" />
+            </Grid>
+        </Border>
+
+        <!-- Row 2: Listado de ejercicios -->
+        <CollectionView Grid.Row="2"
+                        ItemsSource="{Binding Exercises}"
+                        SelectionMode="None"
+                        Margin="15,0">
+
+            <!-- Estado vacío -->
+            <CollectionView.EmptyView>
+                <VerticalStackLayout VerticalOptions="Center"
+                                     HorizontalOptions="Center"
+                                     Spacing="8"
+                                     Padding="30"
+                                     IsVisible="{Binding IsEmpty}">
+                    <Label Text="Sin resultados"
+                           Style="{DynamicResource label-h2-white}"
+                           HorizontalTextAlignment="Center"
+                           Opacity="0.7" />
+                    <Label Text="Prueba con otro término de búsqueda"
+                           Style="{DynamicResource label-p-white}"
+                           HorizontalTextAlignment="Center"
+                           Opacity="0.5" />
+                </VerticalStackLayout>
+            </CollectionView.EmptyView>
+
+            <!-- Tarjeta de ejercicio -->
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="dtos:ExerciseSummaryDto">
+                    <Border Margin="0,0,0,8"
+                            BackgroundColor="{DynamicResource PrimaryColorLightOpacity}"
+                            StrokeThickness="2"
+                            Stroke="{DynamicResource BackgroundPrimaryLight}">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer
+                                Command="{Binding Source={x:Reference ExerciseCatalogPage}, Path=BindingContext.OpenDetailCommand}"
+                                CommandParameter="{Binding .}" />
+                        </Border.GestureRecognizers>
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="{DynamicResource CornerRadiusRectangle}" />
+                        </Border.StrokeShape>
+                        <Border.Shadow>
+                            <Shadow Brush="{DynamicResource BackgroundPrimaryLight}"
+                                    Opacity="0.25"
+                                    Radius="{DynamicResource CornerRadiusRectangle}" />
+                        </Border.Shadow>
+
+                        <Grid Padding="12,10"
+                              RowSpacing="6"
+                              RowDefinitions="Auto,Auto,Auto">
+
+                            <!-- Nombre del ejercicio -->
+                            <Label Grid.Row="0"
+                                   Text="{Binding Name}"
+                                   Style="{DynamicResource label-h2-white}"
+                                   FontSize="16"
+                                   FontAttributes="Bold"
+                                   LineBreakMode="WordWrap" />
+
+                            <!-- Badges: Categoría · Nivel · Equipamiento -->
+                            <FlexLayout Grid.Row="1"
+                                        Wrap="Wrap"
+                                        Direction="Row"
+                                        JustifyContent="Start"
+                                        AlignItems="Center">
+
+                                <!-- Categoría -->
+                                <Border BackgroundColor="{DynamicResource QuaternaryColor}"
+                                        StrokeThickness="0"
+                                        Margin="0,2,6,2"
+                                        Padding="8,3">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="6" />
+                                    </Border.StrokeShape>
+                                    <Label Text="{Binding Category}"
+                                           TextColor="{DynamicResource BackgroundSecondaryDark}"
+                                           FontSize="11"
+                                           FontFamily="Montserrat-Medium" />
+                                </Border>
+
+                                <!-- Nivel -->
+                                <Border BackgroundColor="{DynamicResource TertiaryColor}"
+                                        StrokeThickness="0"
+                                        Margin="0,2,6,2"
+                                        Padding="8,3">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="6" />
+                                    </Border.StrokeShape>
+                                    <Label Text="{Binding Level}"
+                                           TextColor="{DynamicResource BackgroundPrimaryDark}"
+                                           FontSize="11"
+                                           FontFamily="Montserrat-Medium" />
+                                </Border>
+
+                                <!-- Equipamiento -->
+                                <Border BackgroundColor="Transparent"
+                                        StrokeThickness="1"
+                                        Stroke="{DynamicResource BackgroundPrimaryLight}"
+                                        Margin="0,2,0,2"
+                                        Padding="8,3">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="6" />
+                                    </Border.StrokeShape>
+                                    <Label Text="{Binding Equipment}"
+                                           TextColor="{DynamicResource TextSecondaryColorLight}"
+                                           FontSize="11"
+                                           FontFamily="Montserrat-Medium" />
+                                </Border>
+                            </FlexLayout>
+
+                            <!-- Músculos principales -->
+                            <Label Grid.Row="2"
+                                   LineBreakMode="TailTruncation"
+                                   Opacity="0.65">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="Músculos: "
+                                              TextColor="{DynamicResource TextSecondaryColorLight}"
+                                              FontFamily="Montserrat-Medium"
+                                              FontSize="12" />
+                                        <Span Text="{Binding PrimaryMuscles[0]}"
+                                              TextColor="White"
+                                              FontFamily="Montserrat-Medium"
+                                              FontSize="12" />
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+
+            <!-- Footer: botón Cargar más -->
+            <CollectionView.Footer>
+                <Grid Padding="0,4,0,12">
+                    <Button Text="Cargar más ejercicios"
+                            IsVisible="{Binding HasMorePages}"
+                            Command="{Binding LoadMoreCommand}"
+                            Style="{DynamicResource ButtonBold-XL-dark-yellow}"
+                            CornerRadius="{DynamicResource CornerRadiusRectangle}"
+                            HorizontalOptions="Fill" />
+                </Grid>
+            </CollectionView.Footer>
+        </CollectionView>
+
+        <!-- Row 3: Footer de navegación -->
+        <views:HomeFooterView Grid.Row="3" />
+    </Grid>
+</ContentPage>

@@ -18,6 +18,11 @@ namespace IFit.Services
 
         private readonly ISecureStorageService _secureStorage;
 
+        // In-memory cache — avoids hitting SecureStorage (slow on Android Keystore) on every request
+        private string? _cachedAccessToken;
+        private string? _cachedRefreshToken;
+        private DateTime _cachedExpiry = DateTime.MinValue;
+
         /// <summary>
         /// Constructor con inyección de dependencias
         /// </summary>
@@ -36,18 +41,22 @@ namespace IFit.Services
         }
 
         /// <summary>
-        /// Guarda los tokens de autenticación de forma segura
+        /// Guarda los tokens de autenticación de forma segura y actualiza la caché en memoria
         /// </summary>
         public async Task SaveAuthDataAsync(AuthResponse authResponse)
         {
             try
             {
+                // Update in-memory cache first (instant access next time)
+                _cachedAccessToken = authResponse.AccessToken;
+                _cachedRefreshToken = authResponse.RefreshToken;
+                _cachedExpiry = DateTime.UtcNow.AddSeconds(authResponse.ExpiresIn);
+
                 await _secureStorage.SetAsync(ACCESS_TOKEN_KEY, authResponse.AccessToken);
                 await _secureStorage.SetAsync(REFRESH_TOKEN_KEY, authResponse.RefreshToken);
 
                 // Calcular y guardar el momento de expiración
-                var expiryTime = DateTime.UtcNow.AddSeconds(authResponse.ExpiresIn);
-                await _secureStorage.SetAsync(TOKEN_EXPIRY_KEY, expiryTime.ToString("o"));
+                await _secureStorage.SetAsync(TOKEN_EXPIRY_KEY, _cachedExpiry.ToString("o"));
 
                 // Guardar información del usuario
                 if (authResponse.AppUser != null)
@@ -58,20 +67,23 @@ namespace IFit.Services
             }
             catch (Exception ex)
             {
-                // Log error - en producción deberías usar un sistema de logging
                 System.Diagnostics.Debug.WriteLine($"Error guardando tokens: {ex.Message}");
                 throw;
             }
         }
 
         /// <summary>
-        /// Obtiene el token de acceso almacenado
+        /// Obtiene el token de acceso — desde caché en memoria si está disponible
         /// </summary>
         public async Task<string?> GetAccessTokenAsync()
         {
             try
             {
-                return await _secureStorage.GetAsync(ACCESS_TOKEN_KEY);
+                if (_cachedAccessToken != null)
+                    return _cachedAccessToken;
+
+                _cachedAccessToken = await _secureStorage.GetAsync(ACCESS_TOKEN_KEY);
+                return _cachedAccessToken;
             }
             catch (Exception ex)
             {
@@ -81,13 +93,17 @@ namespace IFit.Services
         }
 
         /// <summary>
-        /// Obtiene el token de refresco almacenado
+        /// Obtiene el token de refresco — desde caché en memoria si está disponible
         /// </summary>
         public async Task<string?> GetRefreshTokenAsync()
         {
             try
             {
-                return await _secureStorage.GetAsync(REFRESH_TOKEN_KEY);
+                if (_cachedRefreshToken != null)
+                    return _cachedRefreshToken;
+
+                _cachedRefreshToken = await _secureStorage.GetAsync(REFRESH_TOKEN_KEY);
+                return _cachedRefreshToken;
             }
             catch (Exception ex)
             {
@@ -97,13 +113,17 @@ namespace IFit.Services
         }
 
         /// <summary>
-        /// Verifica si el token de acceso ha expirado o está próximo a expirar
+        /// Verifica si el token ha expirado — usa caché en memoria si está disponible
         /// </summary>
         /// <param name="bufferSeconds">Segundos de margen antes de la expiración (por defecto 60s)</param>
         public async Task<bool> IsTokenExpiredAsync(int bufferSeconds = 60)
         {
             try
             {
+                // Use in-memory expiry if available (avoids SecureStorage read)
+                if (_cachedExpiry != DateTime.MinValue)
+                    return DateTime.UtcNow.AddSeconds(bufferSeconds) >= _cachedExpiry;
+
                 var expiryStr = await _secureStorage.GetAsync(TOKEN_EXPIRY_KEY);
 
                 if (string.IsNullOrEmpty(expiryStr))
@@ -115,15 +135,11 @@ namespace IFit.Services
                     DateTimeStyles.RoundtripKind,
                     out DateTime expiryTime))
                 {
-                    // Asegurar que estamos comparando en UTC
-                    DateTime expiryTimeUtc = expiryTime.Kind == DateTimeKind.Utc
+                    _cachedExpiry = expiryTime.Kind == DateTimeKind.Utc
                         ? expiryTime
                         : expiryTime.ToUniversalTime();
 
-                    DateTime nowWithBuffer = DateTime.UtcNow.AddSeconds(bufferSeconds);
-
-                    // Consideramos expirado si falta menos del buffer de tiempo
-                    return nowWithBuffer >= expiryTimeUtc;
+                    return DateTime.UtcNow.AddSeconds(bufferSeconds) >= _cachedExpiry;
                 }
 
                 return true;
@@ -131,7 +147,7 @@ namespace IFit.Services
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Error verificando expiración: {ex.Message}");
-                return true; // Por seguridad, asumimos que está expirado
+                return true;
             }
         }
 
@@ -166,12 +182,17 @@ namespace IFit.Services
         }
 
         /// <summary>
-        /// Limpia todos los tokens y datos de usuario almacenados
+        /// Limpia todos los tokens, datos de usuario y la caché en memoria
         /// </summary>
         public async Task ClearAuthDataAsync()
         {
             try
             {
+                // Clear in-memory cache
+                _cachedAccessToken = null;
+                _cachedRefreshToken = null;
+                _cachedExpiry = DateTime.MinValue;
+
                 _secureStorage.Remove(ACCESS_TOKEN_KEY);
                 _secureStorage.Remove(REFRESH_TOKEN_KEY);
                 _secureStorage.Remove(TOKEN_EXPIRY_KEY);

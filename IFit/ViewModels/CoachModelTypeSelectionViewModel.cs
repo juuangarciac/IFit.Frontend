@@ -70,7 +70,7 @@ public partial class CoachModelTypeSelectionViewModel : ObservableObject
         {
             if (App.Current?.MainPage != null)
             {
-                await App.Current.MainPage.DisplayAlert("Error", "No se encontraron tipos de modelos de entrenador. Por favor, inténtelo más tarde.", "OK");
+                await NotificationService.ShowErrorAsync("No se encontraron tipos de entrenador. Por favor, intÃ©ntelo mÃ¡s tarde.");
             }
             await Shell.Current.GoToAsync("//ErrorView");
             return;
@@ -105,7 +105,7 @@ public partial class CoachModelTypeSelectionViewModel : ObservableObject
         {
             await ErrorHandler.HandleErrorAsync("Failed to set coach model type.", "//ErrorView",
                 "Error",
-                "No se pudo establecer el tipo de modelo de entrenador. Por favor, inténtelo más tarde.");
+                "No se pudo establecer el tipo de modelo de entrenador. Por favor, intï¿½ntelo mï¿½s tarde.");
             return;
         }
         Preferences.Set("CoachId", selectedCoachModelType.Id);
@@ -113,7 +113,7 @@ public partial class CoachModelTypeSelectionViewModel : ObservableObject
 
         await databaseService.SaveAppUserAsync(response.toEntity());
 
-        await Shell.Current.GoToAsync($"AppUserQuestionnaireView");
+        await Shell.Current.GoToAsync("//AppUserQuestionnaireView");
     }
     #endregion
 }

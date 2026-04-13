@@ -1,20 +1,24 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using IFit.Helper;
 using IFit.Models.Dtos.AI;
 using IFit.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace IFit.ViewModels
 {
     [QueryProperty(nameof(Routine), "Routine")]
     public partial class RoutineSummaryViewModel : ObservableObject
     {
+        #region Constants
+
+        // Número estimado de ejercicios que caben en la tarjeta sin necesitar scroll
+        // (basado en pantalla ~800dp, overhead de cabecera/pie ~150dp, ~66dp por ejercicio ≈ 6 caben)
+        private const int ScrollThreshold = 5;
+
+        #endregion
+
         #region Services
+
         private readonly TrainingService _trainingService;
 
         #endregion
@@ -22,6 +26,10 @@ namespace IFit.ViewModels
         #region Properties
 
         [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(HasMultipleDays))]
+        [NotifyPropertyChangedFor(nameof(DayIndicatorText))]
+        [NotifyPropertyChangedFor(nameof(CurrentDay))]
+        [NotifyPropertyChangedFor(nameof(ShowScrollIndicator))]
         private RoutineResponseDto? _routine;
 
         [ObservableProperty]
@@ -29,6 +37,32 @@ namespace IFit.ViewModels
 
         [ObservableProperty]
         private bool _isSaving = false;
+
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(CurrentDay))]
+        [NotifyPropertyChangedFor(nameof(DayIndicatorText))]
+        [NotifyPropertyChangedFor(nameof(ShowScrollIndicator))]
+        private int _currentDayIndex = 0;
+
+        /// <summary>Día de entrenamiento actualmente visible.</summary>
+        public TrainingDayDto? CurrentDay =>
+            Routine?.Days?.ElementAtOrDefault(CurrentDayIndex);
+
+        /// <summary>Texto indicador de posición: "Día 2 de 5".</summary>
+        public string DayIndicatorText =>
+            Routine?.Days?.Count > 0
+                ? $"Día {CurrentDayIndex + 1} de {Routine.Days.Count}"
+                : string.Empty;
+
+        /// <summary>True si la rutina tiene más de un día (muestra botones nav).</summary>
+        public bool HasMultipleDays => (Routine?.Days?.Count ?? 0) > 1;
+
+        /// <summary>
+        /// True si el día actual tiene más ejercicios de los que caben sin scroll.
+        /// Sirve para mostrar el indicador visual dentro de la tarjeta.
+        /// </summary>
+        public bool ShowScrollIndicator =>
+            (CurrentDay?.Exercises?.Count ?? 0) > ScrollThreshold;
 
         #endregion
 
@@ -42,21 +76,18 @@ namespace IFit.ViewModels
         public RoutineSummaryViewModel() : this(
             App.GetService<TrainingService>() ?? throw new InvalidOperationException("TrainingService no registrado"))
         {
-            
         }
 
         #endregion
 
-        #region Private Methods
+        #region Property Hooks
 
-        /// <summary>
-        /// Carga la rutina desde Preferences si no se recibió por navegación
-        /// </summary>
         partial void OnRoutineChanged(RoutineResponseDto? value)
         {
             if (value != null)
             {
                 MessageAI = value.Description;
+                CurrentDayIndex = 0;
             }
         }
 
@@ -64,33 +95,46 @@ namespace IFit.ViewModels
 
         #region Commands
 
-        /// <summary>
-        /// Comando para volver a generar la rutina (navegar a AIGenerationRoutineView)
-        /// </summary>
+        /// <summary>Retrocede al día anterior de forma circular.</summary>
+        [RelayCommand]
+        private void GoToPreviousDay()
+        {
+            var count = Routine?.Days?.Count ?? 0;
+            if (count == 0) return;
+            CurrentDayIndex = CurrentDayIndex == 0 ? count - 1 : CurrentDayIndex - 1;
+        }
+
+        /// <summary>Avanza al día siguiente de forma circular.</summary>
+        [RelayCommand]
+        private void GoToNextDay()
+        {
+            var count = Routine?.Days?.Count ?? 0;
+            if (count == 0) return;
+            CurrentDayIndex = (CurrentDayIndex + 1) % count;
+        }
+
+        /// <summary>Vuelve al resumen del cuestionario para regenerar la rutina.</summary>
         [RelayCommand]
         private async Task TryAgainAsync()
         {
             try
             {
-                await Shell.Current.GoToAsync($"AIGenerationRoutineView");
+                await Shell.Current.GoToAsync("..");
             }
             catch (Exception ex)
             {
                 await ErrorHandler.HandleErrorAsync(
-                    $"Error al navegar a la generación de rutinas: {ex.Message}"
-                );
+                    $"Error al navegar: {ex.Message}");
             }
         }
 
-        /// <summary>
-        /// Comando para guardar la rutina que le ha gustado al usuario
-        /// </summary>
+        /// <summary>Guarda la rutina generada en el perfil del usuario.</summary>
         [RelayCommand]
         private async Task SaveRoutineAsync()
         {
             if (Routine == null)
             {
-                await ErrorHandler.HandleErrorAsync("No hay ninguna rutina para guardar.");
+                await NotificationService.ShowErrorAsync("No hay ninguna rutina para guardar.");
                 return;
             }
 
@@ -103,28 +147,17 @@ namespace IFit.ViewModels
 
                 if (response == null)
                 {
-                    await Shell.Current.DisplayAlert(
-                        "Error",
-                        "No se pudo guardar tu rutina. Por favor, intenta nuevamente.",
-                        "OK"
-                    );
+                    await NotificationService.ShowErrorAsync(
+                        "No se pudo guardar tu rutina. Por favor, intenta nuevamente.");
                     return;
                 }
 
-                await Shell.Current.DisplayAlert(
-                    "¡Éxito!",
-                    "Tu rutina ha sido guardada correctamente.",
-                    "OK"
-                );
-
-                // Navegar a la página principal o a la vista de rutinas guardadas
-                await Shell.Current.GoToAsync("///HomeView");
+                await NotificationService.ShowSuccessAsync("¡Tu rutina ha sido guardada correctamente!");
+                await Shell.Current.GoToAsync("///HomeView", false);
             }
             catch (Exception ex)
             {
-                await ErrorHandler.HandleErrorAsync(
-                    $"Error al guardar la rutina: {ex.Message}"
-                );
+                await ErrorHandler.HandleErrorAsync($"Error al guardar la rutina: {ex.Message}");
             }
             finally
             {

@@ -10,7 +10,7 @@ public partial class HomeFooterView : ContentView
     // Navega a la pantalla principal (Hoy)
     private async void OnHomeClicked(object sender, EventArgs e)
     {
-        await Shell.Current.GoToAsync("//HomePage");
+        await Shell.Current.GoToAsync("//HomeView");
     }
 
     // Navega a la pantalla de Plan de entrenamiento
@@ -19,10 +19,10 @@ public partial class HomeFooterView : ContentView
         await Shell.Current.GoToAsync("//PlanSummaryView");
     }
 
-    // Navega a la pantalla de Actividades / Workouts
+    // Navega al catálogo de ejercicios
     private async void OnWorkoutsClicked(object sender, EventArgs e)
     {
-        await Shell.Current.GoToAsync("//WorkoutsPage");
+        await Shell.Current.GoToAsync("ExerciseCatalogView");
     }
 
     // Navega a la pantalla de Comunidad

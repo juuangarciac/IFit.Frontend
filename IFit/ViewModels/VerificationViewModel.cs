@@ -123,18 +123,14 @@ public partial class VerificationViewModel : ObservableObject
                 await InsertUserToDatabase(authData.AppUser);
 
                 // Navegar a la pantalla ExperienceLevelSelectionView
-                await Shell.Current.GoToAsync($"GetStartedView");
+                await Shell.Current.GoToAsync("//GetStartedView");
             }
             else
             {
                 //  Error en la verificación
                 ErrorMessage = errorMessage ?? "Código de verificación inválido";
 
-                await Application.Current.MainPage.DisplayAlert(
-                    "Error de verificación",
-                    ErrorMessage,
-                    "OK"
-                );
+                await NotificationService.ShowErrorAsync(ErrorMessage);
             }
         }
         catch (Exception ex)
@@ -143,11 +139,7 @@ public partial class VerificationViewModel : ObservableObject
             ErrorMessage = "Error de conexión. Por favor, intenta de nuevo.";
             Debug.WriteLine($" Excepción en VerifyEmailAsync: {ex.Message}");
 
-            await Application.Current.MainPage.DisplayAlert(
-                "Error",
-                ErrorMessage,
-                "OK"
-            );
+            await NotificationService.ShowErrorAsync(ErrorMessage);
         }
         finally
         {

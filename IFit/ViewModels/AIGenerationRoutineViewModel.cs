@@ -158,7 +158,7 @@ public partial class AIGenerationRoutineViewModel : ObservableObject
                 {"Routine", GeneratedRoutine }
             };
 
-            await Shell.Current.GoToAsync($"RoutineSummaryView", navigationParameter);
+            await Shell.Current.GoToAsync("//RoutineSummaryView", navigationParameter);
         }
         catch (Exception ex)
         {
@@ -208,7 +208,9 @@ public partial class AIGenerationRoutineViewModel : ObservableObject
             await Task.Delay(500); // Dar feedback visual
 
             // Llamar al servicio para generar la rutina
-            var routine = await _aiRoutineService.GenerateRoutineAsync(userId, _responseId);
+            string? coachType = Preferences.Get("CoachName", "");
+            if (string.IsNullOrWhiteSpace(coachType)) coachType = null;
+            var routine = await _aiRoutineService.GenerateRoutineAsync(userId, _responseId, coachType);
             // var routine = _aiRoutineService.GenerateTestRoutine();
 
             if (routine == null)

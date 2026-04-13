@@ -1,15 +1,10 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using IFit.Helper;
 using IFit.Models;
 using IFit.Models.Dtos.AI;
 using IFit.Models.Dtos.Questionnaire;
 using IFit.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace IFit.ViewModels
 {
@@ -37,25 +32,21 @@ namespace IFit.ViewModels
         private string _coachName = string.Empty;
 
         [ObservableProperty]
-        private bool _isGenerating = false;
-
-        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(ShowStartButton))]
         private bool _isLoading = false;
 
         [ObservableProperty]
         private string _statusMessage = "Cargando...";
 
-        [ObservableProperty]
-        private RoutineResponseDto? _generatedRoutine;
+        /// <summary>
+        /// Controla la visibilidad del título y la info del coach.
+        /// Se oculta durante la carga/generación para dar protagonismo al overlay.
+        /// </summary>
+        public bool ShowStartButton => !IsLoading;
 
         #endregion
 
         #region Constructor
-
-        /// <summary>
-        /// Constructor con inyección de dependencias
-        /// </summary>
-        /// 
 
         public QuetionnaireSummaryViewModel(AIRoutineService aiService,
             DatabaseService dbService,
@@ -79,9 +70,7 @@ namespace IFit.ViewModels
         }
 
         private async Task InitializeAsync()
-
         {
-            // Obtener resumen del cuestionario para mostrar en la UI
             try
             {
                 StatusMessage = "Obteniendo respuestas...";
@@ -90,10 +79,8 @@ namespace IFit.ViewModels
                 QuestionnaireResponseSummaryDTO? summary = await _questionnaireService.GetResponseSummary(_responseId);
                 if (summary == null)
                 {
-                    await ErrorHandler.HandleErrorAsync(
-                        "No se pudo obtener el resumen de tu cuestionario. " +
-                        "Por favor, verifica tu conexión a internet e intenta nuevamente."
-                    );
+                    await NotificationService.ShowErrorAsync(
+                        "No se pudo obtener el resumen del cuestionario. Verifica tu conexión.");
                     return;
                 }
 
@@ -103,9 +90,8 @@ namespace IFit.ViewModels
             }
             catch (Exception ex)
             {
-                await ErrorHandler.HandleErrorAsync(
-                    $"Ocurrió un error al obtener el resumen de tu cuestionario: {ex.Message}"
-                );
+                await NotificationService.ShowErrorAsync(
+                    $"Error al cargar el resumen: {ex.Message}");
             }
             finally
             {
@@ -119,19 +105,59 @@ namespace IFit.ViewModels
         #region Commands
 
         /// <summary>
-        /// Comando para iniciar la generación de la rutina
+        /// Genera la rutina directamente desde esta vista, mostrando el overlay de carga.
+        /// Navega a RoutineSummaryView en cuanto el backend responde — sin pasar por AIGenerationRoutineView.
         /// </summary>
         [RelayCommand]
         private async Task StartGenerationAsync()
         {
-            await Shell.Current.GoToAsync($"AIGenerationRoutineView");
+            try
+            {
+                AppUser? appUser = await _databaseService.GetCurrentUserAsync();
+                if (appUser == null)
+                {
+                    await NotificationService.ShowErrorAsync(
+                        "No hay ningún usuario activo. Por favor, inicia sesión.");
+                    return;
+                }
+
+                if (_responseId <= 0)
+                {
+                    await NotificationService.ShowErrorAsync(
+                        "No se encontró un cuestionario completado. Por favor, completa el cuestionario.");
+                    return;
+                }
+
+                StatusMessage = "Tu entrenador está diseñando tu rutina...";
+                IsLoading = true;
+
+                string userId = appUser.Id.ToString();
+                string? coachType = Preferences.Get("CoachName", "");
+                if (string.IsNullOrWhiteSpace(coachType)) coachType = null;
+
+                var routine = await _aiRoutineService.GenerateRoutineAsync(userId, _responseId, coachType);
+
+                if (routine == null)
+                {
+                    await NotificationService.ShowErrorAsync(
+                        "No se pudo generar tu rutina. Verifica tu conexión e intenta nuevamente.");
+                    return;
+                }
+
+                var navigationParams = new Dictionary<string, object> { { "Routine", routine } };
+                await Shell.Current.GoToAsync("//RoutineSummaryView", navigationParams);
+            }
+            catch (Exception ex)
+            {
+                await NotificationService.ShowErrorAsync($"Error inesperado: {ex.Message}");
+            }
+            finally
+            {
+                IsLoading = false;
+                StatusMessage = string.Empty;
+            }
         }
 
-        #endregion
-
-        #region Methods
-
-        
         #endregion
     }
 }

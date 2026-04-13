@@ -5,9 +5,21 @@ using System.Diagnostics;
 
 namespace IFit.ViewModels;
 
+[QueryProperty(nameof(User), "User")]
 public partial class ProfileViewModel : ObservableObject
 {
     #region Properties
+
+    [ObservableProperty]
+    public partial AppUserResponseDto? User { get; set; }
+
+    // Called automatically by MVVM Toolkit when User is set via QueryProperty
+    partial void OnUserChanged(AppUserResponseDto? value)
+    {
+        if (value == null) return;
+        PopulateFromUser(value);
+        _isInitialized = true;
+    }
 
     [ObservableProperty]
     public partial string UserName { get; set; } = string.Empty;
@@ -17,6 +29,12 @@ public partial class ProfileViewModel : ObservableObject
 
     [ObservableProperty]
     public partial string UserInitials { get; set; } = "?";
+
+    [ObservableProperty]
+    public partial string AvatarSource { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial bool HasAvatar { get; set; } = false;
 
     [ObservableProperty]
     public partial string ExperienceLevel { get; set; } = "Sin asignar";
@@ -40,6 +58,8 @@ public partial class ProfileViewModel : ObservableObject
     private readonly AppUserService _appUserService;
 
     #endregion
+
+    private bool _isInitialized = false;
 
     #region Constructor
 
@@ -80,15 +100,31 @@ public partial class ProfileViewModel : ObservableObject
             return;
         }
 
-        UserName = user.Name;
-        UserEmail = user.Email;
-        UserInitials = GetInitials(user.Name);
-        ExperienceLevel = user.ExperienceLevelName ?? "Sin asignar";
-        CoachModel = user.CoachModelTypeName ?? "Sin asignar";
-        MemberSince = user.CreatedAt.ToString("MMMM yyyy");
-
+        User = user;
+        PopulateFromUser(user);
         IsLoading = false;
     }
+
+    private void PopulateFromUser(AppUserResponseDto user)
+    {
+        UserName        = user.Name;
+        UserEmail       = user.Email;
+        UserInitials    = GetInitials(user.Name);
+        ExperienceLevel = user.ExperienceLevelName ?? "Sin asignar";
+        CoachModel      = user.CoachModelTypeName ?? "Sin asignar";
+        MemberSince     = user.CreatedAt.ToString("MMMM yyyy");
+        AvatarSource    = GetAvatarSource(user.CoachModelTypeName);
+        HasAvatar       = !string.IsNullOrEmpty(AvatarSource);
+        IsLoading       = false;
+    }
+
+    private static string GetAvatarSource(string? coachModelName) =>
+        coachModelName?.ToLowerInvariant() switch
+        {
+            "ronnie" or "kael" or "eliud" => "icons8coachmale.png",
+            "serena"                       => "icons8coachfemale.png",
+            _                              => string.Empty
+        };
 
     private static string GetInitials(string name)
     {
@@ -108,7 +144,9 @@ public partial class ProfileViewModel : ObservableObject
     [RelayCommand]
     public async Task AppearingAsync()
     {
+        if (_isInitialized) return;
         await InitializeAsync();
+        _isInitialized = true;
     }
 
     [RelayCommand]
