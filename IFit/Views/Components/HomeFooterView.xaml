@@ -34,7 +34,8 @@
                        Style="{DynamicResource navbar_image}" />
                 <Label Grid.Row="1"
                        Text="Hoy"
-                       Style="{DynamicResource navbar-p-white}" />
+                       Style="{DynamicResource navbar-p-white}"
+                       HorizontalTextAlignment="Center"/>
                 <!-- Botón invisible superpuesto -->
                 <Button Grid.Row="0"
                         Grid.RowSpan="2"
@@ -121,7 +122,8 @@
                 <Label Grid.Row="1"
                        Text="Ayuda"
                        Style="{DynamicResource navbar-p-white}"
-                       LineBreakMode="TailTruncation" />
+                       LineBreakMode="TailTruncation" 
+                       HorizontalTextAlignment="Center"/>
                 <!-- Botón invisible superpuesto -->
                 <Button Grid.Row="0"
                         Grid.RowSpan="2"

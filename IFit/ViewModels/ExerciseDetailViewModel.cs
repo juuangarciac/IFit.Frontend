@@ -6,6 +6,9 @@ using System.Diagnostics;
 
 namespace IFit.ViewModels;
 
+/// <summary>Ítem de instrucción con número de paso para la vista.</summary>
+public record InstructionItem(int Number, string Text);
+
 [QueryProperty(nameof(ExerciseId), "ExerciseId")]
 public partial class ExerciseDetailViewModel : ObservableObject
 {
@@ -23,20 +26,20 @@ public partial class ExerciseDetailViewModel : ObservableObject
     [ObservableProperty]
     public partial string StatusMessage { get; set; } = string.Empty;
 
-    [ObservableProperty]
-    public partial bool HasImages { get; set; }
+    // Visibilidad de secciones opcionales
+    [ObservableProperty] public partial bool HasImages           { get; set; }
+    [ObservableProperty] public partial bool HasInstructions     { get; set; }
+    [ObservableProperty] public partial bool HasSecondaryMuscles { get; set; }
+    [ObservableProperty] public partial bool HasForce            { get; set; }
+    [ObservableProperty] public partial bool HasMechanic         { get; set; }
 
+    /// <summary>URLs absolutas de imagen (base URL + ruta relativa del backend).</summary>
     [ObservableProperty]
-    public partial bool HasInstructions { get; set; }
+    public partial List<string> FullImageUrls { get; set; } = new();
 
+    /// <summary>Instrucciones enumeradas (1-based) para mostrar paso a paso.</summary>
     [ObservableProperty]
-    public partial bool HasSecondaryMuscles { get; set; }
-
-    [ObservableProperty]
-    public partial bool HasForce { get; set; }
-
-    [ObservableProperty]
-    public partial bool HasMechanic { get; set; }
+    public partial List<InstructionItem> NumberedInstructions { get; set; } = new();
 
     #endregion
 
@@ -76,6 +79,17 @@ public partial class ExerciseDetailViewModel : ObservableObject
         HasSecondaryMuscles = value?.SecondaryMuscles?.Count > 0;
         HasForce            = !string.IsNullOrWhiteSpace(value?.Force);
         HasMechanic         = !string.IsNullOrWhiteSpace(value?.Mechanic);
+
+        // Construir URLs absolutas: el backend devuelve rutas relativas (/exercise-images/...)
+        FullImageUrls = value?.ImageUrls?
+            .Where(u => !string.IsNullOrWhiteSpace(u))
+            .Select(u => AppSettings.ApiGatewayBaseUrl + u)
+            .ToList() ?? new();
+
+        // Instrucciones numeradas (1-based) para evitar lógica en XAML
+        NumberedInstructions = value?.Instructions?
+            .Select((text, idx) => new InstructionItem(idx + 1, text))
+            .ToList() ?? new();
     }
 
     #endregion
