@@ -18,14 +18,9 @@ namespace IFit.ViewModels
 
         private TrainingService _trainingService;
 
-        private AppUserService _appUserService;
-
         #endregion
 
         #region Properties
-
-        [ObservableProperty]
-        public partial String User { get; set; }
 
         [ObservableProperty]
         public partial List<RoutineResponseDto> AllRoutines { get; set; }
@@ -64,15 +59,13 @@ namespace IFit.ViewModels
 
         #region Constructor
 
-        public PlanSummaryViewModel(TrainingService trainingService, AppUserService appUserService)
+        public PlanSummaryViewModel(TrainingService trainingService)
         {
-            this._trainingService = trainingService;
-            this._appUserService = appUserService;;
+            _trainingService = trainingService ?? throw new ArgumentNullException(nameof(trainingService));
         }
 
         public PlanSummaryViewModel() : this(
-         App.GetService<TrainingService>() ?? throw new InvalidOperationException("TrainingService no registrado"),
-         App.GetService<AppUserService>() ?? throw new InvalidOperationException("AppUserService no esta registrado"))
+            App.GetService<TrainingService>() ?? throw new InvalidOperationException("TrainingService no registrado"))
         {
         }
 
@@ -81,24 +74,30 @@ namespace IFit.ViewModels
         #region Commands
 
         [RelayCommand]
-        public async Task AppearingAsync()
+        public Task AppearingAsync()
         {
-            if (_isInitialized) return;
+            if (_isInitialized) return Task.CompletedTask;
+            // Fire-and-forget: la vista aparece inmediatamente, los datos cargan en segundo plano
+            _ = LoadDataAsync();
+            return Task.CompletedTask;
+        }
 
+        private async Task LoadDataAsync()
+        {
             try
             {
                 IsLoading = true;
-                StatusMessage = "Cargando rutina...";
+                StatusMessage = "Cargando rutinas...";
 
                 var userId = Preferences.Get("UserId", 0L);
 
-                // Fetch all routines and active routine in parallel
+                // Ambas llamadas en paralelo
                 var allRoutinesTask   = _trainingService.getRoutinesByUserIdAsync(userId);
                 var activeRoutineTask = _trainingService.getLatestActiveRoutineByUserIdAsync(userId);
                 await Task.WhenAll(allRoutinesTask, activeRoutineTask);
 
-                var allRoutines   = await allRoutinesTask;
-                var activeRoutine = await activeRoutineTask;
+                var allRoutines   = allRoutinesTask.Result;
+                var activeRoutine = activeRoutineTask.Result;
 
                 AllRoutines = allRoutines is { Count: > 0 }
                     ? allRoutines
@@ -118,7 +117,7 @@ namespace IFit.ViewModels
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[ERROR] AppearingAsync => {ex.Message}");
+                Debug.WriteLine($"[ERROR] PlanSummary LoadDataAsync => {ex.Message}");
             }
             finally
             {
@@ -139,15 +138,15 @@ namespace IFit.ViewModels
 
         private async Task OnSelectedRoutineAsync()
         {
+            if (SelectedRoutine is null) return;
 
             var parameters = new Dictionary<string, object>
-                {
-                    { "Routine", SelectedRoutine },
-                    { "User", User }
-                };
+            {
+                { "Routine", SelectedRoutine }
+                // User no se pasa: PlanViewModel lo obtiene de Preferences si es null
+            };
 
             await Shell.Current.GoToAsync("//PlanView", parameters);
-
         }
 
         #endregion

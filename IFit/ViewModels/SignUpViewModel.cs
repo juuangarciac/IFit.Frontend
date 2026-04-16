@@ -253,14 +253,14 @@ namespace IFit.ViewModels
                 // 4. Guardar datos de sesiónd
                 await SaveRegistrationData(Name, Email);
 
-                // 5. Marcar como exitoso y navegar
-                CurrentState = RegistrationState.Success;
-
+                // 5. Navegar primero (overlay sigue visible durante la creación de VerificationView)
+                //    y marcar Success después para evitar el flash de pantalla en blanco.
                 Debug.WriteLine("Navegando a VerificationView");
                 await Shell.Current.GoToAsync("//VerificationView", new Dictionary<string, object>
                 {
                     { "Email", Email }
                 });
+                CurrentState = RegistrationState.Success;
             }
             catch (Exception ex)
             {

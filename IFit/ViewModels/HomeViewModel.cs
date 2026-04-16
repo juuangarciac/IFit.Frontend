@@ -51,7 +51,7 @@ public partial class HomeViewModel : ObservableObject
     public partial TrainingDayDto? TrainingDayDto { get; set; }
 
     [ObservableProperty]
-    public partial Boolean IsLoading { get; set; } = true;
+    public partial Boolean IsLoading { get; set; } = false;
 
     [ObservableProperty]
     public partial String StatusMessage { get; set; } = string.Empty;
@@ -89,47 +89,47 @@ public partial class HomeViewModel : ObservableObject
 
     private async Task InitializeAsync()
     {
-        IsLoading = true;
-        StatusMessage = "Cargando tu rutina actual...";
-
-        var userId = Preferences.Get("UserId", 0L);
-
-        // Fetch user and routine in parallel
-        var userTask    = _appUserService.findUserById(userId);
-        var routineTask = _trainingService.getLatestActiveRoutineByUserIdAsync(userId);
-        await Task.WhenAll(userTask, routineTask);
-
-        _currentUser = await userTask;
-        Routine      = await routineTask;
-
-        if (_currentUser == null)
+        try
         {
-            StatusMessage = "No se ha encontrado el usuario actual.";
-            IsLoading = false;
-            return;
-        }
-        ButtonContent = "Pregunta a " + _currentUser.CoachModelTypeName;
+            StatusMessage = "Cargando tu rutina actual...";
 
-        if (Routine == null)
+            var userId = Preferences.Get("UserId", 0L);
+
+            // CoachModelTypeName ya está en Preferences desde el login: no hace falta llamar a /users/{id}
+            var coachName = Preferences.Get("CoachModelTypeName", "tu coach");
+            ButtonContent = "Pregunta a " + coachName;
+
+            Routine = await _trainingService.getLatestActiveRoutineByUserIdAsync(userId);
+
+            if (Routine == null)
+            {
+                StatusMessage = "No se ha encontrado la rutina actual.";
+                DoesntHaveRoutine = true;
+                IsLoading = false;
+                return;
+            }
+
+            TrainingDayDto = await _trainingService
+                .getRoutineDayAsync((long)Routine.Id, (int)Routine.CurrentDay);
+
+            if (TrainingDayDto == null)
+            {
+                StatusMessage = "No se ha encontrado una sesión activa para hoy.";
+                IsLoading = false;
+                return;
+            }
+
+            Debug.WriteLine("TrainingDayDto: " + TrainingDayDto);
+        }
+        catch (Exception ex)
         {
-            StatusMessage = "No se ha encontrado la rutina actual.";
-            DoesntHaveRoutine = true;
-            IsLoading = false;
-            return;
+            Debug.WriteLine($"✗ Error inicializando Home: {ex.Message}");
+            StatusMessage = "Error al cargar los datos.";
         }
-
-        TrainingDayDto = await _trainingService
-            .getRoutineDayAsync((long)Routine.Id, (int)Routine.CurrentDay);
-
-        if (TrainingDayDto == null)
+        finally
         {
-            StatusMessage = "No se ha encontrado una sesión activa para hoy.";
             IsLoading = false;
-            return;
         }
-
-        Debug.WriteLine("TrainingDayDto: " + TrainingDayDto);
-        IsLoading = false;
     }
 
     #endregion
@@ -137,11 +137,14 @@ public partial class HomeViewModel : ObservableObject
     #region Methods
 
     [RelayCommand]
-    public async Task AppearingAsync()
+    public Task AppearingAsync()
     {
-        if (_isInitialized) return;
-        await InitializeAsync();
+        if (_isInitialized) return Task.CompletedTask;
         _isInitialized = true;
+        IsLoading = true;
+        // Fire-and-forget: la vista aparece inmediatamente y los datos cargan en segundo plano
+        _ = InitializeAsync();
+        return Task.CompletedTask;
     }
 
     [RelayCommand]
@@ -176,6 +179,13 @@ public partial class HomeViewModel : ObservableObject
     [RelayCommand]
     public async Task GoToProfileAsync()
     {
+        // Carga lazy: solo se llama a /users/{id} cuando el usuario navega al perfil, no al abrir el home
+        if (_currentUser == null)
+        {
+            var userId = Preferences.Get("UserId", 0L);
+            _currentUser = await _appUserService.findUserById(userId);
+        }
+
         var parameters = new Dictionary<string, object>();
         if (_currentUser != null)
             parameters["User"] = _currentUser;

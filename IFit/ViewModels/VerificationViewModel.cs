@@ -119,8 +119,8 @@ public partial class VerificationViewModel : ObservableObject
                 // Limpiar credenciales temporales
                 SecureStorage.Remove("UserPassword");
 
-                // Guardar datos del usuario
-                await InsertUserToDatabase(authData.AppUser);
+                // Guardar datos del usuario (fire-and-forget: es solo caché local, no bloquea la navegación)
+                _ = InsertUserToDatabase(authData.AppUser);
 
                 // Navegar a la pantalla ExperienceLevelSelectionView
                 await Shell.Current.GoToAsync("//GetStartedView");

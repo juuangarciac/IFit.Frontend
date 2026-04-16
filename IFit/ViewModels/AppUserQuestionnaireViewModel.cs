@@ -369,7 +369,7 @@ namespace IFit.ViewModels
                 }
 
                 // 1. Obtener cuestinario
-                var questionnaireDto = _questionnaireService.GetQuestionnaireByCoachIdAndExperienceLevelId(_coachId, _experienceLevelId);
+                var questionnaireDto = await _questionnaireService.GetQuestionnaireByCoachIdAndExperienceLevelId(_coachId, _experienceLevelId);
 
                 if(questionnaireDto == null)
                 {

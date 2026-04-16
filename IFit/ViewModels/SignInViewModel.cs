@@ -8,12 +8,12 @@ using System.Diagnostics;
 namespace IFit.ViewModels
 {
     /// <summary>
-    /// ViewModel para la página de inicio de sesión.
-    /// Maneja autenticación, validación y navegación post-login.
+    /// ViewModel para la pï¿½gina de inicio de sesiï¿½n.
+    /// Maneja autenticaciï¿½n, validaciï¿½n y navegaciï¿½n post-login.
     /// </summary>
     public partial class SignInViewModel : ObservableObject
     {
-        #region Services (Inyección de Dependencias)
+        #region Services (Inyecciï¿½n de Dependencias)
 
         private readonly AuthenticationService _authenticationService;
         private readonly AppUserService _appUserService;
@@ -42,7 +42,7 @@ namespace IFit.ViewModels
         public partial string Email { get; set; } = string.Empty;
 
         /// <summary>
-        /// Contraseña del usuario
+        /// Contraseï¿½a del usuario
         /// </summary>
         [ObservableProperty]
         public partial string Password { get; set; } = string.Empty;
@@ -64,7 +64,7 @@ namespace IFit.ViewModels
         #region Computed Properties
 
         /// <summary>
-        /// Indica si se está procesando el login
+        /// Indica si se estï¿½ procesando el login
         /// </summary>
         public bool IsLoading => CurrentState == LoginState.Loading;
 
@@ -74,26 +74,26 @@ namespace IFit.ViewModels
         public bool HasError => CurrentState == LoginState.Error;
 
         /// <summary>
-        /// Indica si está en estado idle (inicial)
+        /// Indica si estï¿½ en estado idle (inicial)
         /// </summary>
         public bool IsIdle => CurrentState == LoginState.Idle;
 
         /// <summary>
         /// Mensaje de estado para la UI
         /// </summary>
-        public string StatusMessage => IsLoading ? "Iniciando sesión..." : string.Empty;
+        public string StatusMessage => IsLoading ? "Iniciando sesiï¿½n..." : string.Empty;
 
         /// <summary>
-        /// Texto del botón de login
+        /// Texto del botï¿½n de login
         /// </summary>
-        public string LoginButtonText => IsLoading ? "Iniciando..." : "Iniciar Sesión";
+        public string LoginButtonText => IsLoading ? "Iniciando..." : "Iniciar Sesiï¿½n";
 
         #endregion
 
         #region Constructor
 
         /// <summary>
-        /// Constructor principal con inyección de dependencias
+        /// Constructor principal con inyecciï¿½n de dependencias
         /// </summary>
         public SignInViewModel(
             AuthenticationService authenticationService,
@@ -106,7 +106,7 @@ namespace IFit.ViewModels
         }
 
         /// <summary>
-        /// Constructor sin parámetros para compatibilidad con XAML
+        /// Constructor sin parï¿½metros para compatibilidad con XAML
         /// </summary>
         public SignInViewModel() : this(
             App.GetService<AuthenticationService>() ?? throw new InvalidOperationException("AuthenticationService no registrado"),
@@ -130,7 +130,7 @@ namespace IFit.ViewModels
             OnPropertyChanged(nameof(StatusMessage));
             OnPropertyChanged(nameof(LoginButtonText));
 
-            // Notificar que CanExecute del comando cambió
+            // Notificar que CanExecute del comando cambiï¿½
             SignInCommand.NotifyCanExecuteChanged();
         }
 
@@ -148,7 +148,7 @@ namespace IFit.ViewModels
         }
 
         /// <summary>
-        /// Cuando la contraseña cambia, limpiar errores y actualizar comando
+        /// Cuando la contraseï¿½a cambia, limpiar errores y actualizar comando
         /// </summary>
         partial void OnPasswordChanged(string value)
         {
@@ -165,7 +165,7 @@ namespace IFit.ViewModels
         #region Commands
 
         /// <summary>
-        /// Comando para iniciar sesión con validación de CanExecute
+        /// Comando para iniciar sesiï¿½n con validaciï¿½n de CanExecute
         /// </summary>
         [RelayCommand(CanExecute = nameof(CanSignIn))]
         private async Task SignInAsync()
@@ -192,7 +192,7 @@ namespace IFit.ViewModels
 
                 Debug.WriteLine($"Login exitoso para usuario: {appUser.Email}");
 
-                // 3. Guardar datos de sesión
+                // 3. Guardar datos de sesiï¿½n
                 await SaveLoginData(appUser);
 
                 // 4. Verificar si necesita completar el proceso de registro
@@ -213,10 +213,12 @@ namespace IFit.ViewModels
                     }
                 }
 
-                // 5. Marcar como exitoso y navegar
-                CurrentState = LoginState.Success;
+                // 5. Navegar primero (el overlay sigue visible durante la creaciÃ³n de HomeView)
+                //    y marcar Success despuÃ©s: asÃ­ el usuario no ve la pantalla de login
+                //    en blanco mientras MAUI infla la vista de destino.
                 Debug.WriteLine("Navegando a HomeView");
                 await Shell.Current.GoToAsync("///HomeView");
+                CurrentState = LoginState.Success;
             }
             catch (Exception ex)
             {
@@ -224,7 +226,7 @@ namespace IFit.ViewModels
                 Debug.WriteLine($"StackTrace: {ex.StackTrace}");
 
                 CurrentState = LoginState.Error;
-                ErrorMessage = "Ocurrió un error inesperado. Por favor, intenta de nuevo.";
+                ErrorMessage = "Ocurriï¿½ un error inesperado. Por favor, intenta de nuevo.";
             }
         }
 
@@ -258,7 +260,7 @@ namespace IFit.ViewModels
             if (!IsValidEmail(Email))
             {
                 CurrentState = LoginState.Error;
-                ErrorMessage = "Por favor, ingresa un email válido.";
+                ErrorMessage = "Por favor, ingresa un email vï¿½lido.";
                 return false;
             }
 
@@ -266,14 +268,14 @@ namespace IFit.ViewModels
             if (string.IsNullOrWhiteSpace(Password))
             {
                 CurrentState = LoginState.Error;
-                ErrorMessage = "Por favor, ingresa tu contraseña.";
+                ErrorMessage = "Por favor, ingresa tu contraseï¿½a.";
                 return false;
             }
 
             if (Password.Length < 8)
             {
                 CurrentState = LoginState.Error;
-                ErrorMessage = "La contraseña debe tener al menos 8 caracteres.";
+                ErrorMessage = "La contraseï¿½a debe tener al menos 8 caracteres.";
                 return false;
             }
 
@@ -314,7 +316,7 @@ namespace IFit.ViewModels
                 if (response == null)
                 {
                     CurrentState = LoginState.Error;
-                    ErrorMessage = "Credenciales incorrectas. Por favor, verifica tu email y contraseña.";
+                    ErrorMessage = "Credenciales incorrectas. Por favor, verifica tu email y contraseï¿½a.";
 
                     Debug.WriteLine("Login fallido: Respuesta nula del servidor");
                     return null;
@@ -336,9 +338,9 @@ namespace IFit.ViewModels
             catch (Exception ex)
             {
                 CurrentState = LoginState.Error;
-                ErrorMessage = "Error de conexión. Por favor, verifica tu conexión a internet.";
+                ErrorMessage = "Error de conexiï¿½n. Por favor, verifica tu conexiï¿½n a internet.";
 
-                Debug.WriteLine($"Excepción en TryLoginAsync: {ex.Message}");
+                Debug.WriteLine($"Excepciï¿½n en TryLoginAsync: {ex.Message}");
 
                 return null;
             }
@@ -353,7 +355,7 @@ namespace IFit.ViewModels
             {
                 Debug.WriteLine($"Guardando datos de login para usuario: {dto.Email}");
 
-                // Guarda en Preferences para acceso rápido
+                // Guarda en Preferences para acceso rï¿½pido
                 Preferences.Set("UserId", dto.Id);
                 Preferences.Set("UserEmail", dto.Email);
                 Preferences.Set("Name", dto.Name);
@@ -366,14 +368,14 @@ namespace IFit.ViewModels
 
                 Debug.WriteLine("Datos guardados en Preferences");
 
-                // Guardar en base de datos local
-                await InsertUserToDatabase(dto);
+                // Guardar en base de datos local (fire-and-forget: es solo cachÃ©, no bloquea el flujo)
+                _ = InsertUserToDatabase(dto);
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"Error guardando datos de login: {ex.Message}");
                 // No bloqueamos el flujo si falla el guardado local
-                // El usuario ya está autenticado en el servidor
+                // El usuario ya estï¿½ autenticado en el servidor
             }
         }
 
@@ -388,7 +390,7 @@ namespace IFit.ViewModels
                 {
                     Debug.WriteLine("Usuario no verificado, navegando a VerificationView");
 
-                    // Opcionalmente enviar email de verificación
+                    // Opcionalmente enviar email de verificaciï¿½n
                     // await _authenticationService.SendVerificationEmail(Email);
 
                     await Shell.Current.GoToAsync("///VerificationView");
@@ -436,7 +438,7 @@ namespace IFit.ViewModels
             catch (Exception ex)
             {
                 CurrentState = LoginState.Error;
-                ErrorMessage = "No se pudo verificar la configuración del usuario.";
+                ErrorMessage = "No se pudo verificar la configuraciï¿½n del usuario.";
 
                 Debug.WriteLine($"Error en HandleUserCoachAndExperienceLevel: {ex.Message}");
 
@@ -463,8 +465,8 @@ namespace IFit.ViewModels
                 Debug.WriteLine($"Error guardando usuario en BD local: {ex.Message}");
                 Debug.WriteLine($"StackTrace: {ex.StackTrace}");
 
-                // No lanzamos excepción porque el login ya fue exitoso
-                // La BD local es solo para caché
+                // No lanzamos excepciï¿½n porque el login ya fue exitoso
+                // La BD local es solo para cachï¿½
             }
         }
 

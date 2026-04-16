@@ -26,6 +26,12 @@ public partial class ExerciseDetailViewModel : ObservableObject
     [ObservableProperty]
     public partial string StatusMessage { get; set; } = string.Empty;
 
+    [ObservableProperty]
+    public partial bool HasError { get; set; }
+
+    [ObservableProperty]
+    public partial string ErrorMessage { get; set; } = string.Empty;
+
     // Visibilidad de secciones opcionales
     [ObservableProperty] public partial bool HasImages           { get; set; }
     [ObservableProperty] public partial bool HasInstructions     { get; set; }
@@ -102,13 +108,23 @@ public partial class ExerciseDetailViewModel : ObservableObject
         await Shell.Current.GoToAsync("..");
     }
 
+    [RelayCommand]
+    public async Task RetryAsync()
+    {
+        if (long.TryParse(ExerciseId, out long id) && id > 0)
+            await LoadExerciseAsync(id);
+    }
+
     #endregion
 
     #region Private methods
 
     private async Task LoadExerciseAsync(long id)
     {
+        if (IsLoading) return;
+
         IsLoading = true;
+        HasError = false;
         StatusMessage = "Cargando ejercicio...";
 
         try
@@ -116,14 +132,20 @@ public partial class ExerciseDetailViewModel : ObservableObject
             Exercise = await _exerciseCatalogService.GetExerciseByIdAsync(id);
 
             if (Exercise == null)
-                StatusMessage = "No se pudo cargar el ejercicio.";
+            {
+                HasError = true;
+                ErrorMessage = "No se encontró el ejercicio.";
+            }
             else
+            {
                 StatusMessage = string.Empty;
+            }
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"✗ Error cargando detalle de ejercicio {id}: {ex.Message}");
-            StatusMessage = "Error al cargar el ejercicio.";
+            HasError = true;
+            ErrorMessage = "No se pudo cargar el ejercicio.\nRevisa tu conexión e inténtalo de nuevo.";
         }
         finally
         {

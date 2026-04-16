@@ -64,6 +64,13 @@ namespace IFit.ViewModels
         public bool ShowScrollIndicator =>
             (CurrentDay?.Exercises?.Count ?? 0) > ScrollThreshold;
 
+
+        [ObservableProperty]
+        public partial Boolean IsLoading { get; set; } = false;
+
+        [ObservableProperty]
+        public partial string StatusMessage { get; set; } = string.Empty;
+        
         #endregion
 
         #region Constructor
@@ -132,6 +139,9 @@ namespace IFit.ViewModels
         [RelayCommand]
         private async Task SaveRoutineAsync()
         {
+            IsLoading = true;
+            StatusMessage = "Guardando tu rutina...";
+
             if (Routine == null)
             {
                 await NotificationService.ShowErrorAsync("No hay ninguna rutina para guardar.");
@@ -152,8 +162,16 @@ namespace IFit.ViewModels
                     return;
                 }
 
+                IsLoading = false;
+                StatusMessage = string.Empty;
                 await NotificationService.ShowSuccessAsync("¡Tu rutina ha sido guardada correctamente!");
+                
+                IsLoading = true;
+                StatusMessage = "Cargando tu rutina guardada...";
                 await Shell.Current.GoToAsync("///HomeView", false);
+
+                IsLoading = false;
+                StatusMessage = string.Empty;
             }
             catch (Exception ex)
             {

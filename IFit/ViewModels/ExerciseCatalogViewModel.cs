@@ -14,8 +14,13 @@ public partial class ExerciseCatalogViewModel : ObservableObject
     [ObservableProperty]
     public partial ObservableCollection<ExerciseSummaryDto> Exercises { get; set; } = new();
 
+    // Overlay de pantalla completa: solo para transiciones de navegación
     [ObservableProperty]
-    public partial bool IsLoading { get; set; }
+    public partial bool IsNavigating { get; set; }
+
+    // Indicador inline: carga de datos en el CollectionView
+    [ObservableProperty]
+    public partial bool IsLoadingData { get; set; }
 
     [ObservableProperty]
     public partial string SearchText { get; set; } = string.Empty;
@@ -59,14 +64,17 @@ public partial class ExerciseCatalogViewModel : ObservableObject
     #region Commands
 
     [RelayCommand]
-    public async Task AppearingAsync()
+    public Task AppearingAsync()
     {
-        // Limpia el overlay de transición si venimos de volver atrás desde el detalle
-        IsLoading = false;
+        // Cierra el overlay de navegación si venimos de volver atrás desde el detalle
+        IsNavigating = false;
 
-        if (_isInitialized) return;
-        await LoadExercisesAsync(reset: true);
+        if (_isInitialized) return Task.CompletedTask;
         _isInitialized = true;
+
+        // Fire-and-forget: la vista aparece inmediatamente y los datos cargan en segundo plano
+        _ = LoadExercisesAsync(reset: true);
+        return Task.CompletedTask;
     }
 
     [RelayCommand]
@@ -80,7 +88,7 @@ public partial class ExerciseCatalogViewModel : ObservableObject
     [RelayCommand]
     public async Task LoadMoreAsync()
     {
-        if (!HasMorePages || IsLoading) return;
+        if (!HasMorePages || IsLoadingData) return;
         await LoadExercisesAsync(reset: false);
     }
 
@@ -90,7 +98,7 @@ public partial class ExerciseCatalogViewModel : ObservableObject
         if (exercise is null) return;
 
         // Muestra el overlay antes de navegar para que la transición no parezca un cuelgue
-        IsLoading = true;
+        IsNavigating = true;
         StatusMessage = "Cargando ejercicio...";
 
         var parameters = new Dictionary<string, object>
@@ -106,16 +114,21 @@ public partial class ExerciseCatalogViewModel : ObservableObject
         await Shell.Current.GoToAsync("//HomeView");
     }
 
+    [RelayCommand]
+    public async Task GoToRoutineBuilderAsync()
+    {
+        await Shell.Current.GoToAsync("ManualRoutineBuilderView");
+    }
+
     #endregion
 
     #region Private methods
 
     private async Task LoadExercisesAsync(bool reset)
     {
-        if (IsLoading) return;
+        if (IsLoadingData) return;
 
-        IsLoading = true;
-        StatusMessage = "Cargando ejercicios...";
+        IsLoadingData = true;
 
         if (reset)
         {
@@ -142,13 +155,11 @@ public partial class ExerciseCatalogViewModel : ObservableObject
                 _currentPage++;
                 HasMorePages = !result.Last;
                 IsEmpty = false;
-                StatusMessage = string.Empty;
             }
             else
             {
                 HasMorePages = false;
                 IsEmpty = Exercises.Count == 0;
-                StatusMessage = IsEmpty ? "No se encontraron ejercicios." : string.Empty;
             }
         }
         catch (Exception ex)
@@ -156,11 +167,10 @@ public partial class ExerciseCatalogViewModel : ObservableObject
             Debug.WriteLine($"✗ Error cargando ejercicios: {ex.Message}");
             HasMorePages = false;
             IsEmpty = Exercises.Count == 0;
-            StatusMessage = "Error al cargar los ejercicios.";
         }
         finally
         {
-            IsLoading = false;
+            IsLoadingData = false;
         }
     }
 

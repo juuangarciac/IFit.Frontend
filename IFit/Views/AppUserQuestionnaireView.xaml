@@ -115,7 +115,7 @@
                                                  Binding="{Binding Source={RelativeSource AncestorType={x:Type CollectionView}}, Path=SelectedItem}"
                                                  Value="{Binding .}">
                                         <Setter Property="Stroke" Value="{StaticResource PrimaryColor}" />
-                                        <Setter Property="BackgroundColor" Value="{StaticResource PrimaryColorDarkOpacity}" />
+                                        <Setter Property="BackgroundColor" Value="{StaticResource PrimaryColorLightOpacity70}" />
                                     </DataTrigger>
                                 </Border.Triggers>
 

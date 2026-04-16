@@ -95,7 +95,7 @@ namespace IFit.Services
                     return null;
                 }
 
-                var response = await _webService.GetAsync<QuestionnaireDTO>($"/coach/{coachId}/experience-level/{experienceLevelId}");
+                var response = await _webService.GetAsync<QuestionnaireDTO>($"/questionnaires/coach/{coachId}/experience-level/{experienceLevelId}");
 
                  if (!response.Success)
                  {

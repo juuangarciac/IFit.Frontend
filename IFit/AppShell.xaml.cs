@@ -16,8 +16,9 @@ namespace IFit
             Routing.RegisterRoute("ChatAIView",            typeof(ChatAIView));
             Routing.RegisterRoute("WeeklySummaryView",     typeof(WeeklySummaryView));
             Routing.RegisterRoute("ProfileView",           typeof(ProfileView));
-            Routing.RegisterRoute("ExerciseCatalogView",   typeof(ExerciseCatalogView));
-            Routing.RegisterRoute("ExerciseDetailView",    typeof(ExerciseDetailView));
+            Routing.RegisterRoute("ExerciseCatalogView",      typeof(ExerciseCatalogView));
+            Routing.RegisterRoute("ExerciseDetailView",       typeof(ExerciseDetailView));
+            Routing.RegisterRoute("ManualRoutineBuilderView", typeof(ManualRoutineBuilderView));
         }
     }
 }

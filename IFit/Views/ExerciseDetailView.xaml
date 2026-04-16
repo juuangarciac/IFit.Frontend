@@ -14,18 +14,16 @@
     <Grid RowSpacing="0">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />   <!-- Header fijo -->
-            <RowDefinition Height="Auto" />   <!-- Galería (si hay imágenes) -->
-            <RowDefinition Height="Auto" />   <!-- Indicador de página -->
-            <RowDefinition Height="*" />      <!-- Contenido scrollable -->
+            <RowDefinition Height="*" />      <!-- Scroll: imagen + contenido -->
         </Grid.RowDefinitions>
 
         <!-- Loading overlay -->
-        <components:LoadingOverlay Grid.RowSpan="4"
+        <components:LoadingOverlay Grid.RowSpan="2"
                                    IsLoading="{Binding IsLoading}"
                                    Message="{Binding StatusMessage}"
                                    ZIndex="999" />
 
-        <!-- ── Row 0: Header ───────────────────────────────────────── -->
+        <!-- ── Row 0: Header fijo ──────────────────────────────────── -->
         <Grid Grid.Row="0"
               Padding="15,50,15,10"
               ColumnSpacing="12"
@@ -47,233 +45,257 @@
                    LineBreakMode="WordWrap" />
         </Grid>
 
-        <!-- ── Row 1: Galería de imágenes ─────────────────────────── -->
-        <CarouselView Grid.Row="1"
-                      x:Name="PhotoCarousel"
-                      ItemsSource="{Binding FullImageUrls}"
-                      IsVisible="{Binding HasImages}"
-                      HeightRequest="240"
-                      IndicatorView="PhotoIndicator"
-                      Loop="False">
-            <CarouselView.ItemTemplate>
-                <DataTemplate x:DataType="x:String">
-                    <!-- Fondo como placeholder mientras carga la imagen -->
+        <!-- ── Row 1: Scroll completo (imagen + contenido) ────────── -->
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Spacing="0">
+
+                <!-- ── Error state ────────────────────────────────── -->
+                <VerticalStackLayout IsVisible="{Binding HasError}"
+                                     Spacing="16"
+                                     Padding="30"
+                                     VerticalOptions="Center"
+                                     HorizontalOptions="Center"
+                                     Margin="0,60,0,0">
+
+                    <Label Text="&#x26A0;"
+                           FontSize="48"
+                           HorizontalOptions="Center"
+                           TextColor="{DynamicResource QuaternaryColor}" />
+
+                    <Label Text="{Binding ErrorMessage}"
+                           Style="{DynamicResource label-p-white}"
+                           HorizontalTextAlignment="Center"
+                           LineBreakMode="WordWrap"
+                           Opacity="0.8" />
+
+                    <Button Text="Reintentar"
+                            Command="{Binding RetryCommand}"
+                            Style="{DynamicResource ButtonBold-XL-dark-yellow}"
+                            CornerRadius="8"
+                            HorizontalOptions="Center"
+                            Padding="30,0" />
+                </VerticalStackLayout>
+
+                <!-- ── Galería de imágenes (scrollable) ───────────── -->
+                <CarouselView x:Name="PhotoCarousel"
+                              ItemsSource="{Binding FullImageUrls}"
+                              IsVisible="{Binding HasImages}"
+                              HeightRequest="240"
+                              IndicatorView="PhotoIndicator"
+                              Loop="False"
+                              Margin="0,8,0,0">
+                    <CarouselView.ItemTemplate>
+                        <DataTemplate x:DataType="x:String">
+                            <Border BackgroundColor="{DynamicResource PrimaryColorLightOpacity}"
+                                    StrokeThickness="0"
+                                    Margin="15,0">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="{DynamicResource CornerRadiusRectangle}" />
+                                </Border.StrokeShape>
+                                <Image Source="{Binding .}"
+                                       Aspect="AspectFit" />
+                            </Border>
+                        </DataTemplate>
+                    </CarouselView.ItemTemplate>
+                </CarouselView>
+
+                <!-- ── Indicador de página (dots) ─────────────────── -->
+                <IndicatorView x:Name="PhotoIndicator"
+                               IsVisible="{Binding HasImages}"
+                               IndicatorColor="{DynamicResource TextSecondaryColorLight}"
+                               SelectedIndicatorColor="{DynamicResource TertiaryColor}"
+                               HorizontalOptions="Center"
+                               Margin="0,8,0,4" />
+
+                <!-- ── Contenido del ejercicio ────────────────────── -->
+                <VerticalStackLayout Spacing="12"
+                                     Padding="15,8,15,30"
+                                     IsVisible="{Binding HasError, Converter={StaticResource InvertedBoolConverter}}">
+
+                    <!-- ── Cabecera: nivel, categoría, equipamiento ─ -->
                     <Border BackgroundColor="{DynamicResource PrimaryColorLightOpacity}"
-                            StrokeThickness="0"
-                            Margin="15,0">
+                            StrokeThickness="2"
+                            Stroke="{DynamicResource BackgroundPrimaryLight}">
                         <Border.StrokeShape>
                             <RoundRectangle CornerRadius="{DynamicResource CornerRadiusRectangle}" />
                         </Border.StrokeShape>
-                        <Image Source="{Binding .}"
-                               Aspect="AspectFit" />
-                    </Border>
-                </DataTemplate>
-            </CarouselView.ItemTemplate>
-        </CarouselView>
 
-        <!-- ── Row 2: Indicador de página (dots) ──────────────────── -->
-        <IndicatorView Grid.Row="2"
-                       x:Name="PhotoIndicator"
-                       IsVisible="{Binding HasImages}"
-                       IndicatorColor="{DynamicResource TextSecondaryColorLight}"
-                       SelectedIndicatorColor="{DynamicResource TertiaryColor}"
-                       HorizontalOptions="Center"
-                       Margin="0,8,0,4" />
+                        <VerticalStackLayout Padding="15" Spacing="10">
 
-        <!-- ── Row 3: Contenido scrollable ────────────────────────── -->
-        <ScrollView Grid.Row="3">
-            <VerticalStackLayout Spacing="12"
-                                 Padding="15,8,15,30">
+                            <Label Text="{Binding Exercise.Name}"
+                                   Style="{DynamicResource label-h1-white}"
+                                   FontSize="20"
+                                   LineBreakMode="WordWrap" />
 
-                <!-- ── Cabecera: nivel, categoría, equipamiento ───── -->
-                <Border BackgroundColor="{DynamicResource PrimaryColorLightOpacity}"
-                        StrokeThickness="2"
-                        Stroke="{DynamicResource BackgroundPrimaryLight}">
-                    <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="{DynamicResource CornerRadiusRectangle}" />
-                    </Border.StrokeShape>
+                            <FlexLayout Wrap="Wrap" Direction="Row" JustifyContent="Start">
 
-                    <VerticalStackLayout Padding="15" Spacing="10">
+                                <Border BackgroundColor="{DynamicResource TertiaryColor}"
+                                        StrokeThickness="0" Margin="0,3,8,3" Padding="10,5">
+                                    <Border.StrokeShape><RoundRectangle CornerRadius="6" /></Border.StrokeShape>
+                                    <Label Text="{Binding Exercise.Level}"
+                                           TextColor="{DynamicResource BackgroundPrimaryDark}"
+                                           FontSize="12" FontFamily="Montserrat-Medium" />
+                                </Border>
 
-                        <Label Text="{Binding Exercise.Name}"
-                               Style="{DynamicResource label-h1-white}"
-                               FontSize="20"
-                               LineBreakMode="WordWrap" />
+                                <Border BackgroundColor="{DynamicResource QuaternaryColor}"
+                                        StrokeThickness="0" Margin="0,3,8,3" Padding="10,5">
+                                    <Border.StrokeShape><RoundRectangle CornerRadius="6" /></Border.StrokeShape>
+                                    <Label Text="{Binding Exercise.Category}"
+                                           TextColor="{DynamicResource TextSecondaryColorDark}"
+                                           FontSize="12" FontFamily="Montserrat-Medium" />
+                                </Border>
 
-                        <!-- Badges: nivel · categoría · equipamiento -->
-                        <FlexLayout Wrap="Wrap" Direction="Row" JustifyContent="Start">
+                                <Border BackgroundColor="Transparent"
+                                        StrokeThickness="1"
+                                        Stroke="{DynamicResource BackgroundPrimaryLight}"
+                                        Margin="0,3,0,3" Padding="10,5">
+                                    <Border.StrokeShape><RoundRectangle CornerRadius="6" /></Border.StrokeShape>
+                                    <Label Text="{Binding Exercise.Equipment}"
+                                           TextColor="{DynamicResource TextSecondaryColorLight}"
+                                           FontSize="12" FontFamily="Montserrat-Medium" />
+                                </Border>
+                            </FlexLayout>
 
-                            <Border BackgroundColor="{DynamicResource TertiaryColor}"
-                                    StrokeThickness="0" Margin="0,3,8,3" Padding="10,5">
-                                <Border.StrokeShape><RoundRectangle CornerRadius="6" /></Border.StrokeShape>
-                                <Label Text="{Binding Exercise.Level}"
-                                       TextColor="{DynamicResource BackgroundPrimaryDark}"
-                                       FontSize="12" FontFamily="Montserrat-Medium" />
-                            </Border>
+                            <Grid ColumnDefinitions="*,*" ColumnSpacing="12"
+                                  IsVisible="{Binding HasForce}">
+                                <VerticalStackLayout Grid.Column="0" Spacing="2">
+                                    <Label Text="Tipo de fuerza"
+                                           Style="{DynamicResource label-p-white}"
+                                           FontSize="11" Opacity="0.55" />
+                                    <Label Text="{Binding Exercise.Force}"
+                                           Style="{DynamicResource label-p-white}"
+                                           FontSize="13" />
+                                </VerticalStackLayout>
 
-                            <Border BackgroundColor="{DynamicResource QuaternaryColor}"
-                                    StrokeThickness="0" Margin="0,3,8,3" Padding="10,5">
-                                <Border.StrokeShape><RoundRectangle CornerRadius="6" /></Border.StrokeShape>
-                                <Label Text="{Binding Exercise.Category}"
-                                       TextColor="White"
-                                       FontSize="12" FontFamily="Montserrat-Medium" />
-                            </Border>
+                                <VerticalStackLayout Grid.Column="1" Spacing="2"
+                                                     IsVisible="{Binding HasMechanic}">
+                                    <Label Text="Mecánica"
+                                           Style="{DynamicResource label-p-white}"
+                                           FontSize="11" Opacity="0.55" />
+                                    <Label Text="{Binding Exercise.Mechanic}"
+                                           Style="{DynamicResource label-p-white}"
+                                           FontSize="13" />
+                                </VerticalStackLayout>
+                            </Grid>
 
-                            <Border BackgroundColor="Transparent"
-                                    StrokeThickness="1"
-                                    Stroke="{DynamicResource BackgroundPrimaryLight}"
-                                    Margin="0,3,0,3" Padding="10,5">
-                                <Border.StrokeShape><RoundRectangle CornerRadius="6" /></Border.StrokeShape>
-                                <Label Text="{Binding Exercise.Equipment}"
-                                       TextColor="{DynamicResource TextSecondaryColorLight}"
-                                       FontSize="12" FontFamily="Montserrat-Medium" />
-                            </Border>
-                        </FlexLayout>
-
-                        <!-- Metadatos: fuerza y mecánica -->
-                        <Grid ColumnDefinitions="*,*" ColumnSpacing="12"
-                              IsVisible="{Binding HasForce}">
-                            <VerticalStackLayout Grid.Column="0" Spacing="2">
-                                <Label Text="Tipo de fuerza"
-                                       Style="{DynamicResource label-p-white}"
-                                       FontSize="11" Opacity="0.55" />
-                                <Label Text="{Binding Exercise.Force}"
-                                       Style="{DynamicResource label-p-white}"
-                                       FontSize="13" />
-                            </VerticalStackLayout>
-
-                            <VerticalStackLayout Grid.Column="1" Spacing="2"
-                                                 IsVisible="{Binding HasMechanic}">
-                                <Label Text="Mecánica"
-                                       Style="{DynamicResource label-p-white}"
-                                       FontSize="11" Opacity="0.55" />
-                                <Label Text="{Binding Exercise.Mechanic}"
-                                       Style="{DynamicResource label-p-white}"
-                                       FontSize="13" />
-                            </VerticalStackLayout>
-                        </Grid>
-
-                    </VerticalStackLayout>
-                </Border>
-
-                <!-- ── Músculos ────────────────────────────────────── -->
-                <Border BackgroundColor="{DynamicResource PrimaryColorLightOpacity}"
-                        StrokeThickness="2"
-                        Stroke="{DynamicResource BackgroundPrimaryLight}">
-                    <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="{DynamicResource CornerRadiusRectangle}" />
-                    </Border.StrokeShape>
-
-                    <VerticalStackLayout Padding="15" Spacing="10">
-
-                        <Label Text="Músculos" Style="{DynamicResource label-h2-white}" />
-
-                        <BoxView HeightRequest="1" Color="{DynamicResource QuaternaryColor}"
-                                 Opacity="0.3" HorizontalOptions="Fill" />
-
-                        <!-- Primarios -->
-                        <Label Text="Primarios"
-                               Style="{DynamicResource label-p-white}"
-                               FontSize="12" Opacity="0.6" />
-
-                        <FlexLayout Wrap="Wrap" Direction="Row" JustifyContent="Start"
-                                    BindableLayout.ItemsSource="{Binding Exercise.PrimaryMuscles}">
-                            <BindableLayout.ItemTemplate>
-                                <DataTemplate x:DataType="x:String">
-                                    <Border BackgroundColor="{DynamicResource TertiaryColor}"
-                                            StrokeThickness="0" Margin="0,3,8,3" Padding="12,5">
-                                        <Border.StrokeShape><RoundRectangle CornerRadius="6" /></Border.StrokeShape>
-                                        <Label Text="{Binding .}"
-                                               TextColor="{DynamicResource BackgroundPrimaryDark}"
-                                               FontSize="12" FontFamily="Montserrat-Medium" />
-                                    </Border>
-                                </DataTemplate>
-                            </BindableLayout.ItemTemplate>
-                        </FlexLayout>
-
-                        <!-- Secundarios (oculto si vacío) -->
-                        <Label Text="Secundarios"
-                               Style="{DynamicResource label-p-white}"
-                               FontSize="12" Opacity="0.6"
-                               IsVisible="{Binding HasSecondaryMuscles}"
-                               Margin="0,4,0,0" />
-
-                        <FlexLayout Wrap="Wrap" Direction="Row" JustifyContent="Start"
-                                    IsVisible="{Binding HasSecondaryMuscles}"
-                                    BindableLayout.ItemsSource="{Binding Exercise.SecondaryMuscles}">
-                            <BindableLayout.ItemTemplate>
-                                <DataTemplate x:DataType="x:String">
-                                    <Border BackgroundColor="Transparent"
-                                            StrokeThickness="1"
-                                            Stroke="{DynamicResource BackgroundPrimaryLight}"
-                                            Margin="0,3,8,3" Padding="12,5">
-                                        <Border.StrokeShape><RoundRectangle CornerRadius="6" /></Border.StrokeShape>
-                                        <Label Text="{Binding .}"
-                                               TextColor="{DynamicResource TextSecondaryColorLight}"
-                                               FontSize="12" FontFamily="Montserrat-Medium" />
-                                    </Border>
-                                </DataTemplate>
-                            </BindableLayout.ItemTemplate>
-                        </FlexLayout>
-
-                    </VerticalStackLayout>
-                </Border>
-
-                <!-- ── Instrucciones ──────────────────────────────── -->
-                <Border IsVisible="{Binding HasInstructions}"
-                        BackgroundColor="{DynamicResource PrimaryColorLightOpacity}"
-                        StrokeThickness="2"
-                        Stroke="{DynamicResource BackgroundPrimaryLight}">
-                    <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="{DynamicResource CornerRadiusRectangle}" />
-                    </Border.StrokeShape>
-
-                    <VerticalStackLayout Padding="15" Spacing="10">
-
-                        <Label Text="Instrucciones" Style="{DynamicResource label-h2-white}" />
-
-                        <BoxView HeightRequest="1" Color="{DynamicResource QuaternaryColor}"
-                                 Opacity="0.3" HorizontalOptions="Fill" />
-
-                        <VerticalStackLayout Spacing="14"
-                                             BindableLayout.ItemsSource="{Binding NumberedInstructions}">
-                            <BindableLayout.ItemTemplate>
-                                <DataTemplate x:DataType="vm:InstructionItem">
-                                    <Grid ColumnDefinitions="26,*" ColumnSpacing="10">
-
-                                        <!-- Número del paso -->
-                                        <Border Grid.Column="0"
-                                                BackgroundColor="{DynamicResource TertiaryColor}"
-                                                StrokeThickness="0"
-                                                HeightRequest="24"
-                                                WidthRequest="24"
-                                                HorizontalOptions="Center"
-                                                VerticalOptions="Start">
-                                            <Border.StrokeShape>
-                                                <Ellipse />
-                                            </Border.StrokeShape>
-                                            <Label Text="{Binding Number}"
-                                                   TextColor="{DynamicResource BackgroundPrimaryDark}"
-                                                   FontSize="12"
-                                                   FontAttributes="Bold"
-                                                   HorizontalOptions="Center"
-                                                   VerticalOptions="Center" />
-                                        </Border>
-
-                                        <!-- Texto de la instrucción -->
-                                        <Label Grid.Column="1"
-                                               Text="{Binding Text}"
-                                               Style="{DynamicResource label-p-white}"
-                                               LineBreakMode="WordWrap"
-                                               VerticalOptions="Center" />
-                                    </Grid>
-                                </DataTemplate>
-                            </BindableLayout.ItemTemplate>
                         </VerticalStackLayout>
+                    </Border>
 
-                    </VerticalStackLayout>
-                </Border>
+                    <!-- ── Músculos ──────────────────────────────── -->
+                    <Border BackgroundColor="{DynamicResource PrimaryColorLightOpacity}"
+                            StrokeThickness="2"
+                            Stroke="{DynamicResource BackgroundPrimaryLight}">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="{DynamicResource CornerRadiusRectangle}" />
+                        </Border.StrokeShape>
 
+                        <VerticalStackLayout Padding="15" Spacing="10">
+
+                            <Label Text="Músculos" Style="{DynamicResource label-h2-white}" />
+
+                            <BoxView HeightRequest="1" Color="{DynamicResource QuaternaryColor}"
+                                     Opacity="0.3" HorizontalOptions="Fill" />
+
+                            <Label Text="Primarios"
+                                   Style="{DynamicResource label-p-white}"
+                                   FontSize="12" Opacity="0.6" />
+
+                            <FlexLayout Wrap="Wrap" Direction="Row" JustifyContent="Start"
+                                        BindableLayout.ItemsSource="{Binding Exercise.PrimaryMuscles}">
+                                <BindableLayout.ItemTemplate>
+                                    <DataTemplate x:DataType="x:String">
+                                        <Border BackgroundColor="{DynamicResource TertiaryColor}"
+                                                StrokeThickness="0" Margin="0,3,8,3" Padding="12,5">
+                                            <Border.StrokeShape><RoundRectangle CornerRadius="6" /></Border.StrokeShape>
+                                            <Label Text="{Binding .}"
+                                                   TextColor="{DynamicResource BackgroundPrimaryDark}"
+                                                   FontSize="12" FontFamily="Montserrat-Medium" />
+                                        </Border>
+                                    </DataTemplate>
+                                </BindableLayout.ItemTemplate>
+                            </FlexLayout>
+
+                            <Label Text="Secundarios"
+                                   Style="{DynamicResource label-p-white}"
+                                   FontSize="12" Opacity="0.6"
+                                   IsVisible="{Binding HasSecondaryMuscles}"
+                                   Margin="0,4,0,0" />
+
+                            <FlexLayout Wrap="Wrap" Direction="Row" JustifyContent="Start"
+                                        IsVisible="{Binding HasSecondaryMuscles}"
+                                        BindableLayout.ItemsSource="{Binding Exercise.SecondaryMuscles}">
+                                <BindableLayout.ItemTemplate>
+                                    <DataTemplate x:DataType="x:String">
+                                        <Border BackgroundColor="Transparent"
+                                                StrokeThickness="1"
+                                                Stroke="{DynamicResource BackgroundPrimaryLight}"
+                                                Margin="0,3,8,3" Padding="12,5">
+                                            <Border.StrokeShape><RoundRectangle CornerRadius="6" /></Border.StrokeShape>
+                                            <Label Text="{Binding .}"
+                                                   TextColor="{DynamicResource TextSecondaryColorLight}"
+                                                   FontSize="12" FontFamily="Montserrat-Medium" />
+                                        </Border>
+                                    </DataTemplate>
+                                </BindableLayout.ItemTemplate>
+                            </FlexLayout>
+
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <!-- ── Instrucciones ─────────────────────────── -->
+                    <Border IsVisible="{Binding HasInstructions}"
+                            BackgroundColor="{DynamicResource PrimaryColorLightOpacity}"
+                            StrokeThickness="2"
+                            Stroke="{DynamicResource BackgroundPrimaryLight}">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="{DynamicResource CornerRadiusRectangle}" />
+                        </Border.StrokeShape>
+
+                        <VerticalStackLayout Padding="15" Spacing="10">
+
+                            <Label Text="Instrucciones" Style="{DynamicResource label-h2-white}" />
+
+                            <BoxView HeightRequest="1" Color="{DynamicResource QuaternaryColor}"
+                                     Opacity="0.3" HorizontalOptions="Fill" />
+
+                            <VerticalStackLayout Spacing="14"
+                                                 BindableLayout.ItemsSource="{Binding NumberedInstructions}">
+                                <BindableLayout.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:InstructionItem">
+                                        <Grid ColumnDefinitions="26,*" ColumnSpacing="10">
+
+                                            <Border Grid.Column="0"
+                                                    BackgroundColor="{DynamicResource TertiaryColor}"
+                                                    StrokeThickness="0"
+                                                    HeightRequest="24"
+                                                    WidthRequest="24"
+                                                    HorizontalOptions="Center"
+                                                    VerticalOptions="Start">
+                                                <Border.StrokeShape>
+                                                    <Ellipse />
+                                                </Border.StrokeShape>
+                                                <Label Text="{Binding Number}"
+                                                       TextColor="{DynamicResource BackgroundPrimaryDark}"
+                                                       FontSize="12"
+                                                       FontAttributes="Bold"
+                                                       HorizontalOptions="Center"
+                                                       VerticalOptions="Center" />
+                                            </Border>
+
+                                            <Label Grid.Column="1"
+                                                   Text="{Binding Text}"
+                                                   Style="{DynamicResource label-p-white}"
+                                                   LineBreakMode="WordWrap"
+                                                   VerticalOptions="Center" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </BindableLayout.ItemTemplate>
+                            </VerticalStackLayout>
+
+                        </VerticalStackLayout>
+                    </Border>
+
+                </VerticalStackLayout>
             </VerticalStackLayout>
         </ScrollView>
     </Grid>
