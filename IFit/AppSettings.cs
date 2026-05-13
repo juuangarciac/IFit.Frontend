@@ -11,12 +11,15 @@ namespace IFit
         public static string AppName = "IFit";
 
         // Base address for the HTTP client, depending on the platform
-        public static string ApiGatewayBaseUrl = "http://192.168.1.43:8080/ifit/api/v1";
+        public static string ApiGatewayBaseUrl = "http://192.168.1.79:8080/ifit/api/v1";
         public static string RefreshTokenEndpoint = "/auth/refresh";
 
         public static string BaseAddress = DeviceInfo.Platform == DevicePlatform.Android ? ApiGatewayBaseUrl : ApiGatewayBaseUrl;
 
-        public static readonly HttpClient _HttpClient = new HttpClient();
+        public static readonly HttpClient _HttpClient = new HttpClient
+        {
+            Timeout = TimeSpan.FromSeconds(5)
+        };
 
         // SQLite database
         public const string DatabaseFilename = "IFitSQLite.db3";

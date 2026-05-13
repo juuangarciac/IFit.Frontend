@@ -224,6 +224,16 @@
         <GradientStop Color="{StaticResource CardThirdRedGradientColor}" Offset="1.0" />
     </LinearGradientBrush>
 
+    <!-- Cards color - Indigo variant (sesiones futuras/pendientes) -->
+    <Color x:Key="CardFirstIndigoGradientColor">#7986CB</Color>
+    <Color x:Key="CardSecondIndigoGradientColor">#3F51B5</Color>
+    <Color x:Key="CardThirdIndigoGradientColor">#FF1A1A2E</Color>
+    <LinearGradientBrush x:Key="CardPremiumIndigoGradientColor" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="{StaticResource CardFirstIndigoGradientColor}" Offset="0.0" />
+        <GradientStop Color="{StaticResource CardSecondIndigoGradientColor}" Offset="0.4" />
+        <GradientStop Color="{StaticResource CardThirdIndigoGradientColor}" Offset="1.0" />
+    </LinearGradientBrush>
+
     <!-- Cards color - Yellow variant -->
     <Color x:Key="CardFirstYellowGradientColor">#FFD369</Color>
     <Color x:Key="CardSecondYellowGradientColor">#E6A817</Color>
@@ -632,11 +642,11 @@
 
     <Style TargetType="Page" ApplyToDerivedTypes="True">
         <Setter Property="Padding" Value="0"/>
-        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource OffBlack}}" />
+        <Setter Property="BackgroundColor" Value="{StaticResource BackgroundPrimaryDark}" />
     </Style>
 
     <Style TargetType="Shell" ApplyToDerivedTypes="True">
-        <Setter Property="Shell.BackgroundColor" Value="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource OffBlack}}" />
+        <Setter Property="Shell.BackgroundColor" Value="{StaticResource BackgroundPrimaryDark}" />
         <Setter Property="Shell.ForegroundColor" Value="{OnPlatform WinUI={StaticResource Primary}, Default={StaticResource White}}" />
         <Setter Property="Shell.TitleColor" Value="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource SecondaryDarkText}}" />
         <Setter Property="Shell.DisabledColor" Value="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray950}}" />
