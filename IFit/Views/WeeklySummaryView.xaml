@@ -4,6 +4,7 @@
              xmlns:vmodels="clr-namespace:IFit.ViewModels"
              xmlns:dtos="clr-namespace:IFit.Models.Dtos.AI"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:components="clr-namespace:IFit.Views.Components"
              x:Class="IFit.Views.WeeklySummaryView"
              Title="WeeklySummaryView"
              Shell.NavBarIsVisible="False">
@@ -241,7 +242,7 @@
                                         <Border Grid.Column="0"
                                                 StrokeThickness="0"
                                                 Margin="0"
-                                                Background="{DynamicResource CardPremiumRedGradientColor}">
+                                                Background="{DynamicResource CardPremiumIndigoGradientColor}">
                                             <Border.StrokeShape>
                                                 <RoundRectangle CornerRadius="8, 0, 8, 0"/>
                                             </Border.StrokeShape>
@@ -293,5 +294,10 @@
             </VerticalStackLayout>
         </ScrollView>
 
+        <!-- Loading overlay encima de todo -->
+        <components:LoadingOverlay
+            Grid.RowSpan="2"
+            IsLoading="{Binding IsLoading}"
+            Message="{Binding StatusMessage}" />
     </Grid>
 </ContentPage>

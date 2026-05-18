@@ -1,25 +1,25 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using IFit.Models.Dtos.AI;
 using IFit.Services;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace IFit.ViewModels
 {
+    [QueryProperty(nameof(Routine), "Routine")]
     public partial class WeeklySummaryViewModel : ObservableObject
     {
         #region Properties
+
         [ObservableProperty]
         public partial RoutineResponseDto? Routine { get; set; }
 
         [ObservableProperty]
         public partial TrainingDayDto? TrainingDayDto { get; set; }
+
         partial void OnTrainingDayDtoChanged(TrainingDayDto? value)
         {
             if (value is null) return;
@@ -37,26 +37,24 @@ namespace IFit.ViewModels
 
         [ObservableProperty]
         public partial ObservableCollection<TrainingDayDto> UncompletedSessions { get; set; } = new();
+
         #endregion
 
         #region Services
-        private AppUserService _appUserService;
         private TrainingService _trainingService;
         #endregion
 
         private bool _isInitialized = false;
 
         #region Constructor
-        public WeeklySummaryViewModel(TrainingService trainingService,
-            AppUserService appUserService)
+
+        public WeeklySummaryViewModel(TrainingService trainingService)
         {
             _trainingService = trainingService;
-            _appUserService = appUserService;
         }
 
         public WeeklySummaryViewModel() : this(
-            App.GetService<TrainingService>() ?? throw new InvalidOperationException("TrainingService no registrado"),
-            App.GetService<AppUserService>() ?? throw new InvalidOperationException("AppUserService no esta registrado"))
+            App.GetService<TrainingService>() ?? throw new InvalidOperationException("TrainingService no registrado"))
         {
         }
 
@@ -66,21 +64,17 @@ namespace IFit.ViewModels
             StatusMessage = "Cargando tu rutina actual...";
 
             var userId = Preferences.Get("UserId", 0L);
-
-            // Fetch user and routine in parallel
-            var userTask    = _appUserService.findUserById(userId);
-            var routineTask = _trainingService.getLatestActiveRoutineByUserIdAsync(userId);
-            await Task.WhenAll(userTask, routineTask);
-
-            var currentUser = await userTask;
-            Routine         = await routineTask;
-
-            if (currentUser == null)
+            if (userId == 0)
             {
                 StatusMessage = "No se ha encontrado el usuario actual.";
                 IsLoading = false;
                 return;
             }
+
+            var cachedRoutineId = Preferences.Get("CurrentRoutineId", 0L);
+            Routine = cachedRoutineId > 0
+                ? await _trainingService.getRoutineByIdAsync(cachedRoutineId)
+                : await _trainingService.getLatestActiveRoutineByUserIdAsync(userId);
 
             if (Routine == null)
             {
@@ -92,9 +86,6 @@ namespace IFit.ViewModels
             BuildSessionLists();
             IsLoading = false;
         }
-        #endregion
-
-        #region Commands
 
         #endregion
 
@@ -122,29 +113,28 @@ namespace IFit.ViewModels
         public async Task AppearingAsync()
         {
             if (_isInitialized) return;
-            await InitializeAsync();
             _isInitialized = true;
-        }
 
-        [RelayCommand]
-        public async Task OpenTrainingDayDetailAsync()
-        {
-            var navigationParameter = new Dictionary<String, Object>()
+            if (Routine != null)
             {
-                {"Routine", Routine },
-                {"TrainingDay", TrainingDayDto }
-            };
-            await Shell.Current.GoToAsync("TrainingDayDetailView", navigationParameter);
+                // Routine llegó vía QueryProperty desde HomeViewModel: sin llamada HTTP
+                BuildSessionLists();
+                IsLoading = false;
+                return;
+            }
+
+            await InitializeAsync();
         }
 
         private async Task NavigateToDetailAsync(TrainingDayDto value)
         {
             var navigationParameter = new Dictionary<string, object>()
             {
-                { "Routine", Routine },
+                { "Routine", Routine! },
                 { "TrainingDay", value }
             };
             await Shell.Current.GoToAsync("TrainingDayDetailView", navigationParameter);
+            TrainingDayDto = null; // permite re-seleccionar el mismo día al volver
         }
 
         #endregion
