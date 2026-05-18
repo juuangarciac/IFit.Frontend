@@ -131,7 +131,7 @@ namespace IFit.ViewModels
         [RelayCommand]
         public async Task GenerateNewRoutineAsync()
         {
-            await Shell.Current.GoToAsync("//ExperienceLevelSelectionView");
+            await Shell.Current.GoToAsync("ExperienceLevelSelectionView");
         }
 
         [RelayCommand]

@@ -12,6 +12,9 @@ namespace IFit
             // Rutas drill-down: no están en AppShell.xaml, se navega relativamente (sin //).
             // Las vistas declaradas como ShellContent en AppShell.xaml usan navegación
             // absoluta (// o ///) y NO deben registrarse aquí (duplicado → ruta ambigua).
+            Routing.RegisterRoute("ExperienceLevelSelectionView",  typeof(ExperienceLevelSelectionView));
+            Routing.RegisterRoute("CoachModelTypeSelectionView",   typeof(CoachModelTypeSelectionView));
+            Routing.RegisterRoute("AppUserQuestionnaireView",      typeof(AppUserQuestionnaireView));
             Routing.RegisterRoute("TrainingDayDetailView", typeof(TrainingDayDetailView));
             Routing.RegisterRoute("ChatAIView",            typeof(ChatAIView));
             Routing.RegisterRoute("WeeklySummaryView",     typeof(WeeklySummaryView));
@@ -19,6 +22,8 @@ namespace IFit
             Routing.RegisterRoute("ExerciseCatalogView",      typeof(ExerciseCatalogView));
             Routing.RegisterRoute("ExerciseDetailView",       typeof(ExerciseDetailView));
             Routing.RegisterRoute("ManualRoutineBuilderView", typeof(ManualRoutineBuilderView));
+            Routing.RegisterRoute("QuestionnaireSummaryView", typeof(QuestionnaireSummaryView));
+            Routing.RegisterRoute("AIGenerationRoutineView",  typeof(AIGenerationRoutineView));
         }
     }
 }

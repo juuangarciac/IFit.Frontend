@@ -42,9 +42,9 @@ namespace IFit.ViewModels
         {
             EstimatedDuration = CalculateEstimatedDuration(value);
             CanEndSession = Routine.CurrentDay == value.DayNumber;
-            Background = GetBrush(Routine.CurrentDay >= value.DayNumber 
-                ? "CardPremiumGradientColor" 
-                : "CardPremiumRedGradientColor");
+            Background = GetBrush(Routine.CurrentDay >= value.DayNumber
+                ? "CardPremiumGradientColor"
+                : "CardPremiumIndigoGradientColor");
         }
 
         private static Brush GetBrush(string resourceKey)

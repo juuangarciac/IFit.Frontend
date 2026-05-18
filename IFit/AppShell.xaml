@@ -6,6 +6,7 @@
     xmlns:local="clr-namespace:IFit"
     xmlns:views="clr-namespace:IFit.Views"
     Shell.FlyoutBehavior="Disabled"
+    BackgroundColor="{StaticResource BackgroundPrimaryDark}"
     Title="IFit">
 
     <ShellContent
@@ -43,30 +44,8 @@
         ContentTemplate="{DataTemplate views:GetStartedView}"
         Route="GetStartedView" />
 
-    <ShellContent
-        Title="CoachModelTypeSelection"
-        ContentTemplate="{DataTemplate views:CoachModelTypeSelectionView}"
-        Route="CoachModelTypeSelectionView" />
 
-    <ShellContent
-        Title="ExperienceLevelSelection" 
-        ContentTemplate="{DataTemplate views:ExperienceLevelSelectionView}"
-        Route="ExperienceLevelSelectionView" />
 
-    <ShellContent
-        Title="ExperienceLevelSelection"
-        ContentTemplate="{DataTemplate views:AppUserQuestionnaireView}"
-        Route="AppUserQuestionnaireView" />
-
-    <ShellContent
-        Title="AIGenerationRoutine"
-        ContentTemplate="{DataTemplate views:AIGenerationRoutineView}"
-        Route="AIGenerationRoutineView" />
-
-    <ShellContent
-        Title="QuestionnaireSummary" 
-        ContentTemplate="{DataTemplate views:QuestionnaireSummaryView}" 
-        Route="QuestionnaireSummaryView" />
 
     <ShellContent
         Title="RoutineSummaryView" 
