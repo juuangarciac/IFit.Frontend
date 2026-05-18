@@ -25,13 +25,13 @@
         <!-- Header -->
         <Grid Grid.Row="0" Margin="15">
             <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
             <!-- Back Button -->
             <Button Grid.Column="0"
-                    HorizontalOptions="Start"
                     VerticalOptions="Center"
                     BackgroundColor="Transparent"
                     ImageSource="arrow.png"
@@ -39,12 +39,21 @@
 
             <!-- ifit logo -->
             <Image Grid.Column="0"
-                   Grid.ColumnSpan="2"
+                   Grid.ColumnSpan="3"
                    Source="ifit_logo_white.png"
                    HeightRequest="20"
                    WidthRequest="120"
                    HorizontalOptions="Center"
                    VerticalOptions="Center" />
+
+            <!-- Panel toggle button -->
+            <Button Grid.Column="2"
+                    VerticalOptions="Center"
+                    BackgroundColor="Transparent"
+                    TextColor="{StaticResource White}"
+                    FontSize="22"
+                    Text="☰"
+                    Command="{Binding TogglePanelCommand}" />
         </Grid>
 
         <!-- Chat messages -->
@@ -58,28 +67,26 @@
                         <Grid Margin="0,4">
                             <!-- Mensaje AI (izquierda) -->
                             <Frame IsVisible="{Binding IsAI}"
-                   BackgroundColor="#1E1E2E"
-                   BorderColor="Transparent"
-                   CornerRadius="16"
-                   Padding="12,8"
-                   HorizontalOptions="Start"
-                   Margin="0,0,60,0">
+                                   BackgroundColor="#1E1E2E"
+                                   BorderColor="Transparent"
+                                   CornerRadius="16"
+                                   Padding="12,8"
+                                   HorizontalOptions="Start"
+                                   Margin="0,0,60,0">
                                 <Label Text="{Binding Text}"
-                       TextColor="White"
-                       FontSize="14" />
+                                       Style="{StaticResource label-p-white}" />
                             </Frame>
 
                             <!-- Mensaje usuario (derecha) -->
                             <Frame IsVisible="{Binding IsUser}"
-                   BackgroundColor="{StaticResource BackgroundSecondaryDark}"
-                   BorderColor="Transparent"
-                   CornerRadius="16"
-                   Padding="12,8"
-                   HorizontalOptions="End"
-                   Margin="60,0,0,0">
+                                   BackgroundColor="{StaticResource BackgroundSecondaryDark}"
+                                   BorderColor="Transparent"
+                                   CornerRadius="16"
+                                   Padding="12,8"
+                                   HorizontalOptions="End"
+                                   Margin="60,0,0,0">
                                 <Label Text="{Binding Text}"
-                       TextColor="White"
-                       FontSize="14" />
+                                       Style="{StaticResource label-p-white}" />
                             </Frame>
                         </Grid>
                     </DataTemplate>
@@ -88,38 +95,183 @@
         </ScrollView>
 
         <!-- Input area -->
-        <Grid Grid.Row="2"
-              Padding="15,10"
-              ColumnSpacing="10"
-              BackgroundColor="#1E1E2E">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
+        <Border Grid.Row="2"
+                Padding="15,10"
+                BackgroundColor="{DynamicResource BackgroundPrimaryDark}"
+                StrokeThickness="0">
 
-            <Border Grid.Column="0"
-                    StrokeThickness="0">
-                
-                <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="8"/>
-                </Border.StrokeShape>
-
-                <Entry Placeholder="Escribe tu mensaje..."
-                   PlaceholderColor="#888"
-                   TextColor="White"
-                   BackgroundColor="#2E2E3E"
-                   Text="{Binding UserInput}"
-                   ReturnCommand="{Binding SendMessageCommand}"
-                   VerticalOptions="Center" />
-            </Border>
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="{DynamicResource CornerRadiusRectangle}" />
+            </Border.StrokeShape>
             
-            <Button Grid.Column="1"
-                    Text="Enviar"
-                    BackgroundColor="{StaticResource TertiaryColor}"
-                    TextColor="{StaticResource BackgroundSecondaryDark}"
-                    CornerRadius="10"
-                    Command="{Binding SendMessageCommand}"
-                    IsEnabled="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}" />
+            <Grid ColumnSpacing="10"
+                  BackgroundColor="Transparent">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <Border Grid.Column="0"
+                        StrokeThickness="0">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="8"/>
+                    </Border.StrokeShape>
+                    <Entry Placeholder="Escribe tu mensaje..."
+                           PlaceholderColor="{StaticResource Gray400}"
+                           TextColor="{StaticResource White}"
+                           BackgroundColor="#2E2E3E"
+                           Text="{Binding UserInput}"
+                           ReturnCommand="{Binding SendMessageCommand}"
+                           VerticalOptions="Center" />
+                </Border>
+
+                <Button Grid.Column="1"
+                        Text="Enviar"
+                        BackgroundColor="{StaticResource BackgroundSecondaryDark}"
+                        TextColor="{StaticResource TertiaryColor}"
+                        CornerRadius="10"
+                        Command="{Binding SendMessageCommand}"
+                        IsEnabled="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}" />
+            </Grid>
+        </Border>
+
+        <!-- Backdrop: oscurece el contenido y cierra el panel al tocar fuera -->
+        <BoxView Grid.RowSpan="3"
+                 IsVisible="{Binding IsPanelVisible}"
+                 Color="{StaticResource PrimaryColorLightOpacity70}"
+                 HorizontalOptions="Fill"
+                 VerticalOptions="Fill">
+            <BoxView.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding TogglePanelCommand}" />
+            </BoxView.GestureRecognizers>
+        </BoxView>
+
+        <!-- Panel lateral de conversaciones -->
+        <Grid Grid.RowSpan="3"
+              IsVisible="{Binding IsPanelVisible}"
+              HorizontalOptions="Start"
+              WidthRequest="290"
+              BackgroundColor="{StaticResource BackgroundPrimaryDark}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <!-- Cabecera del panel -->
+            <Grid Grid.Row="0"
+                  Padding="16,50,16,16"
+                  BackgroundColor="{StaticResource BackgroundSecondaryDark}"
+                  RowSpacing="12">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <Label Grid.Row="0" Grid.Column="0"
+                       Text="Conversaciones"
+                       TextColor="{StaticResource TextPrimaryColorLight}"
+                       FontFamily="Montserrat-Bold"
+                       FontSize="17"
+                       VerticalOptions="Center" />
+
+                <Button Grid.Row="0" Grid.Column="1"
+                        Text="✕"
+                        TextColor="{StaticResource TextPrimaryColorLight}"
+                        BackgroundColor="Transparent"
+                        FontSize="18"
+                        Padding="0"
+                        WidthRequest="36"
+                        HeightRequest="36"
+                        Command="{Binding TogglePanelCommand}" />
+
+                <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                        Text="+ Nueva conversación"
+                        TextColor="{StaticResource BackgroundPrimaryDark}"
+                        BackgroundColor="{StaticResource TertiaryColor}"
+                        FontFamily="Montserrat-Medium"
+                        CornerRadius="8"
+                        FontSize="14"
+                        HeightRequest="40"
+                        Command="{Binding NewConversationCommand}" />
+            </Grid>
+
+            <!-- Lista de conversaciones -->
+            <CollectionView Grid.Row="1"
+                            ItemsSource="{Binding Conversations}"
+                            VerticalOptions="Fill">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:ConversationSummary">
+                        <Grid Padding="16,12"
+                              BackgroundColor="Transparent">
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ChatAIViewModel}}, Path=SelectConversationCommand}"
+                                    CommandParameter="{Binding .}" />
+                            </Grid.GestureRecognizers>
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <!-- Separador superior -->
+                            <BoxView Grid.Row="0"
+                                     HeightRequest="1"
+                                     Color="{StaticResource BackgroundSecondaryDark}"
+                                     Margin="-16,0,-16,10" />
+
+                            <!-- Título y fecha en la misma fila -->
+                            <Grid Grid.Row="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <Label Grid.Column="0"
+                                       Text="{Binding Conversation.CoachName}"
+                                       TextColor="{StaticResource TextPrimaryColorLight}"
+                                       FontFamily="Montserrat-Bold"
+                                       FontSize="13"
+                                       LineBreakMode="TailTruncation" />
+
+                                <Label Grid.Column="1"
+                                       Text="{Binding FormattedDate}"
+                                       TextColor="{StaticResource Gray400}"
+                                       FontFamily="Montserrat-Medium"
+                                       FontSize="11"
+                                       VerticalOptions="Center"
+                                       Margin="8,0,0,0" />
+                            </Grid>
+
+                            <!-- Preview del último mensaje -->
+                            <Label Grid.Row="2"
+                                   Text="{Binding PreviewText}"
+                                   TextColor="{StaticResource Gray300}"
+                                   FontFamily="Montserrat-Medium"
+                                   FontSize="12"
+                                   LineBreakMode="TailTruncation"
+                                   MaxLines="2"
+                                   Margin="0,4,0,0" />
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+
+                <!-- Estado vacío -->
+                <CollectionView.EmptyView>
+                    <Label Text="No hay conversaciones guardadas"
+                           TextColor="{StaticResource Gray400}"
+                           FontFamily="Montserrat-Medium"
+                           FontSize="13"
+                           HorizontalOptions="Center"
+                           Margin="0,32,0,0" />
+                </CollectionView.EmptyView>
+            </CollectionView>
         </Grid>
+
     </Grid>
 </ContentPage>

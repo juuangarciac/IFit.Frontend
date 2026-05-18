@@ -80,7 +80,7 @@ namespace IFit.Services
         /// <param name="userId">ID del usuario (String, ej: "user_12345")</param>
         /// <param name="responseId">ID de la respuesta del cuestionario completado</param>
         /// <returns>RoutineResponseDto con la rutina generada o null si hay error</returns>
-        public async Task<RoutineResponseDto?> GenerateRoutineAsync(string userId, long responseId, string? coachType = null)
+        public async Task<RoutineResponseDto?> GenerateRoutineAsync(string userId, long responseId, string? coachType = null, string? note = null)
         {
             try
             {
@@ -106,7 +106,8 @@ namespace IFit.Services
                 {
                     UserId = userId,
                     ResponseId = responseId,
-                    CoachType = string.IsNullOrWhiteSpace(coachType) ? null : coachType.ToUpper().Trim()
+                    CoachType = string.IsNullOrWhiteSpace(coachType) ? null : coachType.ToUpper().Trim(),
+                    Note = string.IsNullOrWhiteSpace(note) ? null : note.Trim()
                 };
 
                 Debug.WriteLine($"→ Llamando a POST /api/routines/generate");
@@ -468,6 +469,54 @@ namespace IFit.Services
             {
                 Debug.WriteLine($"✗ Excepción en GetNewMemoryIdFromServer: {ex.Message}");
                 return null;
+            }
+        }
+
+        /// <summary>
+        /// Obtiene el historial de mensajes de un coach para el usuario activo.
+        /// Endpoint: GET /messages/user/{userId}/coach/{coachName}
+        /// </summary>
+        /// <returns>Lista de mensajes, o lista vacía si no hay historial (404) o hay error.</returns>
+        public async Task<List<MessageHistoryDto>> GetChatHistoryAsync(string coachName)
+        {
+            try
+            {
+                if (!IsValidCoach(coachName))
+                {
+                    Debug.WriteLine($"✗ GetChatHistoryAsync: coach inválido '{coachName}'");
+                    return new List<MessageHistoryDto>();
+                }
+
+                var userId = Preferences.Get("UserId", 0L);
+                if (userId == 0L)
+                {
+                    Debug.WriteLine("✗ GetChatHistoryAsync: userId no encontrado en Preferences");
+                    return new List<MessageHistoryDto>();
+                }
+
+                var endpoint = $"/messages/user/{userId}/coach/{coachName.ToLower()}";
+                var response = await _webService.GetAsync<List<MessageHistoryDto>>(endpoint);
+
+                if (!response.Success)
+                {
+                    // 404 = sin historial → lista vacía, no es un error grave
+                    Debug.WriteLine($"✗ GetChatHistoryAsync: {response.ErrorMessage}");
+                    return new List<MessageHistoryDto>();
+                }
+
+                if (response.Data == null)
+                {
+                    Debug.WriteLine("✗ GetChatHistoryAsync: response.Data es null");
+                    return new List<MessageHistoryDto>();
+                }
+
+                Debug.WriteLine($"✓ GetChatHistoryAsync: {response.Data.Count} mensajes para coach '{coachName}'");
+                return response.Data;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"✗ Excepción en GetChatHistoryAsync: {ex.Message}");
+                return new List<MessageHistoryDto>();
             }
         }
 
