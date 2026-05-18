@@ -50,10 +50,13 @@ namespace IFit.Services
                 // Update in-memory cache first (instant access next time)
                 _cachedAccessToken = authResponse.AccessToken;
                 _cachedRefreshToken = authResponse.RefreshToken;
-                _cachedExpiry = DateTime.UtcNow.AddSeconds(authResponse.ExpiresIn);
+                _cachedExpiry = DateTime.UtcNow.AddSeconds(authResponse.ExpiresIn ?? 0);
 
-                await _secureStorage.SetAsync(ACCESS_TOKEN_KEY, authResponse.AccessToken);
-                await _secureStorage.SetAsync(REFRESH_TOKEN_KEY, authResponse.RefreshToken);
+                if (!string.IsNullOrEmpty(authResponse.AccessToken))
+                    await _secureStorage.SetAsync(ACCESS_TOKEN_KEY, authResponse.AccessToken);
+
+                if (!string.IsNullOrEmpty(authResponse.RefreshToken))
+                    await _secureStorage.SetAsync(REFRESH_TOKEN_KEY, authResponse.RefreshToken);
 
                 // Calcular y guardar el momento de expiración
                 await _secureStorage.SetAsync(TOKEN_EXPIRY_KEY, _cachedExpiry.ToString("o"));

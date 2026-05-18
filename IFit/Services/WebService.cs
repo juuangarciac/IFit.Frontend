@@ -408,6 +408,7 @@ namespace IFit.Services
 
                 if (string.IsNullOrEmpty(refreshToken))
                 {
+                    // No había sesión activa — no redirigir
                     return false;
                 }
 
@@ -432,16 +433,37 @@ namespace IFit.Services
                     }
                 }
 
-                // Si falla el refresco, limpiar tokens
+                // Refresh token rechazado por el servidor — sesión expirada
                 await _tokenManager.ClearAuthDataAsync();
+                await HandleSessionExpiredAsync();
                 return false;
             }
             catch (Exception ex)
             {
+                // Error de red o timeout — no forzar logout, el fallo puede ser temporal
                 System.Diagnostics.Debug.WriteLine($"Error refrescando token: {ex.Message}");
-                await _tokenManager.ClearAuthDataAsync();
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Limpia Preferences de sesión y redirige al login cuando el refresh token expira
+        /// </summary>
+        private static async Task HandleSessionExpiredAsync()
+        {
+            Preferences.Remove("UserId");
+            Preferences.Remove("UserName");
+            Preferences.Remove("UserEmail");
+            Preferences.Remove("CoachId");
+            Preferences.Remove("CoachName");
+            Preferences.Remove("CoachModelTypeName");
+            Preferences.Remove("ExperienceLevelId");
+
+            await MainThread.InvokeOnMainThreadAsync(async () =>
+            {
+                await Shell.Current.GoToAsync("///SignInView");
+                _ = NotificationService.ShowInfoAsync("Tu sesión ha expirado. Por favor, inicia sesión de nuevo.");
+            });
         }
 
         #endregion

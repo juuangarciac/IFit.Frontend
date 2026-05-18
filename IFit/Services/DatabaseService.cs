@@ -118,5 +118,41 @@ namespace IFit.Services
 
             return await _db.Table<AppUser>().Where(user => user.Id.Equals(id)).FirstOrDefaultAsync();
         }
+
+        public async Task DeleteAppUserAsync(AppUser appUser)
+        {
+            if (!_initialized)
+            {
+                await InitializeAsync();
+            }
+
+            try
+            {
+                await _db.DeleteAsync(appUser);
+                Preferences.Remove("UserId");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error deleting user from database: {ex.Message}");
+            }
+        }
+
+        public async Task DeleteAllAppUsersAsync()
+        {
+            if (!_initialized)
+            {
+                await InitializeAsync();
+            }
+
+            try
+            {
+                await _db.DeleteAllAsync<AppUser>();
+                Preferences.Remove("UserId");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error deleting all users from database: {ex.Message}");
+            }
+        }
     }
 }
