@@ -6,6 +6,7 @@
              xmlns:components="clr-namespace:IFit.Views.Components"
              xmlns:dtos="clr-namespace:IFit.Models.Dtos.AI"
              x:Class="IFit.Views.PlanSummaryView"
+             x:Name="PlanSummaryPage"
              Shell.NavBarIsVisible="False"
              Title="PlanSummaryView"
              BackgroundColor="{DynamicResource BackgroundPrimaryDark}">
@@ -334,6 +335,37 @@
                                                            FontAttributes="Bold"/>
                                                         </HorizontalStackLayout>
                                                     </VerticalStackLayout>
+
+                                                    <!-- Botón Activar (solo rutinas inactivas) -->
+                                                    <Border Grid.Column="3"
+                                                            StrokeThickness="0"
+                                                            VerticalOptions="Start"
+                                                            Padding="6,3">
+                                                        <Border.StrokeShape>
+                                                            <RoundRectangle CornerRadius="8" />
+                                                        </Border.StrokeShape>
+                                                        <Border.Background>
+                                                            <SolidColorBrush Color="{StaticResource TertiaryColor}" />
+                                                        </Border.Background>
+                                                        <Border.Triggers>
+                                                            <DataTrigger TargetType="Border"
+                                                                         Binding="{Binding IsActive}"
+                                                                         Value="True">
+                                                                <Setter Property="IsVisible" Value="False" />
+                                                            </DataTrigger>
+                                                        </Border.Triggers>
+                                                        <Label Text="ACTIVAR"
+                                                               FontSize="9"
+                                                               CharacterSpacing="1"
+                                                               TextColor="{StaticResource BackgroundPrimaryDark}"
+                                                               FontAttributes="Bold">
+                                                            <Label.GestureRecognizers>
+                                                                <TapGestureRecognizer
+                                                                    Command="{Binding Source={x:Reference PlanSummaryPage}, Path=BindingContext.ActivateRoutineCommand}"
+                                                                    CommandParameter="{Binding .}" />
+                                                            </Label.GestureRecognizers>
+                                                        </Label>
+                                                    </Border>
                                                 </Grid>
                                             </Grid>
                                         </Border>

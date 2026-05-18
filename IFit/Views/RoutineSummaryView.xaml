@@ -196,24 +196,87 @@
             </Grid>
 
             <!-- Row 4: Botones de acción -->
-            <Grid Grid.Row="4"
-          Margin="0,4,0,8"
-          ColumnDefinitions="*,Auto"
-          ColumnSpacing="10">
+            <VerticalStackLayout Grid.Row="4"
+                                 Margin="0,4,0,8"
+                                 Spacing="10">
 
-                <Button Grid.Column="0"
-                Command="{Binding TryAgainCommand}"
-                CornerRadius="{DynamicResource CornerRadiusRectangle}"
-                HorizontalOptions="Fill"
-                Style="{DynamicResource ButtonBold-XL-dark-yellow}"
-                Text="Probar de nuevo" />
+                <Button Command="{Binding TryAgainCommand}"
+                        CornerRadius="{DynamicResource CornerRadiusRectangle}"
+                        HorizontalOptions="Fill"
+                        HeightRequest="52"
+                        IsEnabled="{Binding IsLoading, Converter={StaticResource InvertedBoolConverter}}"
+                        Style="{DynamicResource ButtonBold-XL-dark-white}"
+                        Text="Probar de nuevo" />
 
-                <Button Grid.Column="1"
-                Command="{Binding SaveRoutineCommand}"
-                CornerRadius="{DynamicResource CornerRadiusRectangle}"
-                Style="{DynamicResource ButtonBold-XL-yellow}"
-                Text="¡Me gusta!" />
-            </Grid>
+                <Button Command="{Binding SaveRoutineCommand}"
+                        CornerRadius="{DynamicResource CornerRadiusRectangle}"
+                        HorizontalOptions="Fill"
+                        HeightRequest="52"
+                        IsEnabled="{Binding IsLoading, Converter={StaticResource InvertedBoolConverter}}"
+                        Style="{DynamicResource ButtonBold-XL-yellow}"
+                        Text="¡Me gusta!" />
+
+            </VerticalStackLayout>
+        </Grid>
+
+        <!-- Overlay: nota para regenerar rutina -->
+        <Grid IsVisible="{Binding ShowNoteInput}"
+              BackgroundColor="#CC000000"
+              ZIndex="998"
+              Padding="24">
+
+            <Border BackgroundColor="{DynamicResource BackgroundPrimaryDark}"
+                    VerticalOptions="Center"
+                    Padding="24">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="{DynamicResource CornerRadiusRectangle}" />
+                </Border.StrokeShape>
+
+                <VerticalStackLayout Spacing="20">
+
+                    <Label Text="¿Qué quieres cambiar?"
+                           Style="{StaticResource label-h1-white}"
+                           HorizontalTextAlignment="Center" />
+
+                    <Label Text="Escribe una nota para que tu coach la tenga en cuenta al regenerar la rutina. Es opcional."
+                           Style="{StaticResource label-p-white}"
+                           HorizontalTextAlignment="Center"
+                           Opacity="0.7" />
+
+                    <Border Stroke="{DynamicResource BackgroundPrimaryLight}"
+                            StrokeThickness="1"
+                            Padding="12,8"
+                            BackgroundColor="{DynamicResource PrimaryColorLightOpacity}">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="8" />
+                        </Border.StrokeShape>
+                        <Entry Text="{Binding UserNote}"
+                               Placeholder="Ej: sin sentadillas, más ejercicios de pecho…"
+                               PlaceholderColor="{DynamicResource TextSecondaryColorLight}"
+                               TextColor="White"
+                               BackgroundColor="Transparent"
+                               FontFamily="Montserrat-Medium"
+                               FontSize="14" />
+                    </Border>
+
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                        <Button Grid.Column="0"
+                                Command="{Binding CancelTryAgainCommand}"
+                                Text="Cancelar"
+                                HeightRequest="48"
+                                CornerRadius="{DynamicResource CornerRadiusRectangle}"
+                                Style="{DynamicResource ButtonBold-XL-dark-white}" />
+
+                        <Button Grid.Column="1"
+                                Command="{Binding ConfirmTryAgainCommand}"
+                                Text="Regenerar"
+                                HeightRequest="48"
+                                CornerRadius="{DynamicResource CornerRadiusRectangle}"
+                                Style="{DynamicResource ButtonBold-XL-yellow}" />
+                    </Grid>
+
+                </VerticalStackLayout>
+            </Border>
         </Grid>
     </Grid>
 

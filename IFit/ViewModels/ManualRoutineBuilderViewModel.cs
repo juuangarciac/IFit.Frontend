@@ -291,6 +291,10 @@ public partial class ManualRoutineBuilderViewModel : ObservableObject
 
             long userId = Preferences.Get("UserId", 0L);
 
+            var activeRoutine = await _trainingService.getLatestActiveRoutineByUserIdAsync(userId);
+            if (activeRoutine != null)
+                await NotificationService.ShowInfoAsync("Al guardar esta rutina, tu rutina actual quedará desactivada automáticamente.");
+
             var routineDto = new RoutineResponseDto
             {
                 Description = Description,

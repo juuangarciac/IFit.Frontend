@@ -127,9 +127,53 @@ namespace IFit.ViewModels
         }
 
         [RelayCommand]
+        private async Task ActivateRoutineAsync(RoutineResponseDto routine)
+        {
+            if (routine is null) return;
+
+            IsLoading = true;
+            StatusMessage = "Actualizando rutina activa...";
+
+            try
+            {
+                // 1. Desactivar la rutina actualmente activa (si existe)
+                var currentActive = ActiveRoutines?.FirstOrDefault();
+                if (currentActive != null)
+                    await _trainingService.toggleRoutineActiveAsync((long)currentActive.Id, false);
+
+                // 2. Activar la rutina seleccionada
+                var result = await _trainingService.toggleRoutineActiveAsync((long)routine.Id, true);
+                if (result == null)
+                {
+                    await NotificationService.ShowErrorAsync("No se pudo activar la rutina. Inténtalo de nuevo.");
+                    return;
+                }
+
+                await NotificationService.ShowSuccessAsync("¡Rutina activada correctamente!");
+
+                // 3. Recargar la vista
+                _isInitialized = false;
+                await LoadDataAsync();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[ERROR] ActivateRoutineAsync => {ex.Message}");
+                await NotificationService.ShowErrorAsync("Error inesperado al activar la rutina.");
+            }
+            finally
+            {
+                IsLoading = false;
+                StatusMessage = string.Empty;
+            }
+        }
+
+        [RelayCommand]
         public async Task GenerateNewRoutineAsync()
         {
-            await Shell.Current.GoToAsync("//CoachModelTypeSelectionView");
+            if (ActiveRoutines?.Count > 0)
+                await NotificationService.ShowInfoAsync("Al generar una nueva rutina, tu rutina actual quedará desactivada automáticamente.");
+
+            await Shell.Current.GoToAsync("CoachModelTypeSelectionView");
         }
 
         #endregion

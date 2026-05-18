@@ -15,6 +15,10 @@ namespace IFit.Models.Dtos.AI
         [JsonPropertyName("coachType")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? CoachType { get; set; }
+
+        [JsonPropertyName("note")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? Note { get; set; }
     }
 
     /// <summary>

@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using IFit.Helper;
 using IFit.Models.Dtos.AI;
 using IFit.Services;
+using System.Diagnostics;
 
 namespace IFit.ViewModels
 {
@@ -11,8 +12,6 @@ namespace IFit.ViewModels
     {
         #region Constants
 
-        // Número estimado de ejercicios que caben en la tarjeta sin necesitar scroll
-        // (basado en pantalla ~800dp, overhead de cabecera/pie ~150dp, ~66dp por ejercicio ≈ 6 caben)
         private const int ScrollThreshold = 5;
 
         #endregion
@@ -20,6 +19,8 @@ namespace IFit.ViewModels
         #region Services
 
         private readonly TrainingService _trainingService;
+        private readonly AppUserService _appUserService;
+        private readonly AIRoutineService _aiRoutineService;
 
         #endregion
 
@@ -66,22 +67,32 @@ namespace IFit.ViewModels
 
 
         [ObservableProperty]
+        public partial bool ShowNoteInput { get; set; } = false;
+
+        [ObservableProperty]
+        public partial string UserNote { get; set; } = string.Empty;
+
+        [ObservableProperty]
         public partial Boolean IsLoading { get; set; } = false;
 
         [ObservableProperty]
         public partial string StatusMessage { get; set; } = string.Empty;
-        
+
         #endregion
 
         #region Constructor
 
-        public RoutineSummaryViewModel(TrainingService trainingService)
+        public RoutineSummaryViewModel(TrainingService trainingService, AppUserService appUserService, AIRoutineService aiRoutineService)
         {
             _trainingService = trainingService;
+            _appUserService = appUserService;
+            _aiRoutineService = aiRoutineService;
         }
 
         public RoutineSummaryViewModel() : this(
-            App.GetService<TrainingService>() ?? throw new InvalidOperationException("TrainingService no registrado"))
+            App.GetService<TrainingService>() ?? throw new InvalidOperationException("TrainingService no registrado"),
+            App.GetService<AppUserService>() ?? throw new InvalidOperationException("AppUserService no registrado"),
+            App.GetService<AIRoutineService>() ?? throw new InvalidOperationException("AIRoutineService no registrado"))
         {
         }
 
@@ -120,18 +131,54 @@ namespace IFit.ViewModels
             CurrentDayIndex = (CurrentDayIndex + 1) % count;
         }
 
-        /// <summary>Vuelve al resumen del cuestionario para regenerar la rutina.</summary>
+        /// <summary>Abre el overlay para que el usuario escriba una nota antes de regenerar.</summary>
         [RelayCommand]
-        private async Task TryAgainAsync()
+        private void TryAgain() => ShowNoteInput = true;
+
+        /// <summary>Cierra el overlay sin regenerar.</summary>
+        [RelayCommand]
+        private void CancelTryAgain()
         {
+            ShowNoteInput = false;
+            UserNote = string.Empty;
+        }
+
+        /// <summary>Regenera la rutina con la nota opcional del usuario.</summary>
+        [RelayCommand]
+        private async Task ConfirmTryAgainAsync()
+        {
+            ShowNoteInput = false;
+            IsLoading = true;
+            StatusMessage = "Regenerando tu rutina...";
+
             try
             {
-                await Shell.Current.GoToAsync("..");
+                long userId = Preferences.Get("UserId", 0L);
+                long responseId = Preferences.Get("responseId", 0L);
+                string coachType = Preferences.Get("CoachModelTypeName", string.Empty);
+                string? note = string.IsNullOrWhiteSpace(UserNote) ? null : UserNote.Trim();
+
+                var newRoutine = await _aiRoutineService.GenerateRoutineAsync(
+                    userId.ToString(), responseId, coachType, note);
+
+                if (newRoutine == null)
+                {
+                    await NotificationService.ShowErrorAsync("No se pudo regenerar la rutina. Intenta de nuevo.");
+                    return;
+                }
+
+                Routine = newRoutine;
+                UserNote = string.Empty;
+                await NotificationService.ShowSuccessAsync("¡Rutina regenerada!");
             }
             catch (Exception ex)
             {
-                await ErrorHandler.HandleErrorAsync(
-                    $"Error al navegar: {ex.Message}");
+                await NotificationService.ShowErrorAsync($"Error al regenerar: {ex.Message}");
+            }
+            finally
+            {
+                IsLoading = false;
+                StatusMessage = string.Empty;
             }
         }
 
@@ -139,18 +186,18 @@ namespace IFit.ViewModels
         [RelayCommand]
         private async Task SaveRoutineAsync()
         {
-            IsLoading = true;
-            StatusMessage = "Guardando tu rutina...";
-
             if (Routine == null)
             {
                 await NotificationService.ShowErrorAsync("No hay ninguna rutina para guardar.");
                 return;
             }
 
+            IsLoading = true;
+            IsSaving = true;
+            StatusMessage = "Guardando tu rutina...";
+
             try
             {
-                IsSaving = true;
                 long userId = Preferences.Get("UserId", 0L);
 
                 var response = await _trainingService.createRoutineAsync(userId, Routine);
@@ -162,16 +209,13 @@ namespace IFit.ViewModels
                     return;
                 }
 
-                IsLoading = false;
-                StatusMessage = string.Empty;
+                var registrationResult = await _appUserService.MarkRegistrationComplete(userId);
+                if (registrationResult == null)
+                    Debug.WriteLine("MarkRegistrationComplete falló, el usuario será redirigido al cuestionario en el próximo login.");
+
                 await NotificationService.ShowSuccessAsync("¡Tu rutina ha sido guardada correctamente!");
-                
-                IsLoading = true;
                 StatusMessage = "Cargando tu rutina guardada...";
                 await Shell.Current.GoToAsync("///HomeView", false);
-
-                IsLoading = false;
-                StatusMessage = string.Empty;
             }
             catch (Exception ex)
             {
@@ -180,6 +224,8 @@ namespace IFit.ViewModels
             finally
             {
                 IsSaving = false;
+                IsLoading = false;
+                StatusMessage = string.Empty;
             }
         }
 
