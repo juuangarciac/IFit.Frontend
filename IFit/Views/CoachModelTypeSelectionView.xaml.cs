@@ -9,8 +9,8 @@ public partial class CoachModelTypeSelectionView : ContentPage
         InitializeComponent();
     }
     public async void onCancelClicked(object sender, EventArgs e)
-    {
-        Console.WriteLine("Cancel clicked. Going back...");
-        await Shell.Current.GoToAsync("///MainPage");
-    }
+        => await Shell.Current.GoToAsync("..");
+
+    public async void onCloseClicked(object sender, EventArgs e)
+        => await Shell.Current.GoToAsync("///MainPage");
 }

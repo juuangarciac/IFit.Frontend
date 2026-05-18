@@ -16,7 +16,6 @@ namespace IFit.ViewModels
         #region Services (Inyecci�n de Dependencias)
 
         private readonly AuthenticationService _authenticationService;
-        private readonly AppUserService _appUserService;
         private readonly DatabaseService _databaseService;
 
         #endregion
@@ -86,7 +85,7 @@ namespace IFit.ViewModels
         /// <summary>
         /// Texto del bot�n de login
         /// </summary>
-        public string LoginButtonText => IsLoading ? "Iniciando..." : "Iniciar Sesi�n";
+        public string LoginButtonText => IsLoading ? "Iniciando..." : "Iniciar Sesión";
 
         #endregion
 
@@ -97,11 +96,9 @@ namespace IFit.ViewModels
         /// </summary>
         public SignInViewModel(
             AuthenticationService authenticationService,
-            AppUserService appUserService,
             DatabaseService databaseService)
         {
             _authenticationService = authenticationService ?? throw new ArgumentNullException(nameof(authenticationService));
-            _appUserService = appUserService ?? throw new ArgumentNullException(nameof(appUserService));
             _databaseService = databaseService ?? throw new ArgumentNullException(nameof(databaseService));
         }
 
@@ -110,7 +107,6 @@ namespace IFit.ViewModels
         /// </summary>
         public SignInViewModel() : this(
             App.GetService<AuthenticationService>() ?? throw new InvalidOperationException("AuthenticationService no registrado"),
-            App.GetService<AppUserService>() ?? throw new InvalidOperationException("AppUserService no registrado"),
             App.GetService<DatabaseService>() ?? throw new InvalidOperationException("DatabaseService no registrado"))
         {
         }
@@ -165,6 +161,19 @@ namespace IFit.ViewModels
         #region Commands
 
         /// <summary>
+        /// Limpiar formulario y mensajes de error al salir de la vista 
+        /// </summary>
+        /// <returns></returns>
+        [RelayCommand]
+        public async Task CloseAsync()
+        {
+            ClearForm();
+            ClearErrors();
+            Console.WriteLine("Cancel clicked. Going back...");
+            await Shell.Current.GoToAsync("///MainPage", animate: false);
+        }
+
+        /// <summary>
         /// Comando para iniciar sesi�n con validaci�n de CanExecute
         /// </summary>
         [RelayCommand(CanExecute = nameof(CanSignIn))]
@@ -180,6 +189,7 @@ namespace IFit.ViewModels
                 // 1. Validar inputs
                 if (!ValidateInputs())
                 {
+                    _ = CleanLoginData(); // Limpiar datos anteriores si el login falla
                     return;
                 }
 
@@ -187,6 +197,7 @@ namespace IFit.ViewModels
                 var appUser = await TryLoginAsync();
                 if (appUser == null)
                 {
+                    _ = CleanLoginData(); // Limpiar datos anteriores si el login falla
                     return;
                 }
 
@@ -203,14 +214,25 @@ namespace IFit.ViewModels
                     // 4a. Verificar email primero
                     if (!await HandleVerificationAsync(appUser))
                     {
+                        CurrentState = LoginState.Success;
+                        ErrorMessage = string.Empty;
                         return;
                     }
 
                     // 4b. Luego seleccionar coach y nivel de experiencia
                     if (!await HandleUserCoachAndExperienceLevel(appUser))
                     {
+                        CurrentState = LoginState.Success;
+                        ErrorMessage = string.Empty;
                         return;
                     }
+
+                    // 4c. Tiene coach y experiencia pero RegistrationComplete sigue siendo false
+                    //     → cuestionario pendiente, no hay rutina asignada
+                    Debug.WriteLine("Usuario pendiente de cuestionario, navegando a GetStartedView");
+                    await Shell.Current.GoToAsync("///GetStartedView");
+                    CurrentState = LoginState.Success;
+                    return;
                 }
 
                 // 5. Navegar primero (el overlay sigue visible durante la creación de HomeView)
@@ -316,9 +338,16 @@ namespace IFit.ViewModels
                 if (response == null)
                 {
                     CurrentState = LoginState.Error;
-                    ErrorMessage = "Credenciales incorrectas. Por favor, verifica tu email y contrase�a.";
+                    ErrorMessage = "Error de conexión. Por favor, verifica tu conexión a internet.";
+                    Debug.WriteLine("Login fallido: Error de conexión");
+                    return null;
+                }
 
-                    Debug.WriteLine("Login fallido: Respuesta nula del servidor");
+                if (!string.IsNullOrEmpty(response.ErrorMessage))
+                {
+                    CurrentState = LoginState.Error;
+                    ErrorMessage = response.ErrorMessage;
+                    Debug.WriteLine($"Login fallido: {response.ErrorMessage}");
                     return null;
                 }
 
@@ -326,9 +355,7 @@ namespace IFit.ViewModels
                 {
                     CurrentState = LoginState.Error;
                     ErrorMessage = "Error al obtener datos del usuario.";
-
                     Debug.WriteLine("Login fallido: AppUser es null");
-
                     return null;
                 }
 
@@ -338,10 +365,8 @@ namespace IFit.ViewModels
             catch (Exception ex)
             {
                 CurrentState = LoginState.Error;
-                ErrorMessage = "Error de conexi�n. Por favor, verifica tu conexi�n a internet.";
-
-                Debug.WriteLine($"Excepci�n en TryLoginAsync: {ex.Message}");
-
+                ErrorMessage = "Error de conexión. Por favor, verifica tu conexión a internet.";
+                Debug.WriteLine($"Excepción en TryLoginAsync: {ex.Message}");
                 return null;
             }
         }
@@ -358,12 +383,13 @@ namespace IFit.ViewModels
                 // Guarda en Preferences para acceso r�pido
                 Preferences.Set("UserId", dto.Id);
                 Preferences.Set("UserEmail", dto.Email);
-                Preferences.Set("Name", dto.Name);
+                Preferences.Set("UserName", dto.Name);
                 Preferences.Set("IsVerified", dto.Verified);
 
                 if (!string.IsNullOrEmpty(dto.CoachModelTypeName))
                 {
                     Preferences.Set("CoachModelTypeName", dto.CoachModelTypeName);
+                    Preferences.Set("CoachName", dto.CoachModelTypeName);
                 }
 
                 Debug.WriteLine("Datos guardados en Preferences");
@@ -376,6 +402,38 @@ namespace IFit.ViewModels
                 Debug.WriteLine($"Error guardando datos de login: {ex.Message}");
                 // No bloqueamos el flujo si falla el guardado local
                 // El usuario ya est� autenticado en el servidor
+            }
+        }
+        
+        /// <summary>
+        /// Elimina los datos de login anteriores antes de guardar los nuevos
+        /// </summary>
+        /// <returns></returns>
+        private async Task CleanLoginData()
+        {
+            try
+            {
+                Debug.WriteLine("Limpiando datos de login anteriores");
+
+                // Limpiar Preferences
+                Preferences.Remove("UserId");
+                Preferences.Remove("UserEmail");
+                Preferences.Remove("UserName");
+                Preferences.Remove("IsVerified");
+                Preferences.Remove("CoachModelTypeName");
+                Preferences.Remove("CoachName");
+
+                Debug.WriteLine("Datos de login anteriores eliminados de Preferences");
+
+                // Limpiar base de datos local
+                await _databaseService.DeleteAllAppUsersAsync();
+
+                Debug.WriteLine("Datos de login anteriores eliminados de BD local");
+               
+            }
+            catch(Exception ex)
+            {
+                 Debug.WriteLine($"Error eliminando datos de login: {ex.Message}");
             }
         }
 
@@ -393,7 +451,10 @@ namespace IFit.ViewModels
                     // Opcionalmente enviar email de verificaci�n
                     // await _authenticationService.SendVerificationEmail(Email);
 
-                    await Shell.Current.GoToAsync("///VerificationView");
+                    await Shell.Current.GoToAsync("///VerificationView", new Dictionary<string, object>
+                    {
+                        { "Email", appUser.Email }
+                    });
                     return false;
                 }
 

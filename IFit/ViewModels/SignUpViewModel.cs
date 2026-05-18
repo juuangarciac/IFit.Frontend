@@ -10,7 +10,7 @@ using System.Text;
 namespace IFit.ViewModels
 {
     /// <summary>
-    /// ViewModel para la página de registro de nuevos usuarios.
+    /// ViewModel        para la página de registro de nuevos usuarios.
     /// Maneja validación de formulario, registro y navegación post-registro.
     /// </summary>
     public partial class SignUpViewModel : ObservableObject
@@ -143,9 +143,7 @@ namespace IFit.ViewModels
 
         private async Task InitializeAsync()
         {
-            Name = "usertest" + DateTime.Now.Ticks;
-            Email = Name + "@test.com";
-            Password = "Test1234!";
+            await ClearRegistrationData();
         }
 
         #endregion
@@ -211,7 +209,19 @@ namespace IFit.ViewModels
 
         #endregion
 
-        #region Commands
+        #region Commands  
+
+        /// <summary>
+        /// Limpiar datos y navegar de regreso a la página principal
+        /// </summary>
+        /// <returns></returns>
+        [RelayCommand]
+        public async Task CloseAsync()
+        {
+            await ClearRegistrationData();
+            Console.WriteLine("Cancel clicked. Going back...");
+            await Shell.Current.GoToAsync("///MainPage", animate: false);
+        }
 
         /// <summary>
         /// Comando para crear una nueva cuenta
@@ -222,7 +232,7 @@ namespace IFit.ViewModels
             try
             {
                 CurrentState = RegistrationState.Validating;
-                ErrorMessage = string.Empty;
+                ClearErrors(); // Limpiar errores anteriores antes de validar  
 
                 Debug.WriteLine($"Iniciando registro para: {Name} ({Email})");
 
@@ -232,9 +242,7 @@ namespace IFit.ViewModels
                 {
                     CurrentState = RegistrationState.Error;
                     ErrorMessage = validationError;
-
                     Debug.WriteLine($"Validación fallida: {validationError}");
-
                     return;
                 }
 
@@ -244,9 +252,7 @@ namespace IFit.ViewModels
                 // 3. Intentar registrar
                 var response = await TryRegisterAsync();
                 if (response == null)
-                {
                     return;
-                }
 
                 Debug.WriteLine($"Registro exitoso para usuario: {response.Email}");
 
@@ -425,6 +431,29 @@ namespace IFit.ViewModels
             }
         }
 
+        private async Task ClearRegistrationData()
+        {
+            try
+            {
+                Debug.WriteLine("Limpiando datos de registro anteriores");
+
+                // Limpiar Preferences
+                Preferences.Remove("UserEmail");
+                Preferences.Remove("UserName");
+
+                // Limpiar SecureStorage
+                await SecureStorage.SetAsync("UserPassword", string.Empty);
+
+                ClearForm(); // Limpiar el formulario para eliminar cualquier dato residual
+            
+                Debug.WriteLine("Datos de registro limpiados");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error limpiando datos de registro: {ex.Message}");
+            }
+        }
+
         #endregion
 
         #region Public Methods
@@ -438,15 +467,11 @@ namespace IFit.ViewModels
             Email = string.Empty;
             Password = string.Empty;
             CurrentState = RegistrationState.Idle;
-            ErrorMessage = string.Empty;
 
             // Limpiar validaciones
             ValidatableName.Value = string.Empty;
             ValidatableEmail.Value = string.Empty;
             ValidatablePassword.Value = string.Empty;
-            ValidatableName.Errors.Clear();
-            ValidatableEmail.Errors.Clear();
-            ValidatablePassword.Errors.Clear();
 
             Debug.WriteLine("Formulario limpiado");
         }

@@ -50,7 +50,7 @@
                     <Button Grid.Column="1" 
                             BackgroundColor="Transparent"
                             ImageSource="cancel.svg"
-                            Clicked="onCancelClicked" />
+                            Command="{Binding CloseCommand}" />
                 </Grid>
 
                 <!-- SignUp with Ifit account -->

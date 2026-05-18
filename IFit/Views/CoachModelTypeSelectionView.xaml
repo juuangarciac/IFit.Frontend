@@ -43,13 +43,13 @@
                     WidthRequest="120"   
                     StrokeThickness="1"/>  
 
-            <!-- Cancel button  -->  
-            <Button Grid.Column="2"   
-                    HorizontalOptions="Center"  
-                    VerticalOptions="Center"  
-                    BackgroundColor="Transparent"  
-                    ImageSource="cancel.svg"  
-                    Clicked="onCancelClicked" />  
+            <!-- Cancel button  -->
+            <Button Grid.Column="2"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    BackgroundColor="Transparent"
+                    ImageSource="cancel.svg"
+                    Clicked="onCloseClicked" />  
         </Grid>  
         
         <!-- Title -->

@@ -3,6 +3,7 @@
              xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:IFit.ViewModels"
+             xmlns:components="clr-namespace:IFit.Views.Components"
              Shell.NavBarIsVisible="False"
              BackgroundColor="{StaticResource BackgroundPrimaryDark}">
     <ContentPage.BindingContext>
@@ -45,7 +46,7 @@
                         VerticalOptions="Start"
                         BackgroundColor="Transparent"
                         ImageSource="cancel.svg"
-                        Clicked="onCancelClicked" />
+                        Command="{Binding CloseCommand}" />
             </Grid>
             
             <!-- Title / Subtitle  Grid -->
@@ -132,10 +133,14 @@
         
         <!-- Verification Button -->
         <Button Grid.Row="1"
-                Margin="15" 
+                Margin="15"
                 Text="Verificar"
                 Style="{StaticResource ButtonBold-XL-dark-yellow}"
                 Command="{Binding VerifyEmailCommand}"
                 />
+
+        <components:LoadingOverlay Grid.RowSpan="2"
+                                   IsVisible="{Binding IsVerifying}"
+                                   Message="Verificando código..." />
     </Grid>
 </ContentPage>

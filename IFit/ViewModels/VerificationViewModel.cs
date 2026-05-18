@@ -11,7 +11,7 @@ using System.Windows.Input;
 
 namespace IFit.ViewModels;
 
-public partial class VerificationViewModel : ObservableObject
+public partial class VerificationViewModel : ObservableObject, IQueryAttributable
 {
     #region Fields
     [ObservableProperty]
@@ -49,6 +49,7 @@ public partial class VerificationViewModel : ObservableObject
     /// Estado actual del proceso de registro
     /// </summary>
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(VerifyEmailCommand))]
     public partial RegistrationState CurrentState { get; set; } = RegistrationState.Idle;
 
     /// <summary>
@@ -56,6 +57,13 @@ public partial class VerificationViewModel : ObservableObject
     /// </summary>
     [ObservableProperty]
     public partial string ErrorMessage { get; set; } = string.Empty;
+
+    public bool IsVerifying => CurrentState == RegistrationState.Verifying;
+
+    partial void OnCurrentStateChanged(RegistrationState value)
+    {
+        OnPropertyChanged(nameof(IsVerifying));
+    }
 
     #endregion
 
@@ -76,15 +84,33 @@ public partial class VerificationViewModel : ObservableObject
     public VerificationViewModel() : this(
         App.GetService<AuthenticationService>() ?? throw new InvalidOperationException("AuthenticationService no registrado"),
         App.GetService<DatabaseService>() ?? throw new InvalidOperationException("DatabaseService no registrado"))
-        {
-        // Cargar email desde preferencias
-        Email = Preferences.Get("UserEmail", string.Empty);
-        Console.WriteLine("UserEmail: " + Email + " found.");
+    {
+    }
+
+    public void ApplyQueryAttributes(IDictionary<string, object> query)
+    {
+        ClearVerificationData();
+
+        if (query.TryGetValue("Email", out var emailObj) && emailObj is string email && !string.IsNullOrEmpty(email))
+            Email = email;
+        else
+            Email = Preferences.Get("UserEmail", string.Empty);
     }
 
     #endregion
 
     #region Commands
+
+    /// <summary>
+    /// Limpiar datos antes de cerrar la pestaña de verificación y volver a la página principal
+    /// </summary>
+    /// <returns></returns>
+    [RelayCommand]
+    public async Task CloseAsync()
+    {
+        ClearVerificationData();
+        await Shell.Current.GoToAsync("//MainPage");
+    }
 
     /// <summary>
     /// Verifica el correo electrónico del usuario
@@ -100,7 +126,9 @@ public partial class VerificationViewModel : ObservableObject
 
             if (string.IsNullOrEmpty(password))
             {
+                CurrentState = RegistrationState.Error;
                 ErrorMessage = "No se encontró la contraseña almacenada.";
+                await NotificationService.ShowErrorAsync(ErrorMessage);
                 return;
             }
 
@@ -116,20 +144,18 @@ public partial class VerificationViewModel : ObservableObject
                 // Verificación exitosa
                 Console.WriteLine($"Email verificado correctamente para: {Email}");
 
-                // Limpiar credenciales temporales
                 SecureStorage.Remove("UserPassword");
 
-                // Guardar datos del usuario (fire-and-forget: es solo caché local, no bloquea la navegación)
-                _ = InsertUserToDatabase(authData.AppUser);
+                Preferences.Set("UserId", authData.AppUser.Id);
+                await InsertUserToDatabase(authData.AppUser);
 
-                // Navegar a la pantalla ExperienceLevelSelectionView
+                CurrentState = RegistrationState.Verified;
                 await Shell.Current.GoToAsync("//GetStartedView");
             }
             else
             {
-                //  Error en la verificación
+                CurrentState = RegistrationState.Error;
                 ErrorMessage = errorMessage ?? "Código de verificación inválido";
-
                 await NotificationService.ShowErrorAsync(ErrorMessage);
             }
         }
@@ -143,13 +169,13 @@ public partial class VerificationViewModel : ObservableObject
         }
         finally
         {
-            CurrentState = RegistrationState.Verified;
+            ClearVerificationData();
         }
     }
 
-    private Boolean CanVerifyEmail()
+    private bool CanVerifyEmail()
     {
-        return !string.IsNullOrWhiteSpace(VerificationCode);
+        return !string.IsNullOrWhiteSpace(VerificationCode) && CurrentState != RegistrationState.Verifying;
     }
 
     #endregion
@@ -178,6 +204,18 @@ public partial class VerificationViewModel : ObservableObject
             // No lanzamos excepción porque el login ya fue exitoso
             // La BD local es solo para caché
         }
+    }
+
+    /// <summary>
+    /// Limpia los datos de verificación del usuario en la base de datos local SQLite después de un registro exitoso
+    /// </summary>
+    /// <param name="appUser"></param>
+    /// <returns></returns>
+    private void ClearVerificationData()
+    {
+        VerificationCode = string.Empty;
+        CurrentState = RegistrationState.Idle;
+        ErrorMessage = string.Empty;
     }
 
     #endregion

@@ -67,7 +67,7 @@
             <Button
                 Grid.Column="2"
                 BackgroundColor="Transparent"
-                Clicked="onCancelClicked"
+                Clicked="onCloseClicked"
                 HorizontalOptions="Center"
                 ImageSource="cancel.svg"
                 VerticalOptions="Center" />

@@ -101,19 +101,20 @@ public partial class CoachModelTypeSelectionViewModel : ObservableObject
 
         AppUserResponseDto? response = await appUserService.SetCoachModelType(user.Id, selectedCoachModelType.Id);
         if (response == null
-            && string.IsNullOrEmpty(response?.CoachModelTypeName))
+            || string.IsNullOrEmpty(response?.CoachModelTypeName))
         {
             await ErrorHandler.HandleErrorAsync("Failed to set coach model type.", "//ErrorView",
                 "Error",
                 "No se pudo establecer el tipo de modelo de entrenador. Por favor, int�ntelo m�s tarde.");
             return;
         }
-        Preferences.Set("CoachId", selectedCoachModelType.Id);
-        Preferences.Set("CoachName", selectedCoachModelType.Name);
+        Preferences.Set("CoachId",            selectedCoachModelType.Id);
+        Preferences.Set("CoachName",           selectedCoachModelType.Name);
+        Preferences.Set("CoachModelTypeName",  selectedCoachModelType.Name);
 
         await databaseService.SaveAppUserAsync(response.toEntity());
 
-        await Shell.Current.GoToAsync("//AppUserQuestionnaireView");
+        await Shell.Current.GoToAsync("AppUserQuestionnaireView");
     }
     #endregion
 }

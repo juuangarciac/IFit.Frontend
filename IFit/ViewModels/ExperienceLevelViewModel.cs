@@ -142,7 +142,7 @@ namespace IFit.ViewModels
             Preferences.Set("ExperienceName", selectedLevel.Name);
 
             await databaseService.SaveAppUserAsync(response.toEntity());
-            await Shell.Current.GoToAsync("//CoachModelTypeSelectionView");
+            await Shell.Current.GoToAsync("CoachModelTypeSelectionView");
         }
 
         #endregion

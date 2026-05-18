@@ -48,12 +48,20 @@ namespace IFit.Services
 
                 if (!response.Success)
                 {
-                    Debug.WriteLine($"Error en login: {response.ErrorMessage}");
-                    return null;
+                    var errorMessage = response.StatusCode switch
+                    {
+                        401 => "Credenciales incorrectas. Por favor, verifica tu email y contraseña.",
+                        500 => "Tenemos problemas en nuestros servidores. Inténtalo de nuevo en unos minutos.",
+                        503 => "Servicio no disponible. Por favor, inténtalo más tarde.",
+                        0   => "Servicio no disponible. Por favor, inténtalo más tarde.",
+                        _   => "No se pudo iniciar sesión. Por favor, inténtalo de nuevo."
+                    };
+                    Debug.WriteLine($"Error en login [{response.StatusCode}]: {response.ErrorMessage}");
+                    return new AuthResponse { ErrorMessage = errorMessage };
                 }
 
                 // Guardar los tokens automáticamente
-                if (response.Data != null)
+                if (response.Data != null && response.Data.AppUser.Verified)
                 {
                     await _webService.SaveAuthenticationAsync(response.Data);
                 }
@@ -105,7 +113,7 @@ namespace IFit.Services
                         409 => "Este email ya está registrado.",
                         500 => "Tenemos problemas en nuestros servidores. Inténtalo de nuevo en unos minutos.",
                         503 => "El servicio no está disponible temporalmente. Por favor, inténtalo más tarde.",
-                        _ => response.ErrorMessage ?? "No pudimos completar tu registro. Inténtalo de nuevo."
+                        _ => "Servicio no disponible. Por favor, inténtalo más tarde."
                     };
 
                     return new RegisterResponseDto
