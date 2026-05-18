@@ -1,75 +1,70 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using IFit.Models.Dtos.Coach;
+using IFit.Models.Dtos.ExperienceLevel;
 using IFit.Services;
-using System.Diagnostics;
 
 namespace IFit.ViewModels;
 
-[QueryProperty(nameof(User), "User")]
+public class ProfileSelectionItem
+{
+    public long Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public bool IsActive { get; set; }
+}
+
 public partial class ProfileViewModel : ObservableObject
 {
-    #region Properties
-
-    [ObservableProperty]
-    public partial AppUserResponseDto? User { get; set; }
-
-    // Called automatically by MVVM Toolkit when User is set via QueryProperty
-    partial void OnUserChanged(AppUserResponseDto? value)
-    {
-        if (value == null) return;
-        PopulateFromUser(value);
-        _isInitialized = true;
-    }
-
-    [ObservableProperty]
-    public partial string UserName { get; set; } = string.Empty;
-
-    [ObservableProperty]
-    public partial string UserEmail { get; set; } = string.Empty;
-
-    [ObservableProperty]
-    public partial string UserInitials { get; set; } = "?";
-
-    [ObservableProperty]
-    public partial string AvatarSource { get; set; } = string.Empty;
-
-    [ObservableProperty]
-    public partial bool HasAvatar { get; set; } = false;
-
-    [ObservableProperty]
-    public partial string ExperienceLevel { get; set; } = "Sin asignar";
-
-    [ObservableProperty]
-    public partial string CoachModel { get; set; } = "Sin asignar";
-
-    [ObservableProperty]
-    public partial string MemberSince { get; set; } = string.Empty;
-
-    [ObservableProperty]
-    public partial bool IsLoading { get; set; } = true;
-
-    [ObservableProperty]
-    public partial string StatusMessage { get; set; } = string.Empty;
-
-    #endregion
-
     #region Services
 
     private readonly AppUserService _appUserService;
+    private readonly CoachModelTypeService _coachModelTypeService;
+    private readonly ExperienceLevelService _experienceLevelService;
 
     #endregion
 
-    private bool _isInitialized = false;
+    #region Properties
+
+    [ObservableProperty] public partial string UserName { get; set; } = string.Empty;
+    [ObservableProperty] public partial string UserEmail { get; set; } = string.Empty;
+    [ObservableProperty] public partial string UserInitials { get; set; } = "?";
+    [ObservableProperty] public partial string AvatarSource { get; set; } = string.Empty;
+    [ObservableProperty] public partial bool HasAvatar { get; set; } = false;
+    [ObservableProperty] public partial string ExperienceLevel { get; set; } = "Sin asignar";
+    [ObservableProperty] public partial string CoachModel { get; set; } = "Sin asignar";
+    [ObservableProperty] public partial string MemberSince { get; set; } = string.Empty;
+    [ObservableProperty] public partial bool IsLoading { get; set; } = true;
+    [ObservableProperty] public partial bool IsSaving { get; set; } = false;
+    [ObservableProperty] public partial string StatusMessage { get; set; } = string.Empty;
+
+    [ObservableProperty] public partial bool IsCoachPanelExpanded { get; set; } = false;
+    [ObservableProperty] public partial bool IsExperiencePanelExpanded { get; set; } = false;
+
+    [ObservableProperty] public partial List<ProfileSelectionItem>? CoachOptions { get; set; }
+    [ObservableProperty] public partial List<ProfileSelectionItem>? ExperienceOptions { get; set; }
+
+    private List<CoachModelTypeResponseDto>? _coachModelTypes;
+    private List<ExperienceLevelDto>? _experienceLevels;
+
+    #endregion
 
     #region Constructor
 
-    public ProfileViewModel(AppUserService appUserService)
+    public ProfileViewModel(
+        AppUserService appUserService,
+        CoachModelTypeService coachModelTypeService,
+        ExperienceLevelService experienceLevelService)
     {
         _appUserService = appUserService;
+        _coachModelTypeService = coachModelTypeService;
+        _experienceLevelService = experienceLevelService;
     }
 
     public ProfileViewModel() : this(
-        App.GetService<AppUserService>() ?? throw new InvalidOperationException("AppUserService no está registrado"))
+        App.GetService<AppUserService>() ?? throw new InvalidOperationException("AppUserService no está registrado"),
+        App.GetService<CoachModelTypeService>() ?? throw new InvalidOperationException("CoachModelTypeService no está registrado"),
+        App.GetService<ExperienceLevelService>() ?? throw new InvalidOperationException("ExperienceLevelService no está registrado"))
     {
     }
 
@@ -83,7 +78,6 @@ public partial class ProfileViewModel : ObservableObject
         StatusMessage = "Cargando perfil...";
 
         var userId = Preferences.Get("UserId", 0L);
-
         if (userId <= 0)
         {
             StatusMessage = "No se ha encontrado el usuario actual.";
@@ -91,8 +85,12 @@ public partial class ProfileViewModel : ObservableObject
             return;
         }
 
-        var user = await _appUserService.findUserById(userId);
+        var userTask = _appUserService.findUserById(userId);
+        var coachesTask = _coachModelTypeService.GetCoachModelTypes();
+        var levelsTask = _experienceLevelService.GetExperienceLevels();
+        await Task.WhenAll(userTask, coachesTask, levelsTask);
 
+        var user = userTask.Result;
         if (user == null)
         {
             StatusMessage = "No se ha podido cargar el perfil.";
@@ -100,7 +98,9 @@ public partial class ProfileViewModel : ObservableObject
             return;
         }
 
-        User = user;
+        _coachModelTypes = coachesTask.Result;
+        _experienceLevels = levelsTask.Result;
+
         PopulateFromUser(user);
         IsLoading = false;
     }
@@ -115,7 +115,22 @@ public partial class ProfileViewModel : ObservableObject
         MemberSince     = user.CreatedAt.ToString("MMMM yyyy");
         AvatarSource    = GetAvatarSource(user.CoachModelTypeName);
         HasAvatar       = !string.IsNullOrEmpty(AvatarSource);
-        IsLoading       = false;
+
+        CoachOptions = _coachModelTypes?.Select(c => new ProfileSelectionItem
+        {
+            Id          = c.Id,
+            Name        = c.Name,
+            Description = c.Description,
+            IsActive    = string.Equals(c.Name, CoachModel, StringComparison.OrdinalIgnoreCase)
+        }).ToList();
+
+        ExperienceOptions = _experienceLevels?.Select(l => new ProfileSelectionItem
+        {
+            Id          = l.Id,
+            Name        = l.Name,
+            Description = l.Description,
+            IsActive    = string.Equals(l.Name, ExperienceLevel, StringComparison.OrdinalIgnoreCase)
+        }).ToList();
     }
 
     private static string GetAvatarSource(string? coachModelName) =>
@@ -128,9 +143,7 @@ public partial class ProfileViewModel : ObservableObject
 
     private static string GetInitials(string name)
     {
-        if (string.IsNullOrWhiteSpace(name))
-            return "?";
-
+        if (string.IsNullOrWhiteSpace(name)) return "?";
         var parts = name.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
         return parts.Length >= 2
             ? $"{parts[0][0]}{parts[1][0]}".ToUpper()
@@ -144,23 +157,55 @@ public partial class ProfileViewModel : ObservableObject
     [RelayCommand]
     public async Task AppearingAsync()
     {
-        if (_isInitialized) return;
+        if (_coachModelTypes != null && _experienceLevels != null) return;
         await InitializeAsync();
-        _isInitialized = true;
+    }
+
+    [RelayCommand]
+    public void ToggleCoachPanel()
+    {
+        IsCoachPanelExpanded = !IsCoachPanelExpanded;
+        if (IsCoachPanelExpanded) IsExperiencePanelExpanded = false;
+    }
+
+    [RelayCommand]
+    public void ToggleExperiencePanel()
+    {
+        IsExperiencePanelExpanded = !IsExperiencePanelExpanded;
+        if (IsExperiencePanelExpanded) IsCoachPanelExpanded = false;
+    }
+
+    [RelayCommand]
+    public async Task SelectCoachAsync(ProfileSelectionItem item)
+    {
+        if (item.IsActive) { IsCoachPanelExpanded = false; return; }
+
+        IsSaving = true;
+        var userId = Preferences.Get("UserId", 0L);
+        var updatedUser = await _appUserService.SetCoachModelType(userId, item.Id)
+                          ?? await _appUserService.findUserById(userId);
+        if (updatedUser != null) PopulateFromUser(updatedUser);
+        IsCoachPanelExpanded = false;
+        IsSaving = false;
+    }
+
+    [RelayCommand]
+    public async Task SelectExperienceLevelAsync(ProfileSelectionItem item)
+    {
+        if (item.IsActive) { IsExperiencePanelExpanded = false; return; }
+
+        IsSaving = true;
+        var userId = Preferences.Get("UserId", 0L);
+        var updatedUser = await _appUserService.SetExperienceLevel(userId, item.Id)
+                          ?? await _appUserService.findUserById(userId);
+        if (updatedUser != null) PopulateFromUser(updatedUser);
+        IsExperiencePanelExpanded = false;
+        IsSaving = false;
     }
 
     [RelayCommand]
     public async Task LogoutAsync()
     {
-        bool confirm = await Shell.Current.DisplayAlert(
-            "Cerrar sesión",
-            "¿Estás seguro de que quieres cerrar sesión?",
-            "Sí",
-            "Cancelar");
-
-        if (!confirm)
-            return;
-
         Preferences.Clear();
         await Shell.Current.GoToAsync("//SignInView");
     }

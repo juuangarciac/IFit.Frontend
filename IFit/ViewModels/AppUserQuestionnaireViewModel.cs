@@ -18,6 +18,7 @@ namespace IFit.ViewModels
     /// 3. Usuario responde pregunta por pregunta
     /// 4. Al completar todas, se marca como completado automáticamente
     /// </summary>
+    [QueryProperty(nameof(ResumeResponseId), "ResumeResponseId")]
     public class AppUserQuestionnaireViewModel : ObservableObject
     {
         #region Fields
@@ -30,10 +31,11 @@ namespace IFit.ViewModels
 
         // Estado de la sesión
         private long _responseId;  // ID de la sesión de respuestas
+        private long _resumeResponseId;
+        private bool _initializationStarted;
+        private bool _sessionCompleted;
         private bool _isLoading;
-        private bool _hasError;
         private string _statusMessage = string.Empty;
-        private string _errorMessage = string.Empty;
 
         // Datos del cuestionario
         private string _questionnaireName = string.Empty;
@@ -78,24 +80,6 @@ namespace IFit.ViewModels
         {
             get => _statusMessage;
             set => SetProperty(ref _statusMessage, value);
-        }
-
-        /// <summary>
-        /// Indica si hay un error activo
-        /// </summary>
-        public bool HasError
-        {
-            get => _hasError;
-            set => SetProperty(ref _hasError, value);
-        }
-
-        /// <summary>
-        /// Mensaje de error para mostrar al usuario
-        /// </summary>
-        public string ErrorMessage
-        {
-            get => _errorMessage;
-            set => SetProperty(ref _errorMessage, value);
         }
 
         /// <summary>
@@ -269,6 +253,17 @@ namespace IFit.ViewModels
         /// </summary>
         public string NextButtonText => "Siguiente";
 
+        /// <summary>
+        /// ID de sesión de cuestionario previo a reanudar. Shell lo asigna síncronamente
+        /// antes de OnAppearing, por lo que el init arrancado desde OnAppearingAsync
+        /// ya lee el valor correcto sin necesidad de relanzar nada aquí.
+        /// </summary>
+        public long ResumeResponseId
+        {
+            get => _resumeResponseId;
+            set => _resumeResponseId = value;
+        }
+
         #endregion
 
         #region Commands
@@ -317,19 +312,13 @@ namespace IFit.ViewModels
                 _selectedOption = null;
                 OnPropertyChanged(nameof(SelectedOption));
             });
-
-            // Cargar datos iniciales
-            _ = InitializeAsync();
         }
 
-        /// <summary>
-        /// Constructor sin parámetros para compatibilidad con XAML
-        /// </summary>
         public AppUserQuestionnaireViewModel() : this(
             App.GetService<QuestionnaireService>() ?? throw new InvalidOperationException("QuestionnaireService no registrado"),
             Preferences.Get("UserId", 0L),
             Preferences.Get("CoachId", 0L),
-            Preferences.Get("ExperienceLevelId", 0L)) // questionnaireId se obtiene posteriormente, mediante una llamada al servidor
+            Preferences.Get("ExperienceLevelId", 0L))
         {
         }
 
@@ -338,88 +327,89 @@ namespace IFit.ViewModels
         #region Initialization
 
         /// <summary>
-        /// Inicializa el cuestionario y carga la primera pregunta
+        /// Disparado desde OnAppearing de la View. MAUI garantiza que los QueryProperty
+        /// (ResumeResponseId) están asignados antes de OnAppearing, así que aquí ya
+        /// sabemos si es modo normal o modo reanudación — sin race conditions.
         /// </summary>
+        public Task OnAppearingAsync()
+        {
+            if (_initializationStarted) return Task.CompletedTask;
+            _initializationStarted = true;
+            IsLoading = true;
+            _ = InitializeAsync();
+            return Task.CompletedTask;
+        }
+
         private async Task InitializeAsync()
         {
             try
             {
-                IsLoading = true;
                 StatusMessage = "Personalizando cuestionario...";
 
-                HasError = false;
-                ErrorMessage = string.Empty;
+                Debug.WriteLine($"InitializeAsync — userId={_userId} coachId={_coachId} experienceId={_experienceLevelId} resumeId={_resumeResponseId}");
 
-                Debug.WriteLine($"Inicializando cuestionario {_questionnaireId} para usuario {_userId}");
-
-                // 0. Validar parámetros
                 if (_userId <= 0)
-                {
                     throw new InvalidOperationException("UserId no válido. Asegúrate de estar autenticado.");
-                }
 
                 if (_coachId <= 0)
-                {
                     throw new InvalidOperationException("CoachId no válido. Asegúrate de haber seleccionado un entrenador.");
-                }
 
                 if (_experienceLevelId <= 0)
-                {
                     throw new InvalidOperationException("ExperienceLevelId no válido. Asegúrate de haber seleccionado un nivel de experiencia.");
-                }
 
-                // 1. Obtener cuestinario
-                var questionnaireDto = await _questionnaireService.GetQuestionnaireByCoachIdAndExperienceLevelId(_coachId, _experienceLevelId);
+                var questionnaireDto = await _questionnaireService
+                    .GetQuestionnaireByCoachIdAndExperienceLevelId(_coachId, _experienceLevelId);
 
-                if(questionnaireDto == null)
-                {
+                if (questionnaireDto == null)
                     throw new InvalidOperationException("No se ha encontrado un cuestionario para el entrenador y nivel de experiencia seleccionado.");
-                }
 
                 _questionnaireId = questionnaireDto.Id;
 
                 if (_questionnaireId <= 0)
-                {
                     throw new InvalidOperationException("QuestionnaireId no válido.");
-                }
 
-                // 2. Iniciar sesión de cuestionario
-                var response = await _questionnaireService.StartQuestionnaire(_userId, _questionnaireId);
+                TotalQuestions = questionnaireDto.Questions?.Count ?? 0;
 
-                if (response == null)
+                QuestionnaireResponseDTO? response;
+
+                if (_resumeResponseId > 0)
                 {
-                    HasError = true;
-                    ErrorMessage = "No se pudo iniciar el cuestionario.";
+                    StatusMessage = "Cargando última pregunta...";
+                    _responseId = _resumeResponseId;
 
-                    await ErrorHandler.HandleErrorAsync(
-                        "Error",
-                        "No se pudo iniciar el cuestionario. Por favor, intenta nuevamente."
-                    );
-                    return;
-                }
+                    response = await _questionnaireService.GoToPreviousQuestion(_responseId);
 
-                // 3. Guardar responseId para respuestas futuras
-                _responseId = response.ResponseId;
-                Debug.WriteLine($"Sesión iniciada con responseId: {_responseId}");
-
-                // 4. Mostrar primera pregunta
-                if (response.CurrentQuestion != null)
-                {
-                    CurrentQuestion = response.CurrentQuestion;
-                    CurrentQuestionIndex = 0;
-                    UpdateNavigationState();
-
-                    Debug.WriteLine($"Primera pregunta cargada: {CurrentQuestion.Text}");
+                    if (response == null)
+                    {
+                        Debug.WriteLine("Sesión completada sin retroceso disponible, iniciando nueva sesión.");
+                        StatusMessage = "Iniciando nuevo cuestionario...";
+                        response = await _questionnaireService.StartQuestionnaire(_userId, _questionnaireId);
+                        if (response != null) _responseId = response.ResponseId;
+                    }
                 }
                 else
                 {
-                    HasError = true;
-                    ErrorMessage = "El cuestionario no tiene preguntas.";
+                    response = await _questionnaireService.StartQuestionnaire(_userId, _questionnaireId);
+                    if (response != null) _responseId = response.ResponseId;
+                }
 
-                    await ErrorHandler.HandleErrorAsync(
-                        "Error",
-                        "El cuestionario no tiene preguntas disponibles."
-                    );
+                if (response == null)
+                {
+                    await NotificationService.ShowErrorAsync("No se pudo iniciar el cuestionario. Por favor, intenta nuevamente.");
+                    return;
+                }
+
+                Debug.WriteLine($"Sesión lista — responseId={_responseId} isCompleted={response.IsCompleted} totalAnswered={response.TotalQuestionsAnswered}");
+
+                if (response.CurrentQuestion != null)
+                {
+                    CurrentQuestion = response.CurrentQuestion;
+                    CurrentQuestionIndex = response.TotalQuestionsAnswered;
+                    Debug.WriteLine($"Pregunta cargada: index={CurrentQuestionIndex} texto={CurrentQuestion.Text}");
+                }
+                else
+                {
+                    await NotificationService.ShowErrorAsync("El cuestionario no tiene preguntas disponibles.");
                 }
             }
             catch (Exception ex)
@@ -427,18 +417,13 @@ namespace IFit.ViewModels
                 Debug.WriteLine($"Error en InitializeAsync: {ex.Message}");
                 Debug.WriteLine($"StackTrace: {ex.StackTrace}");
 
-                HasError = true;
-                ErrorMessage = "Error al cargar el cuestionario.";
-
-                await ErrorHandler.HandleErrorAsync(
-                    "Error Inesperado",
-                    "No se pudo cargar el cuestionario. Por favor, intenta nuevamente."
-                );
+                await NotificationService.ShowErrorAsync("No se pudo cargar el cuestionario. Por favor, intenta nuevamente.");
             }
             finally
             {
                 IsLoading = false;
                 StatusMessage = string.Empty;
+                UpdateNavigationState();
             }
         }
 
@@ -463,19 +448,16 @@ namespace IFit.ViewModels
             {
                 if (SelectedOption == null)
                 {
-                    HasError = true;
-                    ErrorMessage = "Por favor, selecciona una opción.";
+                    await NotificationService.ShowErrorAsync("Por favor, selecciona una opción.");
                     return;
                 }
 
                 IsLoading = true;
                 StatusMessage = string.Empty;
-                HasError = false;
-                ErrorMessage = string.Empty;
 
                 Debug.WriteLine($"Respondiendo pregunta {CurrentQuestionNumber}: Opción seleccionada = {SelectedOption.Id}");
 
-                // 1. Crear request de respuesta
+                // 1. Crear request de respuesta (antes de cualquier cambio de estado)
                 var answerRequest = new AnswerRequestDTO
                 {
                     QuestionId = CurrentQuestion!.Id,
@@ -483,18 +465,26 @@ namespace IFit.ViewModels
                     AdditionalText = string.IsNullOrWhiteSpace(AdditionalText) ? string.Empty : AdditionalText
                 };
 
-                // 2. Enviar respuesta al servidor
+                // 2. Si la sesión estaba completada (usuario volvió desde QuestionnaireSummaryView),
+                //    reabrir la sesión antes de responder para que el servidor acepte la respuesta.
+                if (_sessionCompleted)
+                {
+                    var reopenResponse = await _questionnaireService.GoToPreviousQuestion(_responseId);
+                    if (reopenResponse == null)
+                    {
+                        await NotificationService.ShowErrorAsync("No se pudo reabrir el cuestionario. Por favor, intenta nuevamente.");
+                        return;
+                    }
+                    _sessionCompleted = false;
+                    Debug.WriteLine($"Sesión reabierta — TotalAnswered={reopenResponse.TotalQuestionsAnswered}");
+                }
+
+                // 3. Enviar respuesta al servidor
                 var response = await _questionnaireService.AnswerQuestion(_responseId, answerRequest);
 
                 if (response == null)
                 {
-                    HasError = true;
-                    ErrorMessage = "No se pudo guardar la respuesta.";
-
-                    await ErrorHandler.HandleErrorAsync(
-                        "Error",
-                        "No se pudo guardar tu respuesta. Por favor, intenta nuevamente."
-                    );
+                    await NotificationService.ShowErrorAsync("No se pudo guardar tu respuesta. Por favor, intenta nuevamente.");
                     return;
                 }
 
@@ -519,17 +509,13 @@ namespace IFit.ViewModels
                     SelectedOption = null;
                     AdditionalText = string.Empty;
 
-                    UpdateNavigationState();
-
                     Debug.WriteLine($"Siguiente pregunta cargada: {CurrentQuestion.Text}");
                 }
                 else
                 {
                     // No debería pasar si IsCompleted es false
                     Debug.WriteLine("Error: No hay siguiente pregunta pero IsCompleted=false");
-
-                    HasError = true;
-                    ErrorMessage = "Error al cargar la siguiente pregunta.";
+                    await NotificationService.ShowErrorAsync("Error al cargar la siguiente pregunta.");
                 }
             }
             catch (Exception ex)
@@ -537,17 +523,12 @@ namespace IFit.ViewModels
                 Debug.WriteLine($"Error en GoNextAsync: {ex.Message}");
                 Debug.WriteLine($"StackTrace: {ex.StackTrace}");
 
-                HasError = true;
-                ErrorMessage = "Error al procesar la respuesta.";
-
-                await ErrorHandler.HandleErrorAsync(
-                    "Error Inesperado",
-                    "No se pudo procesar tu respuesta. Por favor, intenta nuevamente."
-                );
+                await NotificationService.ShowErrorAsync("No se pudo procesar tu respuesta. Por favor, intenta nuevamente.");
             }
             finally
             {
                 IsLoading = false;
+                UpdateNavigationState();
             }
         }
 
@@ -559,14 +540,12 @@ namespace IFit.ViewModels
             try
             {
                 IsLoading = true;
-                HasError = false;
-                ErrorMessage = string.Empty;
 
                 Debug.WriteLine($"Retrocediendo en sesión {_responseId}, pregunta actual: {CurrentQuestionNumber}");
 
                 if(CurrentQuestionIndex <= 0)
                 {
-                    await Shell.Current.GoToAsync("//CoachModelTypeSelectionView");
+                    await Shell.Current.GoToAsync("..");
                     return;
                 }
 
@@ -574,19 +553,14 @@ namespace IFit.ViewModels
 
                 if (response == null)
                 {
-                    HasError = true;
-                    ErrorMessage = "No se pudo retroceder a la pregunta anterior.";
-
-                    await ErrorHandler.HandleErrorAsync(
-                        "Error",
-                        "No se pudo retroceder. Por favor, intenta nuevamente."
-                    );
+                    await NotificationService.ShowErrorAsync("No se pudo retroceder. Por favor, intenta nuevamente.");
                     return;
                 }
 
                 // Cargar la pregunta anterior
+                _sessionCompleted = false;
                 CurrentQuestion = response.CurrentQuestion;
-                CurrentQuestionIndex = response.TotalQuestionsAnswered; // El servidor ya nos dice cuántas quedan respondidas
+                CurrentQuestionIndex = response.TotalQuestionsAnswered;
 
                 // Limpiar selección para que el usuario elija de nuevo
                 SelectedOption = null;
@@ -598,13 +572,7 @@ namespace IFit.ViewModels
             {
                 Debug.WriteLine($"Error en GoBackAsync: {ex.Message}");
 
-                HasError = true;
-                ErrorMessage = "Error al retroceder.";
-
-                await ErrorHandler.HandleErrorAsync(
-                    "Error Inesperado",
-                    "No se pudo retroceder. Por favor, intenta nuevamente."
-                );
+                await NotificationService.ShowErrorAsync("No se pudo retroceder. Por favor, intenta nuevamente.");
             }
             finally
             {
@@ -630,20 +598,18 @@ namespace IFit.ViewModels
                 Debug.WriteLine("Navegando a AIGenerationRoutineView");
 
                 // Pasar el responseId a la siguiente vista para generar rutina
+                _sessionCompleted = true;
                 Preferences.Set("responseId", _responseId);
                 // Push suave hacia el resumen — sin triple slash para evitar el salto brusco
                 // del reset de stack. El botón Cancelar de QuestionnaireSummaryView gestiona la salida.
-                await Shell.Current.GoToAsync("//QuestionnaireSummaryView");
+                await Shell.Current.GoToAsync("QuestionnaireSummaryView");
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"Error en OnQuestionnaireCompleted: {ex.Message}");
 
                 // Aunque haya error en la navegación, el cuestionario ya está completado
-                await ErrorHandler.HandleErrorAsync(
-                    "Cuestionario Completado",
-                    "Tu cuestionario se completó exitosamente, pero hubo un problema al continuar."
-                );
+                await NotificationService.ShowErrorAsync("Tu cuestionario se completó exitosamente, pero hubo un problema al continuar.");
             }
         }
 
@@ -656,15 +622,12 @@ namespace IFit.ViewModels
         /// </summary>
         public async Task RestartQuestionnaireAsync()
         {
-            // Limpiar estado
             SelectedOption = null;
             AdditionalText = string.Empty;
             CurrentQuestion = null;
             CurrentQuestionIndex = 0;
-            HasError = false;
-            ErrorMessage = string.Empty;
+            _initializationStarted = false;
 
-            // Volver a inicializar
             await InitializeAsync();
         }
 

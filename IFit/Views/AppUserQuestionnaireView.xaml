@@ -32,8 +32,6 @@
                     <RowDefinition Height="*" />
                     <!-- Options -->
                     <RowDefinition Height="Auto" />
-                    <!-- Error Message -->
-                    <RowDefinition Height="Auto" />
                     <!-- Navigation Buttons -->
                 </Grid.RowDefinitions>
 
@@ -140,28 +138,8 @@
                     </CollectionView.ItemTemplate>
                 </CollectionView>
 
-                <!-- Error Message -->
-                <Border Grid.Row="3"
-                        IsVisible="{Binding HasError}"
-                        BackgroundColor="#FFEBEE"
-                        StrokeThickness="1"
-                        Stroke="#F44336"
-                        Padding="12"
-                        Margin="0,0,0,15">
-
-                    <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="8" />
-                    </Border.StrokeShape>
-
-                    <Label Text="{Binding ErrorMessage}"
-                           TextColor="#C62828"
-                           FontSize="14"
-                           FontAttributes="Bold"
-                           HorizontalTextAlignment="Center" />
-                </Border>
-
                 <!--Navigation Buttons -->
-                <Grid Grid.Row="4"
+                <Grid Grid.Row="3"
                       ColumnSpacing="15"
                       Margin="0,5,0,5">
                     <Grid.ColumnDefinitions>

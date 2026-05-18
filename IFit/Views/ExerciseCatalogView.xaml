@@ -247,17 +247,6 @@
                 </DataTemplate>
             </CollectionView.ItemTemplate>
 
-            <!-- Footer: botón Cargar más -->
-            <CollectionView.Footer>
-                <Grid Padding="0,4,0,12">
-                    <Button Text="Cargar más ejercicios"
-                            IsVisible="{Binding HasMorePages}"
-                            Command="{Binding LoadMoreCommand}"
-                            Style="{DynamicResource ButtonBold-XL-dark-yellow}"
-                            CornerRadius="{DynamicResource CornerRadiusRectangle}"
-                            HorizontalOptions="Fill" />
-                </Grid>
-            </CollectionView.Footer>
         </CollectionView>
 
         <!-- Row 4: Footer de navegación -->

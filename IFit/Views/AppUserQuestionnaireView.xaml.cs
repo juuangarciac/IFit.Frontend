@@ -1,10 +1,19 @@
 namespace IFit.Views;
 
+using IFit.ViewModels;
+
 public partial class AppUserQuestionnaireView : ContentPage
 {
     public AppUserQuestionnaireView()
     {
         InitializeComponent();
+    }
+
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
+        if (BindingContext is AppUserQuestionnaireViewModel vm)
+            _ = vm.OnAppearingAsync();
     }
 
     public async void onCancelClicked(object sender, EventArgs e)

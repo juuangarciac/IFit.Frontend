@@ -5,6 +5,7 @@ using IFit.Models;
 using IFit.Models.Dtos.AI;
 using IFit.Models.Dtos.Questionnaire;
 using IFit.Services;
+using System.Diagnostics;
 
 namespace IFit.ViewModels
 {

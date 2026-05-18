@@ -8,7 +8,8 @@ public partial class QuestionnaireSummaryView : ContentPage
 	}
 
     public async void onCancelClicked(object sender, EventArgs e)
-    {
-        await Shell.Current.GoToAsync("///MainPage", false);
-    }
+        => await Shell.Current.GoToAsync("..");
+
+    public async void onCloseClicked(object sender, EventArgs e)
+        => await Shell.Current.GoToAsync("///MainPage");
 }
