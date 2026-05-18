@@ -63,6 +63,9 @@ public partial class HomeViewModel : ObservableObject
     [ObservableProperty]
     public partial Boolean DoesntHaveRoutine { get; set; } = false;
 
+    [ObservableProperty]
+    public partial int CurrentCarouselPosition { get; set; } = 0;
+
     #endregion
 
     #region Services
@@ -173,30 +176,44 @@ public partial class HomeViewModel : ObservableObject
     [RelayCommand]
     public async Task OpenTrainingDayDetailAsync()
     {
+        IsLoading = true;
         var navigationParameter = new Dictionary<String, Object>()
-            {
-                {"Routine", Routine },
-                {"TrainingDay", TrainingDayDto }
-            };
-
+        {
+            {"Routine", Routine },
+            {"TrainingDay", TrainingDayDto }
+        };
         await Shell.Current.GoToAsync("TrainingDayDetailView", navigationParameter);
+        IsLoading = false;
     }
 
     [RelayCommand]
     public async Task GoToChatViewAsync()
-    {   await Shell.Current.GoToAsync($"ChatAIView");
+    {
+        IsLoading = true;
+        await Shell.Current.GoToAsync("ChatAIView");
+        IsLoading = false;
     }
 
     [RelayCommand]
     public async Task GoToWeeklySummaryAsync()
     {
         if (Routine == null) return;
-
+        IsLoading = true;
         var navigationParameter = new Dictionary<string, object>()
         {
             { "Routine", Routine }
         };
         await Shell.Current.GoToAsync("WeeklySummaryView", navigationParameter);
+        IsLoading = false;
+    }
+
+    [RelayCommand]
+    public void NextCard()
+    {
+        if (CurrentCarouselPosition < InformationCarrousel.Count - 1)
+            CurrentCarouselPosition++;
+        else
+            CurrentCarouselPosition = 0;
     }
 
     [RelayCommand]
