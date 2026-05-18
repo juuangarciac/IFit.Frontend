@@ -136,12 +136,6 @@ namespace IFit.ViewModels
 
             try
             {
-                // 1. Desactivar la rutina actualmente activa (si existe)
-                var currentActive = ActiveRoutines?.FirstOrDefault();
-                if (currentActive != null)
-                    await _trainingService.toggleRoutineActiveAsync((long)currentActive.Id, false);
-
-                // 2. Activar la rutina seleccionada
                 var result = await _trainingService.toggleRoutineActiveAsync((long)routine.Id, true);
                 if (result == null)
                 {
@@ -150,8 +144,6 @@ namespace IFit.ViewModels
                 }
 
                 await NotificationService.ShowSuccessAsync("¡Rutina activada correctamente!");
-
-                // 3. Recargar la vista
                 _isInitialized = false;
                 await LoadDataAsync();
             }
