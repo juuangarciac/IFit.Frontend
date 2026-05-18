@@ -19,14 +19,14 @@ public partial class HomeViewModel : ObservableObject
         new IFitCard(
             "ai_coach_ifit.png",
             "Tu entrenador personal de IA",
-            "Pregunta a tu entrenador personal de IA cualquier duda que tengas sobre tu entrenamiento, nutrici�n o recuperaci�n.",
+            "Pregunta a tu entrenador personal de IA cualquier duda que tengas sobre tu entrenamiento, nutrición o recuperación.",
             "Entendido",
-            "Mejor despu�s"
+            "Mejor después"
         ),
         new IFitCard(
             "smart_watch_ifit.png",
             "Conecta tus aplicaciones y relojes",
-            "Conecta tus aplicaciones y relojes a IFit para\r\nsacar el m�ximo partido a tu entrenamiento.",
+            "Conecta tus aplicaciones y relojes a IFit para\r\nsacar el máximo partido a tu entrenamiento.",
             "Conectar",
             "Descartar")
     };
@@ -72,12 +72,12 @@ public partial class HomeViewModel : ObservableObject
     #endregion
 
     private bool _isInitialized = false;
-    private AppUserResponseDto? _currentUser;
+    private long _lastUserId = 0;
 
     #region Constructor
 
     public HomeViewModel(TrainingService trainingService,
-        AppUserService appUserService) { 
+        AppUserService appUserService) {
         _trainingService = trainingService;
         _appUserService = appUserService;
     }
@@ -91,6 +91,7 @@ public partial class HomeViewModel : ObservableObject
     {
         try
         {
+            DoesntHaveRoutine = false;
             StatusMessage = "Cargando tu rutina actual...";
 
             var userId = Preferences.Get("UserId", 0L);
@@ -99,7 +100,25 @@ public partial class HomeViewModel : ObservableObject
             var coachName = Preferences.Get("CoachModelTypeName", "tu coach");
             ButtonContent = "Pregunta a " + coachName;
 
-            Routine = await _trainingService.getLatestActiveRoutineByUserIdAsync(userId);
+            var cachedRoutineId = Preferences.Get("CurrentRoutineId", 0L);
+            if (cachedRoutineId > 0)
+            {
+                Routine = await _trainingService.getRoutineByIdAsync(cachedRoutineId);
+                if (Routine == null)
+                {
+                    // Rutina cacheada ya no existe (borrada/desactivada): fallback
+                    Preferences.Remove("CurrentRoutineId");
+                    Routine = await _trainingService.getLatestActiveRoutineByUserIdAsync(userId);
+                    if (Routine?.Id != null)
+                        Preferences.Set("CurrentRoutineId", (int)Routine.Id);
+                }
+            }
+            else
+            {
+                Routine = await _trainingService.getLatestActiveRoutineByUserIdAsync(userId);
+                if (Routine?.Id != null)
+                    Preferences.Set("CurrentRoutineId", (int)Routine.Id);
+            }
 
             if (Routine == null)
             {
@@ -139,10 +158,14 @@ public partial class HomeViewModel : ObservableObject
     [RelayCommand]
     public Task AppearingAsync()
     {
-        if (_isInitialized) return Task.CompletedTask;
+        long currentUserId = Preferences.Get("UserId", 0L);
+
+        // Re-inicializar si es la primera vez o si cambió el usuario activo entre sesiones
+        if (_isInitialized && currentUserId == _lastUserId) return Task.CompletedTask;
+
         _isInitialized = true;
+        _lastUserId = currentUserId;
         IsLoading = true;
-        // Fire-and-forget: la vista aparece inmediatamente y los datos cargan en segundo plano
         _ = InitializeAsync();
         return Task.CompletedTask;
     }
@@ -167,7 +190,13 @@ public partial class HomeViewModel : ObservableObject
     [RelayCommand]
     public async Task GoToWeeklySummaryAsync()
     {
-        await Shell.Current.GoToAsync($"WeeklySummaryView");
+        if (Routine == null) return;
+
+        var navigationParameter = new Dictionary<string, object>()
+        {
+            { "Routine", Routine }
+        };
+        await Shell.Current.GoToAsync("WeeklySummaryView", navigationParameter);
     }
 
     [RelayCommand]
@@ -179,18 +208,7 @@ public partial class HomeViewModel : ObservableObject
     [RelayCommand]
     public async Task GoToProfileAsync()
     {
-        // Carga lazy: solo se llama a /users/{id} cuando el usuario navega al perfil, no al abrir el home
-        if (_currentUser == null)
-        {
-            var userId = Preferences.Get("UserId", 0L);
-            _currentUser = await _appUserService.findUserById(userId);
-        }
-
-        var parameters = new Dictionary<string, object>();
-        if (_currentUser != null)
-            parameters["User"] = _currentUser;
-
-        await Shell.Current.GoToAsync("ProfileView", parameters);
+        await Shell.Current.GoToAsync("ProfileView");
     }
 
     #endregion
