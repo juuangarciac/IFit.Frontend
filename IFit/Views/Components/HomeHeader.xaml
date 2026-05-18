@@ -8,7 +8,7 @@
         <vm:HomeHeaderViewModel />
     </ContentView.BindingContext>
     <!-- Header -->
-    <Border 
+    <Border
          BackgroundColor="{DynamicResource BackgroundPrimaryDark}"
          Stroke="{DynamicResource BackgroundPrimaryDark}"
          StrokeThickness="0"
@@ -24,7 +24,7 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <!-- Profile/Notif/Icon/Calendar -->
+            <!-- Profile/Notif/Icon -->
             <Grid Grid.Row="0"
                     Margin="10, 15, 15, 0"
                     ColumnSpacing="20">
@@ -34,25 +34,17 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <!-- Left side: Profile + Notif -->
-                <StackLayout Grid.Column="0" 
-                 Orientation="Horizontal" 
-                 Spacing="20"
-                 HorizontalOptions="Start">
-                    <!-- Profile Icon -->
-                    <Grid>
-                        <Image Source="profile_icon_white.png"
-                               Style="{DynamicResource navbar_image}"/>
-                        <Button BackgroundColor="Transparent"
-                                BorderColor="Transparent"
-                                HorizontalOptions="Fill"
-                                VerticalOptions="Fill"
-                                Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.GoToProfileCommand}" />
-                    </Grid>
-                    <!-- Notif Icon -->
-                    <Image Source="notification_icon_white.png"
+                <!-- Left side: Profile -->
+                <Grid Grid.Column="0"
+                      HorizontalOptions="Start">
+                    <Image Source="profile_icon_white.png"
                            Style="{DynamicResource navbar_image}"/>
-                            </StackLayout>
+                    <Button BackgroundColor="Transparent"
+                            BorderColor="Transparent"
+                            HorizontalOptions="Fill"
+                            VerticalOptions="Fill"
+                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.GoToProfileCommand}" />
+                </Grid>
 
                 <!-- Center: ifit logo -->
                 <Image Grid.Column="1"
@@ -62,16 +54,16 @@
                        HorizontalOptions="Center"
                        VerticalOptions="Center" />
 
-                <!-- Right side: Calendar -->
+                <!-- Right side: Notifications -->
                 <Image Grid.Column="2"
-                       Source="calendar_icon_white.png"
+                       Source="notification_icon_white.png"
                        Style="{DynamicResource navbar_image}"
                        HorizontalOptions="End"/>
             </Grid>
 
             <!-- Calendar -->
             <cal:Calendar Grid.Row="1"
-                   Style="{StaticResource calendar_ifit_style}" 
+                   Style="{StaticResource calendar_ifit_style}"
                    CalendarLayout="{Binding SelectedLayout}">
             </cal:Calendar>
 
