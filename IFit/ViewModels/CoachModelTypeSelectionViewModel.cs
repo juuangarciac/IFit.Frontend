@@ -115,6 +115,7 @@ public partial class CoachModelTypeSelectionViewModel : ObservableObject
         await databaseService.SaveAppUserAsync(response.toEntity());
 
         await Shell.Current.GoToAsync("AppUserQuestionnaireView");
+        SelectedCoachModelType = null;
     }
     #endregion
 }

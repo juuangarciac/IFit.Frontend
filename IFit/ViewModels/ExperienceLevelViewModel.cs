@@ -143,6 +143,7 @@ namespace IFit.ViewModels
 
             await databaseService.SaveAppUserAsync(response.toEntity());
             await Shell.Current.GoToAsync("CoachModelTypeSelectionView");
+            SelectedExperienceLevel = null;
         }
 
         #endregion
