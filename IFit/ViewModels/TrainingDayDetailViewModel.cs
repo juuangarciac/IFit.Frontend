@@ -38,13 +38,33 @@ namespace IFit.ViewModels
         [ObservableProperty]
         public partial Boolean CanEndSession { get; set; } = false;
 
+        [ObservableProperty]
+        public partial Boolean IsLoading { get; set; } = false;
+
+        [ObservableProperty]
+        public partial String StatusMessage { get; set; } = string.Empty;
+
+        [ObservableProperty]
+        public partial int ExerciseCount { get; set; }
+
+        [ObservableProperty]
+        public partial string SessionStatusMessage { get; set; } = string.Empty;
+
         partial void OnTrainingDayChanged(TrainingDayDto value)
         {
+            ExerciseCount = value?.Exercises?.Count ?? 0;
             EstimatedDuration = CalculateEstimatedDuration(value);
             CanEndSession = Routine.CurrentDay == value.DayNumber;
             Background = GetBrush(Routine.CurrentDay >= value.DayNumber
                 ? "CardPremiumGradientColor"
                 : "CardPremiumIndigoGradientColor");
+
+            if (Routine.CurrentDay > value.DayNumber)
+                SessionStatusMessage = "Sesión ya completada";
+            else if (Routine.CurrentDay < value.DayNumber)
+                SessionStatusMessage = "Aún no has llegado a este entrenamiento";
+            else
+                SessionStatusMessage = string.Empty;
         }
 
         private static Brush GetBrush(string resourceKey)
@@ -81,16 +101,28 @@ namespace IFit.ViewModels
         [RelayCommand]
         public async Task EndSessionAsync()
         {
-            Debug.Write($"End Session");
-            var response = await _trainingService.setRoutineDayAsCompletedAsync((long)Routine.Id, (int)Routine.CurrentDay);
-            if (response == null)
+            IsLoading = true;
+            StatusMessage = "Guardando sesión...";
+            try
             {
-                await NotificationService.ShowErrorAsync("No se pudo finalizar la sesión.");
-                return;
-            }
+                var response = await _trainingService.setRoutineDayAsCompletedAsync(
+                    (long)Routine.Id, (int)Routine.CurrentDay);
 
-            await NotificationService.ShowSuccessAsync("¡Sesión guardada correctamente!");
-            await Shell.Current.GoToAsync("//HomeView", false);
+                if (response == null)
+                {
+                    await NotificationService.ShowErrorAsync("No se pudo finalizar la sesión.");
+                    return;
+                }
+
+                Preferences.Remove("CurrentRoutineId");
+                await NotificationService.ShowSuccessAsync("¡Sesión guardada correctamente!");
+                await Shell.Current.GoToAsync("//HomeView", false);
+            }
+            finally
+            {
+                IsLoading = false;
+                StatusMessage = string.Empty;
+            }
         }
 
         [RelayCommand]
@@ -105,9 +137,10 @@ namespace IFit.ViewModels
         private string CalculateEstimatedDuration(TrainingDayDto trainingDay)
         {
             if (trainingDay?.Exercises == null || trainingDay.Exercises.Count == 0)
-                return "N/A";
+                return "~30 min";
 
-            const int secondsPerSet = 40; // tiempo estimado por serie (ejecución)
+            const int secondsPerSet = 50;     // tiempo de ejecución por serie
+            const int transitionSeconds = 90; // transición/calentamiento entre ejercicios
 
             int totalSeconds = 0;
 
@@ -119,13 +152,13 @@ namespace IFit.ViewModels
                 if (sets <= 0) continue;
 
                 int executionTime = sets * secondsPerSet;
-                int restTime = (sets - 1) * rest;
+                int restBetweenSets = (sets - 1) * rest;
 
-                totalSeconds += executionTime + restTime;
+                totalSeconds += executionTime + restBetweenSets + transitionSeconds;
             }
 
-            // Formato legible
-            int minutes = totalSeconds / 60;
+            int minutes = Math.Max(totalSeconds / 60, 30);
+
             if (minutes < 60)
                 return $"~{minutes} min";
 
