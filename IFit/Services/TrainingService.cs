@@ -41,7 +41,7 @@ namespace IFit.Services
                 Debug.WriteLine($"Error creando rutina para el usuario {userId}: {response.ErrorMessage}");
                 return null;
             }
-            Preferences.Set("CurrentRoutineId", response.Data?.Id ?? 0L); // Guardar el ID de la rutina creada para futuras referencias
+            Preferences.Set("CurrentRoutineId", (long)(response.Data?.Id ?? 0)); // Guardar el ID de la rutina creada para futuras referencias
 
             return response.Data;
         }

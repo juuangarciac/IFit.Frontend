@@ -103,7 +103,19 @@ public partial class HomeViewModel : ObservableObject
             var coachName = Preferences.Get("CoachModelTypeName", "tu coach");
             ButtonContent = "Pregunta a " + coachName;
 
-            var cachedRoutineId = Preferences.Get("CurrentRoutineId", 0L);
+            // Defensive read: la clave pudo haberse guardado como int en versiones antiguas.
+            // Android lanza ClassCastException si el tipo almacenado no coincide con el de lectura.
+            long cachedRoutineId;
+            try
+            {
+                cachedRoutineId = Preferences.Get("CurrentRoutineId", 0L);
+            }
+            catch
+            {
+                Preferences.Remove("CurrentRoutineId");
+                cachedRoutineId = 0L;
+            }
+
             if (cachedRoutineId > 0)
             {
                 Routine = await _trainingService.getRoutineByIdAsync(cachedRoutineId);
@@ -113,40 +125,46 @@ public partial class HomeViewModel : ObservableObject
                     Preferences.Remove("CurrentRoutineId");
                     Routine = await _trainingService.getLatestActiveRoutineByUserIdAsync(userId);
                     if (Routine?.Id != null)
-                        Preferences.Set("CurrentRoutineId", (int)Routine.Id);
+                        Preferences.Set("CurrentRoutineId", (long)Routine.Id);
                 }
             }
             else
             {
                 Routine = await _trainingService.getLatestActiveRoutineByUserIdAsync(userId);
                 if (Routine?.Id != null)
-                    Preferences.Set("CurrentRoutineId", (int)Routine.Id);
+                    Preferences.Set("CurrentRoutineId", (long)Routine.Id);
             }
 
             if (Routine == null)
             {
                 StatusMessage = "No se ha encontrado la rutina actual.";
                 DoesntHaveRoutine = true;
-                IsLoading = false;
+                return;
+            }
+
+            if (Routine.CurrentDay == null)
+            {
+                StatusMessage = "La rutina no tiene un día activo configurado.";
                 return;
             }
 
             TrainingDayDto = await _trainingService
-                .getRoutineDayAsync((long)Routine.Id, (int)Routine.CurrentDay);
+                .getRoutineDayAsync((long)Routine.Id!, Routine.CurrentDay.Value);
 
             if (TrainingDayDto == null)
             {
                 StatusMessage = "No se ha encontrado una sesión activa para hoy.";
-                IsLoading = false;
                 return;
             }
 
             Debug.WriteLine("TrainingDayDto: " + TrainingDayDto);
+            _isInitialized = true;
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"✗ Error inicializando Home: {ex.Message}");
             StatusMessage = "Error al cargar los datos.";
+            _isInitialized = false;
         }
         finally
         {
@@ -163,10 +181,15 @@ public partial class HomeViewModel : ObservableObject
     {
         long currentUserId = Preferences.Get("UserId", 0L);
 
+        // Si CurrentRoutineId fue eliminado (sesión completada), forzar recarga
+        long cachedRoutineId = 0;
+        try { cachedRoutineId = Preferences.Get("CurrentRoutineId", 0L); }
+        catch { Preferences.Remove("CurrentRoutineId"); }
+        if (_isInitialized && cachedRoutineId == 0) _isInitialized = false;
+
         // Re-inicializar si es la primera vez o si cambió el usuario activo entre sesiones
         if (_isInitialized && currentUserId == _lastUserId) return Task.CompletedTask;
 
-        _isInitialized = true;
         _lastUserId = currentUserId;
         IsLoading = true;
         _ = InitializeAsync();
