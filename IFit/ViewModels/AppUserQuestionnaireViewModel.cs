@@ -454,7 +454,7 @@ namespace IFit.ViewModels
                 }
 
                 IsLoading = true;
-                StatusMessage = string.Empty;
+                StatusMessage = "Guardando respuesta...";
 
                 Debug.WriteLine($"Respondiendo pregunta {CurrentQuestionNumber}: Opción seleccionada = {SelectedOption.Id}");
 

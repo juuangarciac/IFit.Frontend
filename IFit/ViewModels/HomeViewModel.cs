@@ -199,35 +199,29 @@ public partial class HomeViewModel : ObservableObject
     [RelayCommand]
     public async Task OpenTrainingDayDetailAsync()
     {
-        IsLoading = true;
         var navigationParameter = new Dictionary<String, Object>()
         {
             {"Routine", Routine },
             {"TrainingDay", TrainingDayDto }
         };
         await Shell.Current.GoToAsync("TrainingDayDetailView", navigationParameter);
-        IsLoading = false;
     }
 
     [RelayCommand]
     public async Task GoToChatViewAsync()
     {
-        IsLoading = true;
         await Shell.Current.GoToAsync("ChatAIView");
-        IsLoading = false;
     }
 
     [RelayCommand]
     public async Task GoToWeeklySummaryAsync()
     {
         if (Routine == null) return;
-        IsLoading = true;
         var navigationParameter = new Dictionary<string, object>()
         {
             { "Routine", Routine }
         };
         await Shell.Current.GoToAsync("WeeklySummaryView", navigationParameter);
-        IsLoading = false;
     }
 
     [RelayCommand]
