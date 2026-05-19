@@ -7,6 +7,10 @@
         {
             InitializeComponent();
 
+            // La app usa tema oscuro permanente — forzar Light para que AppThemeBinding
+            // elija siempre los valores "Light" (#EEEEEE) sobre fondos oscuros.
+            UserAppTheme = AppTheme.Light;
+
             // Register the service provider for dependency injection
             Services = serviceProvider;
 
