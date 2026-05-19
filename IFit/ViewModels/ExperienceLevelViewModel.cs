@@ -109,7 +109,12 @@ namespace IFit.ViewModels
 
         private async Task HandleExperienceLevelChangedAsync(ExperienceLevelDto? value)
         {
-            if (value == null || databaseService == null || appUserService == null)
+            if(value == null)
+            { // No selecciono nivel de experiencia, no hacemos nada.
+                return;
+            }
+
+            if (databaseService == null || appUserService == null)
             {
                 await ErrorHandler.HandleErrorAsync("Selected experience level type is null or services are not initialized.", "//ErrorView");
                 return;

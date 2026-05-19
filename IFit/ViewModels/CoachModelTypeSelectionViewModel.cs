@@ -79,6 +79,11 @@ public partial class CoachModelTypeSelectionViewModel : ObservableObject
 
     private async Task HandleOnSelectedCoachChanged(CoachModelTypeResponseDto? selectedCoachModelType)
     {
+        if(selectedCoachModelType == null)
+        { // Esto puede ocurrir cuando se deselecciona un tipo de entrenador. En este caso, simplemente no hacemos nada.
+            return;
+        }
+
         if (selectedCoachModelType == null || databaseService == null || appUserService == null)
         {
             await ErrorHandler.HandleErrorAsync("Selected coach model type is null or services are not initialized.", "//ErrorView");

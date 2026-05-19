@@ -300,9 +300,10 @@ namespace IFit.ViewModels
                 canExecute: () => !IsLoading
             );
 
-            SaveTextInputCommand = new Command(() =>
+            SaveTextInputCommand = new Command(async () =>
             {
                 RequiresTextInput = false;
+                await NotificationService.ShowSuccessAsync("Respuesta guardada correctamente.");
             });
 
             // Comando para cerrar el overlay del input de texto

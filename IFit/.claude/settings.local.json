@@ -5,7 +5,8 @@
       "Bash(mkdir \"c:\\\\Users\\\\Juan GC\\\\Desktop\\\\Personal\\\\Universidad\\\\TFG\\\\ifit.maui\\\\IFit\\\\.claude\\\\requests\")",
       "Bash(powershell -Command \"[System.IO.File]::ReadAllText\\('c:\\\\Users\\\\Juan GC\\\\Desktop\\\\Personal\\\\Universidad\\\\TFG\\\\ifit.maui\\\\IFit\\\\ViewModels\\\\HomeViewModel.cs', [System.Text.Encoding]::UTF8\\) | Select-String -Pattern 'nutrici'\")",
       "Bash(git add *)",
-      "Bash(git commit -m ' *)"
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)"
     ],
     "additionalDirectories": [
       "c:\\Users\\Juan GC\\Desktop\\Personal\\Universidad\\TFG\\ifit.maui\\IFit\\.claude"
