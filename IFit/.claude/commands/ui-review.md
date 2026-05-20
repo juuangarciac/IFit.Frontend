@@ -4,6 +4,8 @@ Eres un diseñador senior de interfaces móviles especializado en **apps de fitn
 
 Cuando el usuario invoque este comando, actúa exclusivamente sobre archivos `Views/**/*.xaml` y `Views/**/*.xaml.cs`. No toques ViewModels, Services ni lógica de negocio salvo que sea estrictamente necesario para corregir un binding roto.
 
+> **PASO 0 — OBLIGATORIO**: Leer `IFit/.claude/IFIT-Style.md` antes de analizar cualquier vista. Ese archivo es la fuente de verdad para colores, cards, tipografía y layout. Las convenciones de este documento son un complemento; en caso de conflicto, `IFIT-Style.md` manda.
+
 ---
 
 ## Design system de IFit — Referencia canónica
@@ -50,9 +52,14 @@ Cuando el usuario invoque este comando, actúa exclusivamente sobre archivos `Vi
 Siempre envueltos en `<Border Style="{StaticResource BorderRectangleWhite}">`. La `Entry` dentro tiene `BackgroundColor="Transparent"`.
 
 ### Cards / Bordes
-- `CornerRadius` estándar para cards: **12** dp.
-- `CornerRadius` para inputs y contenedores pequeños: **8** dp (clave `CornerRadiusRectangle`).
-- Cards con gradiente: usar `<Border>` con `Background="{StaticResource CardPremiumGradientColor}"`.
+- `CornerRadius` estándar para cards de lista: **8** dp (clave `CornerRadiusRectangle`).
+- `CornerRadius` para inputs: **8** dp.
+- Fondo de card: `BackgroundSecondaryDark`. **Nunca** `BackgroundPrimaryDark` como estado normal.
+- `StrokeThickness="0"` siempre. **Nunca** bordes blancos visibles.
+- Sin `Shadow`. Sin accent strips horizontales. Sin `BoxView` separadores verticales dentro de cards.
+- Cards seleccionables: VisualStateManager con Normal=`BackgroundSecondaryDark`, Selected=`BackgroundPrimaryDark`.
+- Barras laterales de color (24 dp, `CornerRadius="8,0,8,0"`): indicadores semánticos de estado — conservar siempre.
+- Ver patrones exactos en `IFit/.claude/IFIT-Style.md` sección 3.
 
 ### Espaciado y márgenes
 - Padding lateral de página: **20** dp (izquierda y derecha).
@@ -86,7 +93,9 @@ Siempre usar el componente `<components:LoadingOverlay>` (namespace `clr-namespa
 - [ ] Fondo de página usa `BackgroundPrimaryDark` (nunca `White` ni colores inline).
 - [ ] Textos usan tokens del sistema (`TextPrimaryColorLight`, `TertiaryColor`, etc.), no valores hex inline.
 - [ ] Botones usan los estilos definidos (`ButtonBold-XL-*`), no estilos locales redundantes.
-- [ ] Cards usan gradientes del sistema, no fondos sólidos custom.
+- [ ] Cards de lista: `BackgroundSecondaryDark` en estado Normal, `BackgroundPrimaryDark` en Selected.
+- [ ] No hay `StrokeThickness` > 0 en cards (bordes blancos prohibidos).
+- [ ] No hay `Shadow`, accent strips ni `BoxView` separadores dentro de cards.
 
 ### 2. Tipografía
 - [ ] Todos los `Label` usan un `Style` del sistema o al menos `FontFamily="Montserrat-Bold/Medium"`.

@@ -168,6 +168,24 @@ Si el usuario puede cambiar de cuenta, añadir un método `Reset()` que ponga `_
 
 ---
 
+### Categoría J: Inconsistencia de estilo visual entre vistas
+**Síntoma**: una pantalla tiene bordes blancos visibles en cards, barras separadoras internas, fondos incorrectos o fuentes que no corresponden a Montserrat.
+
+**Diagnóstico**: leer `IFit/.claude/IFIT-Style.md` y comparar la vista afectada contra los patrones canónicos. Verificar:
+- `StrokeThickness` > 0 en borders de card → prohibido
+- `BackgroundColor=BackgroundPrimaryDark` en estado Normal del VisualStateManager → incorrecto (debe ser `BackgroundSecondaryDark`)
+- Accent strip (Border de 3px horizontal arriba de la card) → eliminar
+- BoxView separador vertical dentro de card → eliminar
+- `Shadow` en cards de lista → eliminar
+- `CornerRadius` > 8 en cards de lista → reducir a 8
+- `Span` dentro de `FormattedString` sin `FontFamily` explícito → añadir `Montserrat-Bold` o `Montserrat-Medium`
+
+**Páginas de referencia correctas**: `TrainingDayDetailView.xaml`, `PlanSummaryView.xaml`, `WeeklySummaryView.xaml`.
+
+**Fix**: aplicar el patrón canónico de `IFIT-Style.md` sección 3.
+
+---
+
 ## Plantilla de prompt para IA — Formato obligatorio
 
 Cuando generes un prompt para que otro modelo de IA resuelva el bug, usa **exactamente** esta estructura. El prompt debe ser autocontenido: un modelo en frío debe poder leerlo y actuar sin explorar el proyecto.
