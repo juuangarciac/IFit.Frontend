@@ -64,10 +64,10 @@ namespace IFit.Services
                 // ── 4. Crear y configurar el toast ───────────────────────────────
                 var toast = new ToastNotification();
                 toast.Initialize(message, type);
-                toast.VerticalOptions = LayoutOptions.End;
+                toast.VerticalOptions = LayoutOptions.Start;
                 toast.ZIndex = 9999;
                 toast.Opacity = 0;
-                toast.TranslationY = 90;
+                toast.TranslationY = -90;
 
                 // Span sobre todas las filas para posicionarse al fondo del Grid
                 int rowSpan = Math.Max(rootGrid.RowDefinitions.Count, 1);
@@ -93,7 +93,7 @@ namespace IFit.Services
                 // ── 7. Animación de salida: slide-down + fade out ────────────────
                 await Task.WhenAll(
                     toast.FadeTo(0, 250, Easing.CubicIn),
-                    toast.TranslateTo(0, 90, 250, Easing.CubicIn)
+                    toast.TranslateTo(0, -90, 250, Easing.CubicIn)
                 );
 
                 // Comprobación final por si llegó otro toast durante la salida

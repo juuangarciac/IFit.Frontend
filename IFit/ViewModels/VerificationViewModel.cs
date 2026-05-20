@@ -58,7 +58,8 @@ public partial class VerificationViewModel : ObservableObject, IQueryAttributabl
     [ObservableProperty]
     public partial string ErrorMessage { get; set; } = string.Empty;
 
-    public bool IsVerifying => CurrentState == RegistrationState.Verifying;
+    public bool IsVerifying => CurrentState == RegistrationState.Verifying
+                             || CurrentState == RegistrationState.Verified;
 
     partial void OnCurrentStateChanged(RegistrationState value)
     {

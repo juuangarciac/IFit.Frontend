@@ -144,7 +144,7 @@
                                         <Label Style="{StaticResource label-p-white}">
                                             <Label.FormattedText>
                                                 <FormattedString>
-                                                    <Span Text="Series: " FontAttributes="Bold"/>
+                                                    <Span Text="Series: " FontFamily="Montserrat-Bold"/>
                                                     <Span Text="{Binding Sets}"/>
                                                 </FormattedString>
                                             </Label.FormattedText>
@@ -152,7 +152,7 @@
                                         <Label Style="{StaticResource label-p-white}">
                                             <Label.FormattedText>
                                                 <FormattedString>
-                                                    <Span Text="Reps: " FontAttributes="Bold"/>
+                                                    <Span Text="Reps: " FontFamily="Montserrat-Bold"/>
                                                     <Span Text="{Binding Reps}"/>
                                                 </FormattedString>
                                             </Label.FormattedText>
@@ -160,7 +160,7 @@
                                         <Label Style="{StaticResource label-p-white}">
                                             <Label.FormattedText>
                                                 <FormattedString>
-                                                    <Span Text="Descanso: " FontAttributes="Bold"/>
+                                                    <Span Text="Descanso: " FontFamily="Montserrat-Bold"/>
                                                     <Span Text="{Binding RestSeconds}"/>
                                                     <Span Text=" seg"/>
                                                 </FormattedString>

@@ -429,6 +429,7 @@
 
     <Style TargetType="Span">
         <Setter Property="TextColor" Value="{StaticResource White}" />
+        <Setter Property="FontFamily" Value="Montserrat-Medium" />
     </Style>
 
     <Style TargetType="Label" x:Key="Headline">
