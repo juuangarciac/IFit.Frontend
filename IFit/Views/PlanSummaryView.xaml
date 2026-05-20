@@ -21,19 +21,18 @@
             Command="{Binding AppearingCommand}" />
     </ContentPage.Behaviors>
 
-    <!-- Raíz: Header arriba, contenido+botón abajo -->
     <Grid>
         <!-- Loading Overlay -->
         <components:LoadingOverlay IsLoading="{Binding IsLoading}"
-                           Message="{Binding StatusMessage}"
-                            ZIndex="999"/>
+                                   Message="{Binding StatusMessage}"
+                                   ZIndex="999"/>
 
         <Grid RowDefinitions="Auto,*">
 
             <!-- ─── HEADER ─── -->
             <Grid Grid.Row="0"
-          Background="{StaticResource CardPremiumYellowGradientColor}"
-          RowDefinitions="Auto,Auto">
+                  Background="{StaticResource CardPremiumYellowGradientColor}"
+                  RowDefinitions="Auto,Auto">
 
                 <!-- Navbar -->
                 <Grid Grid.Row="0" Margin="15">
@@ -43,36 +42,36 @@
                     </Grid.ColumnDefinitions>
 
                     <Button Grid.Column="0"
-                    HorizontalOptions="Start"
-                    VerticalOptions="Center"
-                    BackgroundColor="Transparent"
-                    ImageSource="arrow.png"
-                    Clicked="BackToHome" />
+                            HorizontalOptions="Start"
+                            VerticalOptions="Center"
+                            BackgroundColor="Transparent"
+                            ImageSource="arrow.png"
+                            Clicked="BackToHome" />
 
                     <Image Grid.Column="0"
-                   Grid.ColumnSpan="2"
-                   Source="ifit_logo_white.png"
-                   HeightRequest="20"
-                   WidthRequest="120"
-                   HorizontalOptions="Center"
-                   VerticalOptions="Center" />
+                           Grid.ColumnSpan="2"
+                           Source="ifit_logo_white.png"
+                           HeightRequest="20"
+                           WidthRequest="120"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center" />
                 </Grid>
 
                 <!-- Títulos -->
                 <VerticalStackLayout Grid.Row="1"
-                             Margin="15,0,15,20"
-                             Spacing="6">
+                                     Margin="15,0,15,20"
+                                     Spacing="6">
                     <Label Text="TUS RUTINAS"
-                   FontSize="11"
-                   CharacterSpacing="2"
-                   Opacity="0.7"
-                   Style="{StaticResource label-p-white}" />
-                    <Label Text="Tus rutina"
-                   Style="{StaticResource label-Title-white}" />
+                           FontSize="11"
+                           CharacterSpacing="2"
+                           Opacity="0.7"
+                           Style="{StaticResource label-p-white}" />
+                    <Label Text="Tu rutina"
+                           Style="{StaticResource label-Title-white}" />
                     <Label Text="A continuación te presentamos tus rutinas"
-                   Style="{StaticResource label-p-white}"
-                   Opacity="0.8"
-                   LineBreakMode="WordWrap" />
+                           Style="{StaticResource label-p-white}"
+                           Opacity="0.8"
+                           LineBreakMode="WordWrap" />
                 </VerticalStackLayout>
             </Grid>
 
@@ -86,137 +85,98 @@
                         <!-- SECCIÓN: Rutinas activas -->
                         <VerticalStackLayout Spacing="10">
                             <Label Text="Rutinas activas"
-                           Style="{StaticResource label-h2-white}" />
+                                   Style="{StaticResource label-h2-white}" />
 
                             <CollectionView ItemsSource="{Binding ActiveRoutines}"
-                                    SelectionMode="Single"
-                                    SelectedItem="{Binding SelectedRoutine}">
-
+                                            SelectionMode="Single"
+                                            SelectedItem="{Binding SelectedRoutine}">
                                 <CollectionView.ItemsLayout>
                                     <LinearItemsLayout Orientation="Vertical"
-                                               ItemSpacing="10" />
+                                                       ItemSpacing="10" />
                                 </CollectionView.ItemsLayout>
-                                
+
                                 <CollectionView.ItemTemplate>
                                     <DataTemplate x:DataType="dtos:RoutineResponseDto">
-                                        
-                                        <Border Stroke="{StaticResource BackgroundPrimaryLight}"
-                                        StrokeThickness="1">
-
+                                        <Border StrokeThickness="0">
                                             <VisualStateManager.VisualStateGroups>
                                                 <VisualStateGroupList>
                                                     <VisualStateGroup x:Name="CommonStates">
                                                         <VisualState x:Name="Normal">
                                                             <VisualState.Setters>
-                                                                <Setter Property="BackgroundColor" Value="{DynamicResource BackgroundPrimaryDark}" />
+                                                                <Setter Property="BackgroundColor" Value="{StaticResource BackgroundSecondaryDark}" />
                                                             </VisualState.Setters>
                                                         </VisualState>
                                                         <VisualState x:Name="Selected">
                                                             <VisualState.Setters>
-                                                                <Setter Property="BackgroundColor" Value="{DynamicResource BackgroundSecondaryDark}" />
+                                                                <Setter Property="BackgroundColor" Value="{StaticResource BackgroundPrimaryDark}" />
                                                             </VisualState.Setters>
                                                         </VisualState>
                                                     </VisualStateGroup>
                                                 </VisualStateGroupList>
                                             </VisualStateManager.VisualStateGroups>
-                                            
                                             <Border.StrokeShape>
-                                                <RoundRectangle CornerRadius="14" />
+                                                <RoundRectangle CornerRadius="8" />
                                             </Border.StrokeShape>
-                                            <Border.Shadow>
-                                                <Shadow Brush="Black"
-                                                Opacity="0.2"
-                                                Radius="10"
-                                                Offset="0,3"/>
-                                            </Border.Shadow>
 
-                                            <Grid RowDefinitions="Auto,*">
+                                            <Grid Padding="12,10"
+                                                  ColumnSpacing="12"
+                                                  ColumnDefinitions="48,*,Auto">
 
-                                                <!-- Accent strip -->
-                                                <Border Grid.Row="0"
-                                                StrokeThickness="0"
-                                                Background="{DynamicResource CardPremiumYellowGradientColor}"
-                                                HeightRequest="3"
-                                                HorizontalOptions="Fill">
-                                                    <Border.StrokeShape>
-                                                        <RoundRectangle CornerRadius="14,14,0,0" />
-                                                    </Border.StrokeShape>
-                                                </Border>
-
-                                                <!-- Contenido rutina -->
-                                                <Grid Grid.Row="1"
-                                              ColumnSpacing="12"
-                                              Margin="12,10,12,12"
-                                              ColumnDefinitions="48,1,*,Auto">
-
-                                                    <!-- Días -->
-                                                    <VerticalStackLayout Grid.Column="0"
-                                                                 VerticalOptions="Center"
-                                                                 HorizontalOptions="Center"
-                                                                 Spacing="2">
-                                                        <Label Text="DÍAS"
-                                                       FontSize="9"
-                                                       CharacterSpacing="1"
-                                                       TextColor="White"
-                                                       Opacity="0.5"
-                                                       HorizontalTextAlignment="Center"/>
-                                                        <Label Text="{Binding TrainingDays}"
-                                                       Style="{DynamicResource label-Title-white}"
-                                                       FontSize="28"
-                                                       FontAttributes="Bold,Italic"
-                                                       HorizontalTextAlignment="Center" />
-                                                    </VerticalStackLayout>
-
-                                                    <!-- Separador -->
-                                                    <BoxView Grid.Column="1"
-                                                     BackgroundColor="{StaticResource TextSecondaryColorLight}"
-                                                     Opacity="0.3"
-                                                     VerticalOptions="Fill"
-                                                     WidthRequest="1" />
-
-                                                    <!-- Nombre + descripción + día actual -->
-                                                    <VerticalStackLayout Grid.Column="2"
-                                                                 VerticalOptions="Center"
-                                                                 Margin="8,0,0,0"
-                                                                 Spacing="4">
-
-                                                        <Label Text="{Binding Description}"
-                                                       Style="{DynamicResource label-h2-white}"
-                                                       Opacity="0.7"
-                                                       MaxLines="2"
-                                                       LineBreakMode="TailTruncation"
-                                                       FontSize="13"/>
-                                                        <HorizontalStackLayout Spacing="4"
-                                                                       IsVisible="{Binding CurrentDay, Converter={StaticResource IsNotNullConverter}}">
-                                                            <Label Text="Día actual:"
-                                                           Style="{DynamicResource label-p-white}"
+                                                <!-- Días -->
+                                                <VerticalStackLayout Grid.Column="0"
+                                                                     VerticalOptions="Center"
+                                                                     HorizontalOptions="Center"
+                                                                     Spacing="2">
+                                                    <Label Text="DÍAS"
+                                                           FontSize="9"
+                                                           CharacterSpacing="1"
+                                                           TextColor="White"
                                                            Opacity="0.5"
-                                                           FontSize="11"/>
-                                                            <Label Text="{Binding CurrentDay}"
-                                                           Style="{DynamicResource label-p-white}"
-                                                           FontSize="11"
-                                                           FontAttributes="Bold"/>
-                                                        </HorizontalStackLayout>
-                                                    </VerticalStackLayout>
+                                                           HorizontalTextAlignment="Center"/>
+                                                    <Label Text="{Binding TrainingDays}"
+                                                           Style="{DynamicResource label-Title-white}"
+                                                           FontSize="26"
+                                                           HorizontalTextAlignment="Center" />
+                                                </VerticalStackLayout>
 
-                                                    <!-- Badge activa -->
-                                                    <Border Grid.Column="3"
-                                                    StrokeThickness="0"
-                                                    VerticalOptions="Start"
-                                                    Padding="6,3">
-                                                        <Border.StrokeShape>
-                                                            <RoundRectangle CornerRadius="8" />
-                                                        </Border.StrokeShape>
-                                                        <Border.Background>
-                                                            <SolidColorBrush Color="#4CAF50" />
-                                                        </Border.Background>
-                                                        <Label Text="ACTIVA"
-                                                       FontSize="9"
-                                                       CharacterSpacing="1"
-                                                       TextColor="White"
-                                                       FontAttributes="Bold"/>
-                                                    </Border>
-                                                </Grid>
+                                                <!-- Descripción + día actual -->
+                                                <VerticalStackLayout Grid.Column="1"
+                                                                     VerticalOptions="Center"
+                                                                     Spacing="4">
+                                                    <Label Text="{Binding Description}"
+                                                           Style="{DynamicResource label-h2-white}"
+                                                           MaxLines="2"
+                                                           LineBreakMode="TailTruncation" />
+                                                    <HorizontalStackLayout Spacing="4"
+                                                                           IsVisible="{Binding CurrentDay, Converter={StaticResource IsNotNullConverter}}">
+                                                        <Label Text="Día actual:"
+                                                               Style="{DynamicResource label-p-white}"
+                                                               Opacity="0.5"
+                                                               FontSize="11"/>
+                                                        <Label Text="{Binding CurrentDay}"
+                                                               Style="{DynamicResource label-p-white}"
+                                                               FontSize="11"
+                                                               FontAttributes="Bold"/>
+                                                    </HorizontalStackLayout>
+                                                </VerticalStackLayout>
+
+                                                <!-- Badge ACTIVA -->
+                                                <Border Grid.Column="2"
+                                                        StrokeThickness="0"
+                                                        VerticalOptions="Center"
+                                                        Padding="6,3">
+                                                    <Border.StrokeShape>
+                                                        <RoundRectangle CornerRadius="8" />
+                                                    </Border.StrokeShape>
+                                                    <Border.Background>
+                                                        <SolidColorBrush Color="#4CAF50" />
+                                                    </Border.Background>
+                                                    <Label Text="ACTIVA"
+                                                           FontSize="9"
+                                                           CharacterSpacing="1"
+                                                           TextColor="White"
+                                                           FontAttributes="Bold"/>
+                                                </Border>
                                             </Grid>
                                         </Border>
                                     </DataTemplate>
@@ -227,152 +187,116 @@
                         <!-- SECCIÓN: Todas las rutinas -->
                         <VerticalStackLayout Spacing="10">
                             <Label Text="Todas las rutinas"
-                           Style="{StaticResource label-h2-white}" />
+                                   Style="{StaticResource label-h2-white}" />
 
                             <CollectionView ItemsSource="{Binding AllRoutines}"
-                                    SelectionMode="Single"
-                                    SelectedItem="{Binding SelectedRoutine}">
+                                            SelectionMode="Single"
+                                            SelectedItem="{Binding SelectedRoutine}">
                                 <CollectionView.ItemsLayout>
                                     <LinearItemsLayout Orientation="Vertical"
-                                               ItemSpacing="10" />
+                                                       ItemSpacing="10" />
                                 </CollectionView.ItemsLayout>
+
                                 <CollectionView.ItemTemplate>
                                     <DataTemplate x:DataType="dtos:RoutineResponseDto">
-                                        <Border Stroke="{StaticResource BackgroundPrimaryLight}"
-                                        StrokeThickness="1">
-                                            <Border.StrokeShape>
-                                                <RoundRectangle CornerRadius="14" />
-                                            </Border.StrokeShape>
-                                            <Border.Shadow>
-                                                <Shadow Brush="Black"
-                                                Opacity="0.2"
-                                                Radius="10"
-                                                Offset="0,3"/>
-                                            </Border.Shadow>
-
+                                        <Border StrokeThickness="0">
                                             <VisualStateManager.VisualStateGroups>
                                                 <VisualStateGroupList>
                                                     <VisualStateGroup x:Name="CommonStates">
                                                         <VisualState x:Name="Normal">
                                                             <VisualState.Setters>
-                                                                <Setter Property="BackgroundColor" Value="{DynamicResource BackgroundPrimaryDark}" />
+                                                                <Setter Property="BackgroundColor" Value="{StaticResource BackgroundSecondaryDark}" />
                                                             </VisualState.Setters>
                                                         </VisualState>
                                                         <VisualState x:Name="Selected">
                                                             <VisualState.Setters>
-                                                                <Setter Property="BackgroundColor" Value="{DynamicResource BackgroundSecondaryDark}" />
+                                                                <Setter Property="BackgroundColor" Value="{StaticResource BackgroundPrimaryDark}" />
                                                             </VisualState.Setters>
                                                         </VisualState>
                                                     </VisualStateGroup>
                                                 </VisualStateGroupList>
                                             </VisualStateManager.VisualStateGroups>
+                                            <Border.StrokeShape>
+                                                <RoundRectangle CornerRadius="8" />
+                                            </Border.StrokeShape>
 
-                                            <Grid RowDefinitions="Auto,*">
+                                            <Grid Padding="12,10"
+                                                  ColumnSpacing="12"
+                                                  ColumnDefinitions="48,*,Auto">
 
-                                                <!-- Accent strip -->
-                                                <Border Grid.Row="0"
-                                                StrokeThickness="0"
-                                                Background="{DynamicResource CardPremiumYellowGradientColor}"
-                                                HeightRequest="3"
-                                                HorizontalOptions="Fill">
-                                                    <Border.StrokeShape>
-                                                        <RoundRectangle CornerRadius="14,14,0,0" />
-                                                    </Border.StrokeShape>
-                                                </Border>
-
-                                                <!-- Contenido rutina -->
-                                                <Grid Grid.Row="1"
-                                              ColumnSpacing="12"
-                                              Margin="12,10,12,12"
-                                              ColumnDefinitions="48,1,*,Auto">
-
-                                                    <!-- Días -->
-                                                    <VerticalStackLayout Grid.Column="0"
-                                                                 VerticalOptions="Center"
-                                                                 HorizontalOptions="Center"
-                                                                 Spacing="2">
-                                                        <Label Text="DÍAS"
-                                                       FontSize="9"
-                                                       CharacterSpacing="1"
-                                                       TextColor="White"
-                                                       Opacity="0.5"
-                                                       HorizontalTextAlignment="Center"/>
-                                                        <Label Text="{Binding TrainingDays}"
-                                                       Style="{DynamicResource label-Title-white}"
-                                                       FontSize="28"
-                                                       FontAttributes="Bold,Italic"
-                                                       HorizontalTextAlignment="Center" />
-                                                    </VerticalStackLayout>
-
-                                                    <!-- Separador -->
-                                                    <BoxView Grid.Column="1"
-                                                     BackgroundColor="{StaticResource TextSecondaryColorLight}"
-                                                     Opacity="0.3"
-                                                     VerticalOptions="Fill"
-                                                     WidthRequest="1" />
-
-                                                    <!-- Nombre + descripción + día actual -->
-                                                    <VerticalStackLayout Grid.Column="2"
-                                                                 VerticalOptions="Center"
-                                                                 Margin="8,0,0,0"
-                                                                 Spacing="4">
-
-                                                        <Label Text="{Binding Description}"
-                                                       Style="{DynamicResource label-h2-white}"
-                                                       Opacity="0.7"
-                                                       MaxLines="2"
-                                                        LineBreakMode="TailTruncation"
-                                                       FontSize="13"/>
-                                                        <HorizontalStackLayout Spacing="4"
-                                                                       IsVisible="{Binding CurrentDay, Converter={StaticResource IsNotNullConverter}}">
-                                                            <Label Text="Día actual:"
-                                                           Style="{DynamicResource label-p-white}"
+                                                <!-- Días -->
+                                                <VerticalStackLayout Grid.Column="0"
+                                                                     VerticalOptions="Center"
+                                                                     HorizontalOptions="Center"
+                                                                     Spacing="2">
+                                                    <Label Text="DÍAS"
+                                                           FontSize="9"
+                                                           CharacterSpacing="1"
+                                                           TextColor="White"
                                                            Opacity="0.5"
-                                                           FontSize="11"/>
-                                                            <Label Text="{Binding CurrentDay}"
-                                                           Style="{DynamicResource label-p-white}"
-                                                           FontSize="11"
-                                                           FontAttributes="Bold"/>
-                                                        </HorizontalStackLayout>
-                                                    </VerticalStackLayout>
+                                                           HorizontalTextAlignment="Center"/>
+                                                    <Label Text="{Binding TrainingDays}"
+                                                           Style="{DynamicResource label-Title-white}"
+                                                           FontSize="26"
+                                                           HorizontalTextAlignment="Center" />
+                                                </VerticalStackLayout>
 
-                                                    <!-- Botón Activar (solo rutinas inactivas) -->
-                                                    <Border Grid.Column="3"
-                                                            StrokeThickness="0"
-                                                            VerticalOptions="Start"
-                                                            Padding="6,3">
-                                                        <Border.StrokeShape>
-                                                            <RoundRectangle CornerRadius="8" />
-                                                        </Border.StrokeShape>
-                                                        <Border.Background>
-                                                            <SolidColorBrush Color="{StaticResource TertiaryColor}" />
-                                                        </Border.Background>
-                                                        <Border.Triggers>
-                                                            <DataTrigger TargetType="Border"
-                                                                         Binding="{Binding IsActive}"
-                                                                         Value="True">
-                                                                <Setter Property="IsVisible" Value="False" />
-                                                            </DataTrigger>
-                                                        </Border.Triggers>
-                                                        <Label Text="ACTIVAR"
-                                                               FontSize="9"
-                                                               CharacterSpacing="1"
-                                                               TextColor="{StaticResource BackgroundPrimaryDark}"
-                                                               FontAttributes="Bold">
-                                                            <Label.GestureRecognizers>
-                                                                <TapGestureRecognizer
-                                                                    Command="{Binding Source={x:Reference PlanSummaryPage}, Path=BindingContext.ActivateRoutineCommand}"
-                                                                    CommandParameter="{Binding .}" />
-                                                            </Label.GestureRecognizers>
-                                                        </Label>
-                                                    </Border>
-                                                </Grid>
+                                                <!-- Descripción + día actual -->
+                                                <VerticalStackLayout Grid.Column="1"
+                                                                     VerticalOptions="Center"
+                                                                     Spacing="4">
+                                                    <Label Text="{Binding Description}"
+                                                           Style="{DynamicResource label-h2-white}"
+                                                           MaxLines="2"
+                                                           LineBreakMode="TailTruncation" />
+                                                    <HorizontalStackLayout Spacing="4"
+                                                                           IsVisible="{Binding CurrentDay, Converter={StaticResource IsNotNullConverter}}">
+                                                        <Label Text="Día actual:"
+                                                               Style="{DynamicResource label-p-white}"
+                                                               Opacity="0.5"
+                                                               FontSize="11"/>
+                                                        <Label Text="{Binding CurrentDay}"
+                                                               Style="{DynamicResource label-p-white}"
+                                                               FontSize="11"
+                                                               FontAttributes="Bold"/>
+                                                    </HorizontalStackLayout>
+                                                </VerticalStackLayout>
+
+                                                <!-- Badge ACTIVAR -->
+                                                <Border Grid.Column="2"
+                                                        StrokeThickness="0"
+                                                        VerticalOptions="Center"
+                                                        Padding="6,3">
+                                                    <Border.StrokeShape>
+                                                        <RoundRectangle CornerRadius="8" />
+                                                    </Border.StrokeShape>
+                                                    <Border.Background>
+                                                        <SolidColorBrush Color="{StaticResource TertiaryColor}" />
+                                                    </Border.Background>
+                                                    <Border.Triggers>
+                                                        <DataTrigger TargetType="Border"
+                                                                     Binding="{Binding IsActive}"
+                                                                     Value="True">
+                                                            <Setter Property="IsVisible" Value="False" />
+                                                        </DataTrigger>
+                                                    </Border.Triggers>
+                                                    <Label Text="ACTIVAR"
+                                                           FontSize="9"
+                                                           CharacterSpacing="1"
+                                                           TextColor="{StaticResource BackgroundPrimaryDark}"
+                                                           FontAttributes="Bold">
+                                                        <Label.GestureRecognizers>
+                                                            <TapGestureRecognizer
+                                                                Command="{Binding Source={x:Reference PlanSummaryPage}, Path=BindingContext.ActivateRoutineCommand}"
+                                                                CommandParameter="{Binding .}" />
+                                                        </Label.GestureRecognizers>
+                                                    </Label>
+                                                </Border>
                                             </Grid>
                                         </Border>
                                     </DataTemplate>
                                 </CollectionView.ItemTemplate>
                             </CollectionView>
-
                         </VerticalStackLayout>
 
                     </VerticalStackLayout>
@@ -380,11 +304,11 @@
 
                 <!-- Botón fijo en la parte inferior -->
                 <Button Grid.Row="1"
-                Margin="15,10,15,20"
-                Text="Generar nueva rutina"
-                Style="{StaticResource ButtonBold-XL-dark-yellow}"
-                CornerRadius="{StaticResource CornerRadiusRectangle}"
-                Command="{Binding GenerateNewRoutineCommand}"/>
+                        Margin="15,10,15,20"
+                        Text="Generar nueva rutina"
+                        Style="{StaticResource ButtonBold-XL-dark-yellow}"
+                        CornerRadius="{StaticResource CornerRadiusRectangle}"
+                        Command="{Binding GenerateNewRoutineCommand}"/>
 
             </Grid>
 
