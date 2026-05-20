@@ -32,13 +32,13 @@
 
             <!-- Imagen de fondo -->
             <Image Grid.Row="0"
-           Grid.RowSpan="2"
-           Source="verificationpageimg.jpg"
-           Aspect="AspectFill" />
+                   Grid.RowSpan="2"
+                   Source="verificationpageimg.jpg"
+                   Aspect="AspectFill" />
 
             <!-- Overlay gradiente oscuro para legibilidad -->
             <BoxView Grid.Row="0"
-             Grid.RowSpan="2">
+                     Grid.RowSpan="2">
                 <BoxView.Background>
                     <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
                         <GradientStop Color="#CC000000" Offset="0.0" />
@@ -48,248 +48,238 @@
                 </BoxView.Background>
             </BoxView>
 
-            <!-- Ifit navbar -->
+            <!-- Navbar -->
             <Grid Grid.Row="0" Margin="15">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <Button Grid.Column="0"
-                HorizontalOptions="Start"
-                VerticalOptions="Center"
-                BackgroundColor="Transparent"
-                ImageSource="arrow.png"
-                Clicked="BackToHome" />
+                        HorizontalOptions="Start"
+                        VerticalOptions="Center"
+                        BackgroundColor="Transparent"
+                        ImageSource="arrow.png"
+                        Clicked="BackToHome" />
                 <Image Grid.Column="0"
-               Grid.ColumnSpan="2"
-               Source="ifit_logo_white.png"
-               HeightRequest="20"
-               WidthRequest="120"
-               HorizontalOptions="Center"
-               VerticalOptions="Center" />
+                       Grid.ColumnSpan="2"
+                       Source="ifit_logo_white.png"
+                       HeightRequest="20"
+                       WidthRequest="120"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center" />
             </Grid>
 
-            <!-- Texto con más jerarquía -->
+            <!-- Títulos -->
             <VerticalStackLayout Grid.Row="1"
-                         Margin="15,0,15,20"
-                         Spacing="6"
-                         VerticalOptions="End">
+                                 Margin="15,0,15,20"
+                                 Spacing="6"
+                                 VerticalOptions="End">
                 <Label Text="RESUMEN SEMANAL"
-               FontSize="11"
-               CharacterSpacing="2"
-               Opacity="0.7"
-               Style="{StaticResource label-p-white}" />
+                       FontSize="11"
+                       CharacterSpacing="2"
+                       Opacity="0.7"
+                       Style="{StaticResource label-p-white}" />
                 <Label Text="Tu progreso esta semana"
-               Style="{StaticResource label-Title-white}" />
+                       Style="{StaticResource label-Title-white}" />
                 <Label Text="A continuación te presentamos un resumen de tu progreso semanal"
-               Style="{StaticResource label-p-white}"
-               Opacity="0.8"
-               LineBreakMode="WordWrap" />
+                       Style="{StaticResource label-p-white}"
+                       Opacity="0.8"
+                       LineBreakMode="WordWrap" />
             </VerticalStackLayout>
         </Grid>
 
         <!-- Body -->
         <ScrollView Grid.Row="1"
-                    Margin="0, 10, 0, 0"
+                    Margin="0,10,0,0"
                     IsVisible="{Binding IsLoading, Converter={StaticResource InvertedBoolConverter}}"
                     IsEnabled="{Binding IsLoading, Converter={StaticResource InvertedBoolConverter}}">
-            
-            <VerticalStackLayout Spacing="0">
+
+            <VerticalStackLayout Spacing="0" Margin="15,12,15,0">
 
                 <!-- Separator -->
                 <BoxView HeightRequest="1"
                          BackgroundColor="{StaticResource TextSecondaryColorLight}"
-                         VerticalOptions="Center"
-                         Margin="15, 0, 15, 0"/>
+                         Margin="0,0,0,12" />
 
-                <!-- Description -->
-                <VerticalStackLayout Padding="15,12" Spacing="4">
-                    <Label Text="Descripción"
-                           Style="{StaticResource label-h2-white}" />
+                <!-- Descripción -->
+                <Label Text="Descripción"
+                       Style="{StaticResource label-h2-white}"
+                       Margin="0,0,0,8" />
+
+                <Border StrokeThickness="0"
+                        Margin="0,0,0,16"
+                        BackgroundColor="{StaticResource BackgroundSecondaryDark}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="8"/>
+                    </Border.StrokeShape>
                     <Label Text="{Binding Routine.Description}"
-                           Style="{StaticResource label-p-white}" />
-                </VerticalStackLayout>
+                           Style="{StaticResource label-p-white}"
+                           Padding="12,10" />
+                </Border>
 
-                <!-- Completed sessions -->
-                <VerticalStackLayout Padding="15,8" Spacing="8">
-                    <Label Text="Sesiones completadas"
-                           Style="{StaticResource label-h2-white}" />
-                    <CollectionView ItemsSource="{Binding CompletedSessions}"
-                                    SelectedItem="{Binding TrainingDayDto}"
-                                    SelectionMode="Single">
-                        <CollectionView.ItemTemplate>
-                            <DataTemplate x:DataType="dtos:TrainingDayDto">
-                                <Border StrokeThickness="1"
-                                        Margin="0,4"
-                                        BackgroundColor="{DynamicResource BackgroundPrimaryDark}">
+                <!-- Sesiones completadas -->
+                <Label Text="Sesiones completadas"
+                       Style="{StaticResource label-h2-white}"
+                       Margin="0,0,0,8" />
 
-                                    <VisualStateManager.VisualStateGroups>
-                                        <VisualStateGroupList>
-                                            <VisualStateGroup x:Name="CommonStates">
-                                                <VisualState x:Name="Normal">
-                                                    <VisualState.Setters>
-                                                        <Setter Property="BackgroundColor" Value="{DynamicResource BackgroundPrimaryDark}" />
-                                                    </VisualState.Setters>
-                                                </VisualState>
-                                                <VisualState x:Name="Selected">
-                                                    <VisualState.Setters>
-                                                        <Setter Property="BackgroundColor" Value="{DynamicResource BackgroundSecondaryDark}" />
-                                                    </VisualState.Setters>
-                                                </VisualState>
-                                            </VisualStateGroup>
-                                        </VisualStateGroupList>
-                                    </VisualStateManager.VisualStateGroups>
+                <CollectionView ItemsSource="{Binding CompletedSessions}"
+                                SelectedItem="{Binding TrainingDayDto}"
+                                SelectionMode="Single"
+                                Margin="0,0,0,16">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="dtos:TrainingDayDto">
+                            <Border StrokeThickness="0"
+                                    Margin="0,0,0,8">
+                                <VisualStateManager.VisualStateGroups>
+                                    <VisualStateGroupList>
+                                        <VisualStateGroup x:Name="CommonStates">
+                                            <VisualState x:Name="Normal">
+                                                <VisualState.Setters>
+                                                    <Setter Property="BackgroundColor" Value="{StaticResource BackgroundSecondaryDark}" />
+                                                </VisualState.Setters>
+                                            </VisualState>
+                                            <VisualState x:Name="Selected">
+                                                <VisualState.Setters>
+                                                    <Setter Property="BackgroundColor" Value="{StaticResource BackgroundPrimaryDark}" />
+                                                </VisualState.Setters>
+                                            </VisualState>
+                                        </VisualStateGroup>
+                                    </VisualStateGroupList>
+                                </VisualStateManager.VisualStateGroups>
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="8"/>
+                                </Border.StrokeShape>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="24"/>
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
 
-                                    <Border.StrokeShape>
-                                        <RoundRectangle CornerRadius="8"/>
-                                    </Border.StrokeShape>
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="24"/>
-                                            <ColumnDefinition Width="*" />
-                                        </Grid.ColumnDefinitions>
-                                        <Border Grid.Column="0"
-                                                StrokeThickness="0"
-                                                Margin="0"
-                                                Background="{DynamicResource CardPremiumGradientColor}">
-                                            <Border.StrokeShape>
-                                                <RoundRectangle CornerRadius="8, 0, 8, 0"/>
-                                            </Border.StrokeShape>
-                                        </Border>
-                                        <Grid Grid.Column="1"
-                                              RowSpacing="10"
-                                              Padding="12,10">
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="Auto"/>
-                                                <RowDefinition Height="Auto"/>
-                                            </Grid.RowDefinitions>
+                                    <!-- Barra lateral verde (completada) -->
+                                    <Border Grid.Column="0"
+                                            StrokeThickness="0"
+                                            Margin="0"
+                                            Background="{DynamicResource CardPremiumGradientColor}">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="8,0,8,0"/>
+                                        </Border.StrokeShape>
+                                    </Border>
 
-                                            <Grid Grid.Row="0">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*" />
-                                                    <ColumnDefinition Width="Auto" />
-                                                </Grid.ColumnDefinitions>
+                                    <Grid Grid.Column="1"
+                                          RowSpacing="4"
+                                          Padding="12,10">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
 
-                                                <Label Grid.Column="0"
+                                        <Grid Grid.Row="0">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <Label Grid.Column="0"
                                                    Text="{Binding DayName}"
                                                    Style="{DynamicResource label-h2-white}"/>
-
-                                                <Image Grid.Column="1"
-                                                       VerticalOptions="Center"
-                                                    Source="arrow_icon_white.png"
-                                                    MaximumHeightRequest="20"
-                                                    MaximumWidthRequest="20"/>
-
-                                            </Grid>
-                                            
-                                            <Grid Grid.Row="1">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*"/>
-                                                    <ColumnDefinition Width="25"/>
-                                                </Grid.ColumnDefinitions>
-                                                <Label Grid.Column="0"
-                                                       VerticalOptions="Center"
-                                                       Text="{Binding Description}"
-                                                       Style="{DynamicResource label-p-white}" />
-                                            </Grid>
+                                            <Image Grid.Column="1"
+                                                   VerticalOptions="Center"
+                                                   Source="arrow_icon_white.png"
+                                                   MaximumHeightRequest="20"
+                                                   MaximumWidthRequest="20"/>
                                         </Grid>
+
+                                        <Label Grid.Row="1"
+                                               Text="{Binding Description}"
+                                               Style="{DynamicResource label-p-white}"
+                                               Opacity="0.7" />
                                     </Grid>
-                                </Border>
-                            </DataTemplate>
-                        </CollectionView.ItemTemplate>
-                    </CollectionView>
-                </VerticalStackLayout>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
 
-                <!-- Uncompleted sessions -->
-                <VerticalStackLayout Padding="15,8" Spacing="8">
-                    <Label Text="Sesiones pendientes"
-                           Style="{StaticResource label-h2-white}" />
-                    <CollectionView ItemsSource="{Binding UncompletedSessions}"
-                                    SelectedItem="{Binding TrainingDayDto}"
-                                    SelectionMode="Single">
-                        <CollectionView.ItemTemplate>
-                            <DataTemplate x:DataType="dtos:TrainingDayDto">
-                                <Border StrokeThickness="1"
-                                        Margin="0,4"
-                                        BackgroundColor="{DynamicResource BackgroundPrimaryDark}">
+                <!-- Sesiones pendientes -->
+                <Label Text="Sesiones pendientes"
+                       Style="{StaticResource label-h2-white}"
+                       Margin="0,0,0,8" />
 
-                                    <VisualStateManager.VisualStateGroups>
-                                        <VisualStateGroupList>
-                                            <VisualStateGroup x:Name="CommonStates">
-                                                <VisualState x:Name="Normal">
-                                                    <VisualState.Setters>
-                                                        <Setter Property="BackgroundColor" Value="{DynamicResource BackgroundPrimaryDark}" />
-                                                    </VisualState.Setters>
-                                                </VisualState>
-                                                <VisualState x:Name="Selected">
-                                                    <VisualState.Setters>
-                                                        <Setter Property="BackgroundColor" Value="{DynamicResource BackgroundSecondaryDark}" />
-                                                    </VisualState.Setters>
-                                                </VisualState>
-                                            </VisualStateGroup>
-                                        </VisualStateGroupList>
-                                    </VisualStateManager.VisualStateGroups>
-                                    
-                                    <Border.StrokeShape>
-                                        <RoundRectangle CornerRadius="8"/>
-                                    </Border.StrokeShape>
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="24"/>
-                                            <ColumnDefinition Width="*" />
-                                        </Grid.ColumnDefinitions>
-                                        
-                                        <Border Grid.Column="0"
-                                                StrokeThickness="0"
-                                                Margin="0"
-                                                Background="{DynamicResource CardPremiumIndigoGradientColor}">
-                                            <Border.StrokeShape>
-                                                <RoundRectangle CornerRadius="8, 0, 8, 0"/>
-                                            </Border.StrokeShape>
-                                        </Border>
-                                        <Grid Grid.Column="1"
-                                              RowSpacing="10"
-                                              Padding="12,10">
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="Auto"/>
-                                                <RowDefinition Height="Auto"/>
-                                            </Grid.RowDefinitions>
+                <CollectionView ItemsSource="{Binding UncompletedSessions}"
+                                SelectedItem="{Binding TrainingDayDto}"
+                                SelectionMode="Single"
+                                Margin="0,0,0,16">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="dtos:TrainingDayDto">
+                            <Border StrokeThickness="0"
+                                    Margin="0,0,0,8">
+                                <VisualStateManager.VisualStateGroups>
+                                    <VisualStateGroupList>
+                                        <VisualStateGroup x:Name="CommonStates">
+                                            <VisualState x:Name="Normal">
+                                                <VisualState.Setters>
+                                                    <Setter Property="BackgroundColor" Value="{StaticResource BackgroundSecondaryDark}" />
+                                                </VisualState.Setters>
+                                            </VisualState>
+                                            <VisualState x:Name="Selected">
+                                                <VisualState.Setters>
+                                                    <Setter Property="BackgroundColor" Value="{StaticResource BackgroundPrimaryDark}" />
+                                                </VisualState.Setters>
+                                            </VisualState>
+                                        </VisualStateGroup>
+                                    </VisualStateGroupList>
+                                </VisualStateManager.VisualStateGroups>
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="8"/>
+                                </Border.StrokeShape>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="24"/>
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
 
-                                            <Grid Grid.Row="0">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*" />
-                                                    <ColumnDefinition Width="Auto" />
-                                                </Grid.ColumnDefinitions>
+                                    <!-- Barra lateral índigo (pendiente) -->
+                                    <Border Grid.Column="0"
+                                            StrokeThickness="0"
+                                            Margin="0"
+                                            Background="{DynamicResource CardPremiumIndigoGradientColor}">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="8,0,8,0"/>
+                                        </Border.StrokeShape>
+                                    </Border>
 
-                                                <Label Grid.Column="0"
-                                                        Text="{Binding DayName}"
-                                                        Style="{DynamicResource label-h2-white}"/>
+                                    <Grid Grid.Column="1"
+                                          RowSpacing="4"
+                                          Padding="12,10">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
 
-                                                <Image Grid.Column="1"
-                                                        VerticalOptions="Center"
-                                                         Source="arrow_icon_white.png"
-                                                         MaximumHeightRequest="20"
-                                                         MaximumWidthRequest="20"/>
-                                            </Grid>
-
-                                            <Grid Grid.Row="1">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*"/>
-                                                    <ColumnDefinition Width="25"/>
-                                                </Grid.ColumnDefinitions>
-                                                
-                                                <Label Grid.Column="0"
-                                                       VerticalOptions="Center"
-                                                       Text="{Binding Description}"
-                                                       Style="{DynamicResource label-p-white}" />
-                                            </Grid>
+                                        <Grid Grid.Row="0">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <Label Grid.Column="0"
+                                                   Text="{Binding DayName}"
+                                                   Style="{DynamicResource label-h2-white}"/>
+                                            <Image Grid.Column="1"
+                                                   VerticalOptions="Center"
+                                                   Source="arrow_icon_white.png"
+                                                   MaximumHeightRequest="20"
+                                                   MaximumWidthRequest="20"/>
                                         </Grid>
+
+                                        <Label Grid.Row="1"
+                                               Text="{Binding Description}"
+                                               Style="{DynamicResource label-p-white}"
+                                               Opacity="0.7" />
                                     </Grid>
-                                </Border>
-                            </DataTemplate>
-                        </CollectionView.ItemTemplate>
-                    </CollectionView>
-                </VerticalStackLayout>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
 
             </VerticalStackLayout>
         </ScrollView>
