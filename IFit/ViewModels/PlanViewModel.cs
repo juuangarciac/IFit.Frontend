@@ -41,7 +41,7 @@ namespace IFit.ViewModels
         public partial String StatusMessage { get; set; } = string.Empty;
 
         [ObservableProperty]
-        public partial Boolean IsLoading { get; set; } = false;
+        public partial Boolean IsLoading { get; set; } = true;
 
         [ObservableProperty]
         public partial Boolean IsRoutineCompleted { get; set; } = false;

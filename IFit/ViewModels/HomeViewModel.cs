@@ -66,6 +66,9 @@ public partial class HomeViewModel : ObservableObject
     [ObservableProperty]
     public partial int CurrentCarouselPosition { get; set; } = 0;
 
+    [ObservableProperty]
+    public partial String UserName { get; set; } = string.Empty;
+
     #endregion
 
     #region Services
@@ -102,6 +105,7 @@ public partial class HomeViewModel : ObservableObject
             // CoachModelTypeName ya está en Preferences desde el login: no hace falta llamar a /users/{id}
             var coachName = Preferences.Get("CoachModelTypeName", "tu coach");
             ButtonContent = "Pregunta a " + coachName;
+            UserName = Preferences.Get("UserName", "");
 
             // Defensive read: la clave pudo haberse guardado como int en versiones antiguas.
             // Android lanza ClassCastException si el tipo almacenado no coincide con el de lectura.

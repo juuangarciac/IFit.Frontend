@@ -2,10 +2,8 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using IFit.Models.Dtos.AI;
 using IFit.Services;
+using IFit.Views.Components;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace IFit.ViewModels
 {
@@ -37,6 +35,24 @@ namespace IFit.ViewModels
 
         [ObservableProperty]
         public partial ObservableCollection<TrainingDayDto> UncompletedSessions { get; set; } = new();
+
+        [ObservableProperty]
+        public partial string SessionProgress { get; set; } = "0/0";
+
+        [ObservableProperty]
+        public partial int TotalExercises { get; set; } = 0;
+
+        [ObservableProperty]
+        public partial int TotalSets { get; set; } = 0;
+
+        [ObservableProperty]
+        public partial string EstimatedTime { get; set; } = "0 min";
+
+        [ObservableProperty]
+        public partial bool HasCompletedSessions { get; set; } = false;
+
+        [ObservableProperty]
+        public partial BarChartDrawable? BarChart { get; set; }
 
         #endregion
 
@@ -107,6 +123,47 @@ namespace IFit.ViewModels
                 else
                     UncompletedSessions.Add(day);
             }
+
+            ComputeStats();
+        }
+
+        private void ComputeStats()
+        {
+            SessionProgress = $"{CompletedSessions.Count}/{Routine?.TrainingDays ?? 0}";
+
+            int exercises = 0, sets = 0, seconds = 0;
+            foreach (var day in CompletedSessions)
+            {
+                exercises += day.Exercises.Count;
+                foreach (var ex in day.Exercises)
+                {
+                    int s = ex.Sets ?? 0;
+                    sets += s;
+                    seconds += s * (30 + (ex.RestSeconds ?? 60));
+                }
+            }
+
+            TotalExercises = exercises;
+            TotalSets = sets;
+            EstimatedTime = $"{seconds / 60} min";
+
+            BuildChart();
+        }
+
+        private void BuildChart()
+        {
+            HasCompletedSessions = CompletedSessions.Count > 0;
+            if (!HasCompletedSessions) return;
+
+            var values = CompletedSessions
+                .Select(d => (double)d.Exercises.Count)
+                .ToArray();
+
+            var labels = CompletedSessions
+                .Select(d => d.DayName.Length > 9 ? d.DayName[..9] + "." : d.DayName)
+                .ToArray();
+
+            BarChart = new BarChartDrawable(values, labels);
         }
 
         [RelayCommand]

@@ -244,6 +244,16 @@
         <GradientStop Color="{StaticResource CardThirdYellowGradientColor}" Offset="1.0" />
     </LinearGradientBrush>
 
+    <!-- Cards color - Orange variant (sesiones pendientes) -->
+    <Color x:Key="CardFirstOrangeGradientColor">#FF7043</Color>
+    <Color x:Key="CardSecondOrangeGradientColor">#E64A19</Color>
+    <Color x:Key="CardThirdOrangeGradientColor">#FF222831</Color>
+    <LinearGradientBrush x:Key="CardPremiumOrangeGradientColor" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="{StaticResource CardFirstOrangeGradientColor}" Offset="0.0" />
+        <GradientStop Color="{StaticResource CardSecondOrangeGradientColor}" Offset="0.4" />
+        <GradientStop Color="{StaticResource CardThirdOrangeGradientColor}" Offset="1.0" />
+    </LinearGradientBrush>
+
     <!-- Dark surface background (slightly lighter than black for legibility) -->
     <SolidColorBrush x:Key="SurfaceDark" Color="#141516" />
 

@@ -14,7 +14,7 @@
             EventName="Appearing"
             Command="{Binding AppearingCommand}" />
     </ContentPage.Behaviors>
-    
+
     <ContentPage.BindingContext>
         <vm:PlanViewModel/>
     </ContentPage.BindingContext>
@@ -31,216 +31,214 @@
               Background="{StaticResource CardPremiumYellowGradientColor}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <!-- Ifit navbar -->
             <Grid Grid.Row="0" Margin="15">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <Button Grid.Column="0"
-                HorizontalOptions="Start"
-                VerticalOptions="Center"
-                BackgroundColor="Transparent"
-                ImageSource="arrow.png"
-                Clicked="BackToHome" />
+                        HorizontalOptions="Start"
+                        VerticalOptions="Center"
+                        BackgroundColor="Transparent"
+                        ImageSource="arrow.png"
+                        Clicked="BackToHome" />
                 <Image Grid.Column="0"
-               Grid.ColumnSpan="2"
-               Source="ifit_logo_white.png"
-               HeightRequest="20"
-               WidthRequest="120"
-               HorizontalOptions="Center"
-               VerticalOptions="Center" />
-
+                       Grid.ColumnSpan="2"
+                       Source="ifit_logo_white.png"
+                       HeightRequest="20"
+                       WidthRequest="120"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center" />
             </Grid>
 
-            <!-- Texto con más jerarquía -->
             <VerticalStackLayout Grid.Row="1"
-                 Margin="15,0,15,20"
-                 Spacing="6"
-                 VerticalOptions="End">
+                                 Margin="15,0,15,20"
+                                 Spacing="6"
+                                 VerticalOptions="End">
                 <Label Text="PLAN PERSONALIZADO"
-       FontSize="11"
-       CharacterSpacing="2"
-       Opacity="0.7"
-       Style="{StaticResource label-p-white}" />
+                       FontSize="11"
+                       CharacterSpacing="2"
+                       Opacity="0.7"
+                       Style="{StaticResource label-p-white}" />
                 <Label Text="Tu plan de entreno personalizado"
-       Style="{StaticResource label-Title-white}" />
-                <Label Text="A continuación te presentamos tu plan de entreno personalizado "
-       Style="{StaticResource label-p-white}"
-       Opacity="0.8"
-       LineBreakMode="WordWrap" />
+                       Style="{StaticResource label-Title-white}" />
+                <Label Text="A continuación te presentamos tu plan de entreno personalizado"
+                       Style="{StaticResource label-p-white}"
+                       Opacity="0.8"
+                       LineBreakMode="WordWrap" />
             </VerticalStackLayout>
-
         </Grid>
 
         <!-- Content -->
         <ScrollView Grid.Row="1">
-            <VerticalStackLayout  Margin="15"
-                                  Spacing="10">
+            <VerticalStackLayout Margin="15,12,15,0"
+                                 Spacing="0">
 
-                <!-- CoachMessage -->
-                <Border StrokeThickness="2"
-        Stroke="{DynamicResource BackgroundPrimaryLight}"
-        BackgroundColor="{DynamicResource PrimaryColorLightOpacity}"
-        Margin="0,0,0,15">
-
+                <!-- Coach message bubble -->
+                <Border StrokeThickness="0"
+                        BackgroundColor="{StaticResource BackgroundSecondaryDark}"
+                        Margin="0,0,0,16">
                     <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="{DynamicResource CornerRadiusRectangle}" />
+                        <RoundRectangle CornerRadius="4,16,16,16"/>
                     </Border.StrokeShape>
+                    <Grid Padding="12,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="68"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
 
-                    <Border.Shadow>
-                        <Shadow Brush="{DynamicResource BackgroundPrimaryLight}"
-                Opacity="0.35"
-                Radius="{DynamicResource CornerRadiusRectangle}" />
-                    </Border.Shadow>
+                        <!-- Coach name -->
+                        <Label Grid.Row="0" Grid.Column="0"
+                               Margin="0,0,0,6">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span Text="Tu entrenador " />
+                                    <Span Text="{Binding User.CoachModelTypeName}"
+                                          FontFamily="Montserrat-Bold"
+                                          TextColor="{StaticResource TertiaryColor}"/>
+                                    <Span Text=" te dice:" />
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
 
-                    <Label Margin="10">
-                        <Label.FormattedText>
-                            <FormattedString>
-                                <Span Text="Tu entrenador "
-                      Style="{StaticResource label-p-yellow}"
-                      FontAttributes="Bold"/>
-                                <Span Text="{Binding User.CoachModelTypeName}"
-                      Style="{StaticResource label-p-yellow}"
-                      FontAttributes="Bold"/>
-                                <Span Text=" te dice:&#10;&#10;"
-                      Style="{StaticResource label-p-white}"/>
-                                <Span Text="¡Hola, "
-                      Style="{StaticResource label-p-white}"/>
-                                <Span Text="{Binding User.Name}"
-                      Style="{StaticResource label-p-white}"
-                      FontAttributes="Bold"/>
-                                <Span Text="! Me alegra verte por aquí. 💪"
-                      Style="{StaticResource label-p-white}"/>
-                            </FormattedString>
-                        </Label.FormattedText>
-                    </Label>
+                        <!-- Message -->
+                        <Label Grid.Row="1" Grid.Column="0">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span Text="¡Hola, " />
+                                    <Span Text="{Binding User.Name}"
+                                          FontFamily="Montserrat-Bold"/>
+                                    <Span Text="! Me alegra verte por aquí. 💪" />
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+
+                        <!-- Photo placeholder (top-right) -->
+                        <Border Grid.Row="0" Grid.RowSpan="2" Grid.Column="1"
+                                StrokeThickness="2"
+                                Stroke="{StaticResource TertiaryColor}"
+                                HeightRequest="56"
+                                WidthRequest="56"
+                                VerticalOptions="Center"
+                                HorizontalOptions="Center"
+                                BackgroundColor="{StaticResource BackgroundPrimaryDark}">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="28"/>
+                            </Border.StrokeShape>
+                            <Label Text="🤖"
+                                   FontSize="26"
+                                   HorizontalTextAlignment="Center"
+                                   VerticalTextAlignment="Center"/>
+                        </Border>
+                    </Grid>
                 </Border>
 
                 <!-- Separator -->
                 <BoxView HeightRequest="1"
-       BackgroundColor="{StaticResource TextSecondaryColorLight}"
-       VerticalOptions="Center"
-       Margin="15, 0, 15, 0"/>
+                         BackgroundColor="{StaticResource TextSecondaryColorLight}"
+                         Margin="0,0,0,12" />
 
                 <!-- Description -->
-                <VerticalStackLayout  Spacing="4">
-                    <Label Text="Descripción"
-   Style="{StaticResource label-h2-white}" />
-                    <Label Text="{Binding Routine.Description}"
-   Style="{StaticResource label-p-white}" />
-                </VerticalStackLayout>
-
-                <!-- CollectionView TrainingDayDto -->
-                <VerticalStackLayout Spacing="10">
-                    <Label Text="Sesiones"
+                <Label Text="Descripción"
                        Style="{StaticResource label-h2-white}"
-                       VerticalOptions="Center"/>
+                       Margin="0,0,0,8"/>
 
-                    <VerticalStackLayout Spacing="10"
-                     BindableLayout.ItemsSource="{Binding Days}">
-                        <BindableLayout.ItemTemplate>
-                            <DataTemplate x:DataType="dtos:TrainingDayDto">
-                                <Border Stroke="{StaticResource BackgroundPrimaryLight}"
-                                        StrokeThickness="1"
-                                        Margin="0,0,0,10">
-                                    <Border.StrokeShape>
-                                        <RoundRectangle CornerRadius="14" />
-                                    </Border.StrokeShape>
-                                    <Border.Shadow>
-                                        <Shadow Brush="Black"
-                                                Opacity="0.2"
-                                                Radius="10"
-                                                Offset="0,3"/>
-                                    </Border.Shadow>
-                                    
-                                    <Border.GestureRecognizers>
-                                        <TapGestureRecognizer 
-                                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.SelectDayCommand}"
-                                            CommandParameter="{Binding .}"/>
-                                    </Border.GestureRecognizers>
+                <Border StrokeThickness="0"
+                        Margin="0,0,0,16"
+                        BackgroundColor="{StaticResource BackgroundSecondaryDark}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="8"/>
+                    </Border.StrokeShape>
+                    <Label Text="{Binding Routine.Description}"
+                           Style="{StaticResource label-p-white}"
+                           Padding="12,10" />
+                </Border>
 
-                                    <Grid>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto" />
-                                            <RowDefinition Height="*" />
-                                        </Grid.RowDefinitions>
+                <!-- Sessions -->
+                <Label Text="Sesiones"
+                       Style="{StaticResource label-h2-white}"
+                       Margin="0,0,0,8"/>
 
-                                        <!-- Accent strip -->
-                                        <Border Grid.Row="0"
-                                                StrokeThickness="0"
-                                                Background="{DynamicResource CardPremiumYellowGradientColor}"
-                                                HeightRequest="3"
-                                                HorizontalOptions="Fill">
-                                            <Border.StrokeShape>
-                                                <RoundRectangle CornerRadius="14,14,0,0" />
-                                            </Border.StrokeShape>
-                                        </Border>
+                <VerticalStackLayout Spacing="0"
+                                     BindableLayout.ItemsSource="{Binding Days}">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="dtos:TrainingDayDto">
+                            <Border StrokeThickness="0"
+                                    Margin="0,0,0,8"
+                                    BackgroundColor="{StaticResource BackgroundSecondaryDark}">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="8"/>
+                                </Border.StrokeShape>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.SelectDayCommand}"
+                                        CommandParameter="{Binding .}"/>
+                                </Border.GestureRecognizers>
 
-                                        <!-- Contenido día -->
-                                        <Grid Grid.Row="1"
-                                              ColumnSpacing="12"
-                                              Margin="12,10,12,12">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="48" />
-                                                <ColumnDefinition Width="1" />
-                                                <ColumnDefinition Width="*" />
-                                            </Grid.ColumnDefinitions>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="24"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
 
-                                            <!-- Número de día en círculo -->
-                                            <VerticalStackLayout Grid.Column="0"
-                                                                 VerticalOptions="Center"
-                                                                 HorizontalOptions="Center"
-                                                                 Spacing="2">
-                                                <Label Text="DÍA"
-                                                       FontSize="9"
-                                                       CharacterSpacing="1"
-                                                       TextColor="White"
-                                                       Opacity="0.5"
-                                                       HorizontalTextAlignment="Center"/>
-                                                <Label Text="{Binding DayNumber}"
-                                                       Style="{DynamicResource label-Title-white}"
-                                                       FontSize="28"
-                                                       FontAttributes="Bold,Italic"
-                                                       HorizontalTextAlignment="Center" />
-                                            </VerticalStackLayout>
+                                    <!-- Barra lateral amarilla -->
+                                    <Border Grid.Column="0"
+                                            StrokeThickness="0"
+                                            Margin="0"
+                                            Background="{DynamicResource CardPremiumYellowGradientColor}">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="8,0,8,0"/>
+                                        </Border.StrokeShape>
+                                    </Border>
 
-                                            <!-- Separador -->
-                                            <BoxView Grid.Column="1"
-                                                     BackgroundColor="{StaticResource TextSecondaryColorLight}"
-                                                     Opacity="0.3"
-                                                     VerticalOptions="Fill"
-                                                     WidthRequest="1" />
+                                    <!-- Nombre + descripción -->
+                                    <VerticalStackLayout Grid.Column="1"
+                                                         Padding="12,10"
+                                                         Spacing="4"
+                                                         VerticalOptions="Center">
+                                        <Label Text="{Binding DayName}"
+                                               Style="{DynamicResource label-h2-white}"/>
+                                        <Label Text="{Binding Description}"
+                                               Style="{DynamicResource label-p-white}"
+                                               Opacity="0.7"
+                                               MaxLines="2"
+                                               LineBreakMode="TailTruncation"/>
+                                    </VerticalStackLayout>
 
-                                            <!-- Nombre + descripción -->
-                                            <VerticalStackLayout Grid.Column="2"
-                                                                 VerticalOptions="Center"
-                                                                 Margin="8,0,0,0"
-                                                                 Spacing="4">
-                                                <Label Text="{Binding DayName}"
-                                                       Style="{DynamicResource label-h2-white}"
-                                                       FontSize="15"/>
-                                                <Label Text="{Binding Description}"
-                                                       Style="{DynamicResource label-p-white}"
-                                                       Opacity="0.7"
-                                                       MaxLines="2"
-                                                       LineBreakMode="TailTruncation"
-                                                       FontSize="13"/>
-                                            </VerticalStackLayout>
-                                        </Grid>
-                                    </Grid>
-                                </Border>
-                            </DataTemplate>
-                        </BindableLayout.ItemTemplate>
-                    </VerticalStackLayout>
+                                    <!-- Número de día -->
+                                    <VerticalStackLayout Grid.Column="2"
+                                                         VerticalOptions="Center"
+                                                         HorizontalOptions="Center"
+                                                         Spacing="0"
+                                                         Margin="0,0,14,0">
+                                        <Label Text="DÍA"
+                                               FontSize="9"
+                                               CharacterSpacing="1"
+                                               FontFamily="Montserrat-Bold"
+                                               TextColor="{StaticResource TextPrimaryColorLight}"
+                                               Opacity="0.5"
+                                               HorizontalTextAlignment="Center"/>
+                                        <Label Text="{Binding DayNumber}"
+                                               Style="{DynamicResource label-Title-white}"
+                                               FontSize="22"
+                                               HorizontalTextAlignment="Center"/>
+                                    </VerticalStackLayout>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
                 </VerticalStackLayout>
 
             </VerticalStackLayout>
         </ScrollView>
-
 
         <Button Grid.Row="2"
                 Margin="15"
@@ -252,27 +250,23 @@
 
         <!-- Day Detail Modal -->
         <Grid Grid.RowSpan="3"
-          IsVisible="{Binding IsDetailVisible}"
-          ZIndex="998">
-
-            <!-- Fondo oscuro que bloquea toques -->
+              IsVisible="{Binding IsDetailVisible}"
+              ZIndex="998">
             <BoxView BackgroundColor="#CC000000"
-             VerticalOptions="Fill">
+                     VerticalOptions="Fill">
                 <BoxView.GestureRecognizers>
                     <TapGestureRecognizer />
                 </BoxView.GestureRecognizers>
             </BoxView>
-
             <components:PlanDayDetailView
                 x:Name="DayDetailView"
                 VerticalOptions="End"
                 TrainingDayDto="{Binding SelectedDay}" />
         </Grid>
-        
-        
-        <components:LoadingOverlay  Grid.RowSpan="3"
-                                    IsLoading="{Binding IsLoading}"
-                                    Message="{Binding StatusMessage}"
-                                    ZIndex="999"/>
+
+        <components:LoadingOverlay Grid.RowSpan="3"
+                                   IsLoading="{Binding IsLoading}"
+                                   Message="{Binding StatusMessage}"
+                                   ZIndex="999"/>
     </Grid>
 </ContentPage>

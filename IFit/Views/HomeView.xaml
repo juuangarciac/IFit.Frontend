@@ -35,6 +35,7 @@
       RowSpacing="10">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
@@ -135,8 +136,28 @@
                 </CarouselView.ItemTemplate>
             </CarouselView>
 
+            <!-- Mensaje de bienvenida -->
+            <VerticalStackLayout Grid.Row="1"
+                                 Spacing="4"
+                                 Margin="0,4,0,0"
+                                 IsVisible="{Binding IsLoading, Converter={StaticResource InvertedBoolConverter}}">
+                <Label Style="{StaticResource label-h1-white}">
+                    <Label.FormattedText>
+                        <FormattedString>
+                            <Span Text="Hola, " />
+                            <Span Text="{Binding UserName}"
+                                  FontFamily="Montserrat-Bold"/>
+                            <Span Text=" 👋" />
+                        </FormattedString>
+                    </Label.FormattedText>
+                </Label>
+                <Label Text="Aquí tienes tu entrenamiento de hoy."
+                       Style="{StaticResource label-p-white}"
+                       Opacity="0.6"/>
+            </VerticalStackLayout>
+
             <!-- Entrenamientos de hoy -->
-            <ScrollView Grid.Row="1"
+            <ScrollView Grid.Row="2"
                 VerticalOptions="Fill">
                 
                 <Grid RowSpacing="15">
@@ -358,7 +379,7 @@
             </ScrollView>
 
             <!-- Registrar entrenamiento -->
-            <Button Grid.Row="2"
+            <Button Grid.Row="3"
                 Text="{Binding ButtonContent}"
                 Style="{DynamicResource ButtonBold-XL-dark-white}"
                 CornerRadius="6"

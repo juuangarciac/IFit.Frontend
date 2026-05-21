@@ -5,7 +5,7 @@
              xmlns:dtos="clr-namespace:IFit.Models.Dtos.AI"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:components="clr-namespace:IFit.Views.Components"
-             x:Class="IFit.Views.WeeklySummaryView"
+x:Class="IFit.Views.WeeklySummaryView"
              Title="WeeklySummaryView"
              Shell.NavBarIsVisible="False">
     <ContentPage.Behaviors>
@@ -41,9 +41,9 @@
                      Grid.RowSpan="2">
                 <BoxView.Background>
                     <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                        <GradientStop Color="#CC000000" Offset="0.0" />
-                        <GradientStop Color="#88000000" Offset="0.5" />
-                        <GradientStop Color="#CC000000" Offset="1.0" />
+                        <GradientStop Color="#66000000" Offset="0.0" />
+                        <GradientStop Color="#22000000" Offset="0.5" />
+                        <GradientStop Color="#99000000" Offset="1.0" />
                     </LinearGradientBrush>
                 </BoxView.Background>
             </BoxView>
@@ -100,6 +100,102 @@
                 <BoxView HeightRequest="1"
                          BackgroundColor="{StaticResource TextSecondaryColorLight}"
                          Margin="0,0,0,12" />
+
+                <!-- Stats -->
+                <Grid ColumnSpacing="8" Margin="0,0,0,16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0" StrokeThickness="0"
+                            BackgroundColor="{StaticResource BackgroundSecondaryDark}">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
+                        <VerticalStackLayout Padding="6,10" Spacing="3" HorizontalOptions="Center">
+                            <Label Text="{Binding SessionProgress}"
+                                   FontFamily="Montserrat-Bold"
+                                   FontSize="17"
+                                   TextColor="{StaticResource TertiaryColor}"
+                                   HorizontalTextAlignment="Center"/>
+                            <Label Text="sesiones"
+                                   Style="{StaticResource label-p-white}"
+                                   FontSize="11"
+                                   Opacity="0.6"
+                                   HorizontalTextAlignment="Center"/>
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Border Grid.Column="1" StrokeThickness="0"
+                            BackgroundColor="{StaticResource BackgroundSecondaryDark}">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
+                        <VerticalStackLayout Padding="6,10" Spacing="3" HorizontalOptions="Center">
+                            <Label Text="{Binding TotalExercises}"
+                                   FontFamily="Montserrat-Bold"
+                                   FontSize="17"
+                                   TextColor="{StaticResource TertiaryColor}"
+                                   HorizontalTextAlignment="Center"/>
+                            <Label Text="ejercicios"
+                                   Style="{StaticResource label-p-white}"
+                                   FontSize="11"
+                                   Opacity="0.6"
+                                   HorizontalTextAlignment="Center"/>
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Border Grid.Column="2" StrokeThickness="0"
+                            BackgroundColor="{StaticResource BackgroundSecondaryDark}">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
+                        <VerticalStackLayout Padding="6,10" Spacing="3" HorizontalOptions="Center">
+                            <Label Text="{Binding TotalSets}"
+                                   FontFamily="Montserrat-Bold"
+                                   FontSize="17"
+                                   TextColor="{StaticResource TertiaryColor}"
+                                   HorizontalTextAlignment="Center"/>
+                            <Label Text="series"
+                                   Style="{StaticResource label-p-white}"
+                                   FontSize="11"
+                                   Opacity="0.6"
+                                   HorizontalTextAlignment="Center"/>
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Border Grid.Column="3" StrokeThickness="0"
+                            BackgroundColor="{StaticResource BackgroundSecondaryDark}">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
+                        <VerticalStackLayout Padding="6,10" Spacing="3" HorizontalOptions="Center">
+                            <Label Text="{Binding EstimatedTime}"
+                                   FontFamily="Montserrat-Bold"
+                                   FontSize="17"
+                                   TextColor="{StaticResource TertiaryColor}"
+                                   HorizontalTextAlignment="Center"/>
+                            <Label Text="tiempo est."
+                                   Style="{StaticResource label-p-white}"
+                                   FontSize="11"
+                                   Opacity="0.6"
+                                   HorizontalTextAlignment="Center"/>
+                        </VerticalStackLayout>
+                    </Border>
+                </Grid>
+
+                <!-- Gráfica ejercicios por sesión -->
+                <Border StrokeThickness="0"
+                        BackgroundColor="{StaticResource BackgroundSecondaryDark}"
+                        Margin="0,0,0,16"
+                        IsVisible="{Binding HasCompletedSessions}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="8"/>
+                    </Border.StrokeShape>
+                    <VerticalStackLayout Padding="12,10" Spacing="6">
+                        <Label Text="Ejercicios por sesión"
+                               Style="{StaticResource label-h3-white}"
+                               Opacity="0.7"/>
+                        <GraphicsView Drawable="{Binding BarChart}"
+                                      HeightRequest="160"
+                                      BackgroundColor="Transparent"/>
+                    </VerticalStackLayout>
+                </Border>
 
                 <!-- Descripción -->
                 <Label Text="Descripción"
@@ -191,7 +287,9 @@
                                         <Label Grid.Row="1"
                                                Text="{Binding Description}"
                                                Style="{DynamicResource label-p-white}"
-                                               Opacity="0.7" />
+                                               Opacity="0.7"
+                                               MaxLines="2"
+                                               LineBreakMode="TailTruncation" />
                                     </Grid>
                                 </Grid>
                             </Border>
@@ -237,11 +335,11 @@
                                         <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
 
-                                    <!-- Barra lateral índigo (pendiente) -->
+                                    <!-- Barra lateral naranja (pendiente) -->
                                     <Border Grid.Column="0"
                                             StrokeThickness="0"
                                             Margin="0"
-                                            Background="{DynamicResource CardPremiumIndigoGradientColor}">
+                                            Background="{DynamicResource CardPremiumOrangeGradientColor}">
                                         <Border.StrokeShape>
                                             <RoundRectangle CornerRadius="8,0,8,0"/>
                                         </Border.StrokeShape>
@@ -273,7 +371,9 @@
                                         <Label Grid.Row="1"
                                                Text="{Binding Description}"
                                                Style="{DynamicResource label-p-white}"
-                                               Opacity="0.7" />
+                                               Opacity="0.7"
+                                               MaxLines="2"
+                                               LineBreakMode="TailTruncation" />
                                     </Grid>
                                 </Grid>
                             </Border>

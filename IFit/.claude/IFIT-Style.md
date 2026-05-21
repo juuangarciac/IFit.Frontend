@@ -16,7 +16,8 @@
 | `BackgroundPrimaryLight` | `#EEEEEE` | Inputs, superficies claras |
 | `PremiumGradient` | azul→oscuro (vertical) | Fondo del HomeView |
 | `CardPremiumGradientColor` | cyan→verde→`#222831` | Barra lateral: entrenamiento activo / completado |
-| `CardPremiumIndigoGradientColor` | índigo→azul→oscuro | Barra lateral: sesiones pendientes |
+| `CardPremiumOrangeGradientColor` | naranja→naranja oscuro→`#222831` | Barra lateral: sesiones pendientes |
+| `CardPremiumIndigoGradientColor` | índigo→azul→oscuro | Sin uso activo (reemplazado por Orange) |
 | `CardPremiumYellowGradientColor` | amarillo→dorado→`#222831` | Header de PlanSummaryView, barra lateral destacada |
 
 **Regla**: nunca usar valores hex inline en XAML. Siempre `{StaticResource TokenName}`.
