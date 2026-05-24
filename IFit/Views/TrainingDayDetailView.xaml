@@ -112,61 +112,115 @@
                        Style="{StaticResource label-h2-white}"
                        Margin="0,0,0,8" />
 
-                <CollectionView ItemsSource="{Binding TrainingDay.Exercises}">
+                <CollectionView ItemsSource="{Binding TrainingDay.Exercises}"
+                                SelectionMode="Single"
+                                SelectedItem="{Binding SelectedExercise}">
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="dto:ExerciseDto">
                             <Border StrokeThickness="0"
-                                    Margin="0,0,0,8"
-                                    BackgroundColor="{StaticResource BackgroundSecondaryDark}">
+                                    Margin="0,0,0,8">
+                                <VisualStateManager.VisualStateGroups>
+                                    <VisualStateGroupList>
+                                        <VisualStateGroup x:Name="CommonStates">
+                                            <VisualState x:Name="Normal">
+                                                <VisualState.Setters>
+                                                    <Setter Property="BackgroundColor" Value="{StaticResource BackgroundSecondaryDark}"/>
+                                                </VisualState.Setters>
+                                            </VisualState>
+                                            <VisualState x:Name="Selected">
+                                                <VisualState.Setters>
+                                                    <Setter Property="BackgroundColor" Value="{StaticResource BackgroundPrimaryDark}"/>
+                                                </VisualState.Setters>
+                                            </VisualState>
+                                        </VisualStateGroup>
+                                    </VisualStateGroupList>
+                                </VisualStateManager.VisualStateGroups>
                                 <Border.StrokeShape>
                                     <RoundRectangle CornerRadius="8"/>
                                 </Border.StrokeShape>
-                                <Grid Padding="12,10"
-                                      RowSpacing="5">
+                                <Grid Padding="12,10" RowSpacing="4">
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="Auto"/>
                                     </Grid.RowDefinitions>
 
-                                    <Label Grid.Row="0"
-                                           Text="{Binding ExerciseName}"
-                                           Style="{StaticResource label-h2-white}" />
+                                    <Grid Grid.Row="0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Label Grid.Column="0"
+                                               Text="{Binding ExerciseName}"
+                                               Style="{StaticResource label-h2-white}" />
+                                        <HorizontalStackLayout Grid.Column="1"
+                                                               Spacing="6"
+                                                               HorizontalOptions="End"
+                                                               VerticalOptions="Center">
 
-                                    <Label Grid.Row="1"
-                                           Text="{Binding Notes}"
-                                           Style="{StaticResource label-p-white}"
-                                           Opacity="0.7"
-                                           IsVisible="{Binding Notes,
-                                               Converter={StaticResource StringNotNullOrEmptyConverter}}" />
+                                            <!-- Catálogo -->
+                                            <Border StrokeThickness="1.5"
+                                                    Stroke="{StaticResource TertiaryColor}"
+                                                    BackgroundColor="Transparent"
+                                                    WidthRequest="30"
+                                                    HeightRequest="30">
+                                                <Border.StrokeShape>
+                                                    <RoundRectangle CornerRadius="15"/>
+                                                </Border.StrokeShape>
+                                                <Border.GestureRecognizers>
+                                                    <TapGestureRecognizer
+                                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.OpenInCatalogCommand}"
+                                                        CommandParameter="{Binding .}" />
+                                                </Border.GestureRecognizers>
+                                                <Image Source="arrow_icon_white.png"
+                                                       WidthRequest="12"
+                                                       HeightRequest="12"
+                                                       HorizontalOptions="Center"
+                                                       VerticalOptions="Center"
+                                                       InputTransparent="True" />
+                                            </Border>
 
-                                    <HorizontalStackLayout Grid.Row="2" Spacing="16">
-                                        <Label Style="{StaticResource label-p-white}">
-                                            <Label.FormattedText>
-                                                <FormattedString>
-                                                    <Span Text="Series: " FontFamily="Montserrat-Bold"/>
-                                                    <Span Text="{Binding Sets}"/>
-                                                </FormattedString>
-                                            </Label.FormattedText>
-                                        </Label>
-                                        <Label Style="{StaticResource label-p-white}">
-                                            <Label.FormattedText>
-                                                <FormattedString>
-                                                    <Span Text="Reps: " FontFamily="Montserrat-Bold"/>
-                                                    <Span Text="{Binding Reps}"/>
-                                                </FormattedString>
-                                            </Label.FormattedText>
-                                        </Label>
-                                        <Label Style="{StaticResource label-p-white}">
-                                            <Label.FormattedText>
-                                                <FormattedString>
-                                                    <Span Text="Descanso: " FontFamily="Montserrat-Bold"/>
-                                                    <Span Text="{Binding RestSeconds}"/>
-                                                    <Span Text=" seg"/>
-                                                </FormattedString>
-                                            </Label.FormattedText>
-                                        </Label>
-                                    </HorizontalStackLayout>
+                                            <!-- IA -->
+                                            <Border StrokeThickness="0"
+                                                    BackgroundColor="{StaticResource TertiaryColor}"
+                                                    WidthRequest="30"
+                                                    HeightRequest="30">
+                                                <Border.StrokeShape>
+                                                    <RoundRectangle CornerRadius="15"/>
+                                                </Border.StrokeShape>
+                                                <Border.GestureRecognizers>
+                                                    <TapGestureRecognizer
+                                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.ExplainExerciseCommand}"
+                                                        CommandParameter="{Binding .}" />
+                                                </Border.GestureRecognizers>
+                                                <Label Text="IA"
+                                                       TextColor="{StaticResource BackgroundPrimaryDark}"
+                                                       FontFamily="Montserrat-Bold"
+                                                       FontSize="11"
+                                                       HorizontalTextAlignment="Center"
+                                                       VerticalTextAlignment="Center" />
+                                            </Border>
+
+                                        </HorizontalStackLayout>
+                                    </Grid>
+
+                                    <Label Grid.Row="1" Style="{StaticResource label-p-white}">
+                                        <Label.FormattedText>
+                                            <FormattedString>
+                                                <Span Text="{Binding Sets}"
+                                                      FontFamily="Montserrat-Bold"
+                                                      TextColor="{StaticResource TertiaryColor}"/>
+                                                <Span Text=" series  ·  "/>
+                                                <Span Text="{Binding Reps}"
+                                                      FontFamily="Montserrat-Bold"
+                                                      TextColor="{StaticResource TertiaryColor}"/>
+                                                <Span Text=" reps  ·  "/>
+                                                <Span Text="{Binding RestSeconds}"
+                                                      FontFamily="Montserrat-Bold"
+                                                      TextColor="{StaticResource TertiaryColor}"/>
+                                                <Span Text=" seg"/>
+                                            </FormattedString>
+                                        </Label.FormattedText>
+                                    </Label>
                                 </Grid>
                             </Border>
                         </DataTemplate>
@@ -198,5 +252,164 @@
             Grid.RowSpan="3"
             IsLoading="{Binding IsLoading}"
             Message="{Binding StatusMessage}" />
+
+        <!-- Modal: explicación de ejercicio -->
+        <Grid Grid.RowSpan="3"
+              IsVisible="{Binding IsExplanationModalVisible}">
+
+            <!-- Fondo semitransparente — tap para cerrar -->
+            <BoxView BackgroundColor="#BB000000">
+                <BoxView.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding CloseExplanationCommand}" />
+                </BoxView.GestureRecognizers>
+            </BoxView>
+
+            <!-- Card centrada -->
+            <Border BackgroundColor="{StaticResource BackgroundSecondaryDark}"
+                    StrokeThickness="0"
+                    VerticalOptions="Center"
+                    HorizontalOptions="Fill"
+                    Margin="20,0">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="12"/>
+                </Border.StrokeShape>
+                <VerticalStackLayout Spacing="12" Padding="16">
+
+                    <!-- Header: nombre + cerrar -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0"
+                               Text="{Binding ExplanationExerciseName}"
+                               Style="{StaticResource label-h2-white}"
+                               VerticalOptions="Center"/>
+                        <Label Grid.Column="1"
+                               Text="✕"
+                               TextColor="{StaticResource TextPrimaryColorLight}"
+                               FontSize="18"
+                               MinimumWidthRequest="36"
+                               MinimumHeightRequest="36"
+                               HorizontalTextAlignment="Center"
+                               VerticalTextAlignment="Center">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding CloseExplanationCommand}" />
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </Grid>
+
+                    <BoxView HeightRequest="1"
+                             BackgroundColor="{StaticResource TextSecondaryColorLight}"
+                             Opacity="0.25"/>
+
+                    <!-- Spinner mientras carga -->
+                    <ActivityIndicator IsRunning="{Binding IsExplanationLoading}"
+                                       IsVisible="{Binding IsExplanationLoading}"
+                                       Color="{StaticResource TertiaryColor}"
+                                       HorizontalOptions="Center"/>
+
+                    <!-- Texto de la explicación -->
+                    <ScrollView MaximumHeightRequest="320"
+                                IsVisible="{Binding IsExplanationLoading,
+                                    Converter={StaticResource InvertedBoolConverter}}">
+                        <Label Text="{Binding ExplanationText}"
+                               Style="{StaticResource label-p-white}"
+                               LineBreakMode="WordWrap"/>
+                    </ScrollView>
+
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+
+        <!-- Modal: ejercicio no disponible en catálogo -->
+        <Grid Grid.RowSpan="3"
+              IsVisible="{Binding IsCatalogNotFoundModalVisible}">
+
+            <!-- Fondo semitransparente -->
+            <BoxView BackgroundColor="#BB000000">
+                <BoxView.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding CloseCatalogNotFoundCommand}" />
+                </BoxView.GestureRecognizers>
+            </BoxView>
+
+            <!-- Card centrada -->
+            <Border BackgroundColor="{StaticResource BackgroundSecondaryDark}"
+                    StrokeThickness="0"
+                    VerticalOptions="Center"
+                    HorizontalOptions="Fill"
+                    Margin="20,0">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="12"/>
+                </Border.StrokeShape>
+                <VerticalStackLayout Spacing="12" Padding="16">
+
+                    <!-- Header: nombre + cerrar -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0"
+                               Text="{Binding CatalogNotFoundExerciseName}"
+                               Style="{StaticResource label-h2-white}"
+                               VerticalOptions="Center"/>
+                        <Label Grid.Column="1"
+                               Text="✕"
+                               TextColor="{StaticResource TextPrimaryColorLight}"
+                               FontSize="18"
+                               MinimumWidthRequest="36"
+                               MinimumHeightRequest="36"
+                               HorizontalTextAlignment="Center"
+                               VerticalTextAlignment="Center">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding CloseCatalogNotFoundCommand}" />
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </Grid>
+
+                    <BoxView HeightRequest="1"
+                             BackgroundColor="{StaticResource TextSecondaryColorLight}"
+                             Opacity="0.25"/>
+
+                    <!-- Icono de estado -->
+                    <Border StrokeThickness="0"
+                            BackgroundColor="{StaticResource BackgroundPrimaryDark}"
+                            WidthRequest="48"
+                            HeightRequest="48"
+                            HorizontalOptions="Center">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="24"/>
+                        </Border.StrokeShape>
+                        <Label Text="↗"
+                               TextColor="{StaticResource TertiaryColor}"
+                               FontSize="22"
+                               HorizontalTextAlignment="Center"
+                               VerticalTextAlignment="Center"/>
+                    </Border>
+
+                    <!-- Mensaje -->
+                    <Label Text="Este ejercicio todavía no está en nuestro catálogo."
+                           Style="{StaticResource label-h3-white}"
+                           HorizontalTextAlignment="Center"
+                           Opacity="0.9"/>
+
+                    <Label Text="Seguimos ampliándolo continuamente — no tardará en estar disponible."
+                           Style="{StaticResource label-p-white}"
+                           HorizontalTextAlignment="Center"
+                           Opacity="0.65"
+                           LineBreakMode="WordWrap"/>
+
+                    <!-- CTA: explorar catálogo de todas formas -->
+                    <Button Text="Explorar catálogo"
+                            Style="{StaticResource ButtonBold-XL-yellow}"
+                            CornerRadius="{StaticResource CornerRadiusRectangle}"
+                            Command="{Binding OpenCatalogAnywayCommand}"
+                            Margin="0,4,0,0"/>
+
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+
     </Grid>
 </ContentPage>

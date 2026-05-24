@@ -2,14 +2,12 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:IFit.ViewModels"
-             xmlns:views="clr-namespace:IFit.Views.Templates"
              xmlns:components="clr-namespace:IFit.Views.Components"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:dtos="clr-namespace:IFit.Models.Dtos.Exercise"
              x:Class="IFit.Views.ExerciseCatalogView"
              x:Name="ExerciseCatalogPage"
-             Shell.NavBarIsVisible="False"
-             BackgroundColor="{DynamicResource BackgroundPrimaryDark}">
+             Shell.NavBarIsVisible="False">
 
     <ContentPage.Behaviors>
         <toolkit:EventToCommandBehavior
@@ -21,14 +19,13 @@
         <vm:ExerciseCatalogViewModel />
     </ContentPage.BindingContext>
 
-    <Grid BackgroundColor="{DynamicResource BackgroundPrimaryDark}"
-          RowSpacing="0">
+    <Grid RowSpacing="0">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />   <!-- Header -->
-            <RowDefinition Height="Auto" />   <!-- Búsqueda -->
-            <RowDefinition Height="Auto" />   <!-- Indicador de carga (collapsa a 0 cuando no carga) -->
-            <RowDefinition Height="*" />      <!-- Lista de ejercicios -->
-            <RowDefinition Height="Auto" />   <!-- Botón inferior -->
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <!-- Loading Overlay: solo para transiciones de navegación -->
@@ -44,80 +41,66 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
             <ImageButton Grid.Column="0"
                          Source="arrow_icon_white.png"
-                         MaximumHeightRequest="16"
-                         MaximumWidthRequest="16"
+                         HeightRequest="20"
+                         WidthRequest="20"
                          VerticalOptions="Center"
                          Command="{Binding GoToHomeCommand}"
                          Rotation="180" />
 
             <HorizontalStackLayout Grid.Column="1"
                                    HorizontalOptions="Start"
-                                    VerticalOptions="Center">
+                                   VerticalOptions="Center">
                 <Label Text="Catálogo de "
-                       Style="{DynamicResource label-Title-white}"
-                       FontSize="18"/>
-                
+                       Style="{StaticResource label-h1-white}" />
                 <Label Text="Ejercicios"
-                       Style="{DynamicResource label-Title-yellow}" 
-                       FontSize="18"/>
-                  
+                       Style="{StaticResource label-h1-yellow}" />
             </HorizontalStackLayout>
-
         </Grid>
 
-        
-            <Grid Grid.Row="1"
-                  Margin="15"
-                  ColumnDefinitions="*,Auto"
-                  ColumnSpacing="3">
+        <!-- Row 1: Barra de búsqueda -->
+        <Grid Grid.Row="1"
+              Margin="15,0,15,12"
+              ColumnDefinitions="*,Auto"
+              ColumnSpacing="8">
 
-            <!-- Row 1: Barra de búsqueda -->
-            <Border  Grid.Column="0"
-                BackgroundColor="{DynamicResource BackgroundPrimaryLight}"
-                StrokeThickness="0"
-                     Padding="12, 0">
-
+            <Border Grid.Column="0"
+                    BackgroundColor="{StaticResource BackgroundPrimaryLight}"
+                    StrokeThickness="0"
+                    Padding="12,0">
                 <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="10" />
+                    <RoundRectangle CornerRadius="8" />
                 </Border.StrokeShape>
-               
-                <!-- Campo de texto -->
                 <Entry Text="{Binding SearchText}"
                        Placeholder="Buscar por músculo, ej: pecho"
-                       PlaceholderColor="{DynamicResource BackgroundPrimaryDark}"
-                       TextColor="{DynamicResource BackgroundPrimaryDark}"
+                       PlaceholderColor="{StaticResource BackgroundSecondaryDark}"
+                       TextColor="{StaticResource BackgroundPrimaryDark}"
                        BackgroundColor="Transparent"
                        ReturnType="Search"
                        ReturnCommand="{Binding SearchCommand}"
-                       ClearButtonVisibility="WhileEditing"/>
-
+                       ClearButtonVisibility="WhileEditing" />
             </Border>
-                
-            <!-- Botón buscar -->
-                <Button Grid.Column="1"
-                        Grid.ColumnSpan="2"
-                        Text="Buscar"
-                        Command="{Binding SearchCommand}"
-                        Style="{DynamicResource ButtonBold-XL-yellow}"
-                        FontSize="12"
-                        Padding="15,0"
-                        HorizontalOptions="Fill"
-                        VerticalOptions="Center"
-                        CornerRadius="8" />
-            </Grid>
 
-        <!-- Row 2: Indicador de carga inline — la fila collapsa sola cuando IsVisible=false -->
+            <Button Grid.Column="1"
+                    Text="Buscar"
+                    Command="{Binding SearchCommand}"
+                    Style="{StaticResource ButtonBold-XL-yellow}"
+                    FontSize="12"
+                    Padding="15,0"
+                    VerticalOptions="Center"
+                    CornerRadius="{StaticResource CornerRadiusRectangle}" />
+        </Grid>
+
+        <!-- Row 2: Indicador inline de carga de datos (no bloquea la lista) -->
         <ActivityIndicator Grid.Row="2"
                            IsRunning="{Binding IsLoadingData}"
                            IsVisible="{Binding IsLoadingData}"
-                           Color="{DynamicResource QuaternaryColor}"
+                           Color="{StaticResource TertiaryColor}"
                            HorizontalOptions="Center"
-                           Margin="0,8,0,4" />
+                           Margin="0,4" />
 
         <!-- Row 3: Listado de ejercicios -->
         <CollectionView Grid.Row="3"
@@ -126,9 +109,8 @@
                         ItemSizingStrategy="MeasureFirstItem"
                         RemainingItemsThreshold="4"
                         RemainingItemsThresholdReachedCommand="{Binding LoadMoreCommand}"
-                        Margin="5,15, 5, 15">
+                        Margin="15,4,15,8">
 
-            <!-- Estado vacío -->
             <CollectionView.EmptyView>
                 <VerticalStackLayout VerticalOptions="Center"
                                      HorizontalOptions="Center"
@@ -136,94 +118,78 @@
                                      Padding="30"
                                      IsVisible="{Binding IsEmpty}">
                     <Label Text="Sin resultados"
-                           Style="{DynamicResource label-h2-white}"
+                           Style="{StaticResource label-h2-white}"
                            HorizontalTextAlignment="Center"
                            Opacity="0.7" />
                     <Label Text="Prueba con otro término de búsqueda"
-                           Style="{DynamicResource label-p-white}"
+                           Style="{StaticResource label-p-white}"
                            HorizontalTextAlignment="Center"
                            Opacity="0.5" />
                 </VerticalStackLayout>
             </CollectionView.EmptyView>
 
-            <!-- Tarjeta de ejercicio -->
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="dtos:ExerciseSummaryDto">
                     <Border Margin="0,0,0,8"
-                            BackgroundColor="{DynamicResource PrimaryColorLightOpacity}"
-                            StrokeThickness="2"
-                            Stroke="{DynamicResource BackgroundPrimaryLight}">
+                            BackgroundColor="{StaticResource BackgroundSecondaryDark}"
+                            StrokeThickness="0">
                         <Border.GestureRecognizers>
                             <TapGestureRecognizer
                                 Command="{Binding Source={x:Reference ExerciseCatalogPage}, Path=BindingContext.OpenDetailCommand}"
                                 CommandParameter="{Binding .}" />
                         </Border.GestureRecognizers>
                         <Border.StrokeShape>
-                            <RoundRectangle CornerRadius="{DynamicResource CornerRadiusRectangle}" />
+                            <RoundRectangle CornerRadius="8" />
                         </Border.StrokeShape>
 
-                        <Grid Padding="12,10"
-                              RowSpacing="6"
-                              RowDefinitions="Auto,Auto,Auto">
+                        <Grid Padding="12,10" RowSpacing="5" RowDefinitions="Auto,Auto,Auto">
 
-                            <!-- Nombre del ejercicio -->
+                            <!-- Nombre -->
                             <Label Grid.Row="0"
                                    Text="{Binding Name}"
-                                   Style="{DynamicResource label-h2-white}"
-                                   FontSize="16"
-                                   FontAttributes="Bold"
+                                   Style="{StaticResource label-h2-white}"
                                    LineBreakMode="WordWrap" />
 
                             <!-- Badges: Categoría · Nivel · Equipamiento -->
-                            <FlexLayout Grid.Row="1"
-                                        Wrap="Wrap"
-                                        Direction="Row"
-                                        JustifyContent="Start"
-                                        AlignItems="Center">
+                            <HorizontalStackLayout Grid.Row="1" Spacing="6" Margin="0,2,0,0">
 
-                                <!-- Categoría -->
-                                <Border BackgroundColor="{DynamicResource QuaternaryColor}"
+                                <Border BackgroundColor="{StaticResource BackgroundPrimaryDark}"
                                         StrokeThickness="0"
-                                        Margin="0,2,6,2"
                                         Padding="8,3">
                                     <Border.StrokeShape>
                                         <RoundRectangle CornerRadius="6" />
                                     </Border.StrokeShape>
                                     <Label Text="{Binding Category}"
-                                           TextColor="{DynamicResource BackgroundSecondaryDark}"
+                                           TextColor="{StaticResource TextSecondaryColorLight}"
                                            FontSize="11"
                                            FontFamily="Montserrat-Medium" />
                                 </Border>
 
-                                <!-- Nivel -->
-                                <Border BackgroundColor="{DynamicResource TertiaryColor}"
+                                <Border BackgroundColor="{StaticResource TertiaryColor}"
                                         StrokeThickness="0"
-                                        Margin="0,2,6,2"
                                         Padding="8,3">
                                     <Border.StrokeShape>
                                         <RoundRectangle CornerRadius="6" />
                                     </Border.StrokeShape>
                                     <Label Text="{Binding Level}"
-                                           TextColor="{DynamicResource BackgroundPrimaryDark}"
+                                           TextColor="{StaticResource BackgroundPrimaryDark}"
                                            FontSize="11"
                                            FontFamily="Montserrat-Medium" />
                                 </Border>
 
-                                <!-- Equipamiento -->
-                                <Border BackgroundColor="Transparent"
-                                        StrokeThickness="1"
-                                        Stroke="{DynamicResource BackgroundPrimaryLight}"
-                                        Margin="0,2,0,2"
+                                <Border BackgroundColor="{StaticResource BackgroundPrimaryDark}"
+                                        StrokeThickness="0"
                                         Padding="8,3">
                                     <Border.StrokeShape>
                                         <RoundRectangle CornerRadius="6" />
                                     </Border.StrokeShape>
                                     <Label Text="{Binding Equipment}"
-                                           TextColor="{DynamicResource TextSecondaryColorLight}"
+                                           TextColor="{StaticResource TextPrimaryColorLight}"
                                            FontSize="11"
                                            FontFamily="Montserrat-Medium" />
                                 </Border>
-                            </FlexLayout>
+
+                            </HorizontalStackLayout>
 
                             <!-- Músculos principales -->
                             <Label Grid.Row="2"
@@ -232,30 +198,30 @@
                                 <Label.FormattedText>
                                     <FormattedString>
                                         <Span Text="Músculos: "
-                                              TextColor="{DynamicResource TextSecondaryColorLight}"
+                                              TextColor="{StaticResource TextSecondaryColorLight}"
                                               FontFamily="Montserrat-Medium"
                                               FontSize="12" />
                                         <Span Text="{Binding PrimaryMuscles[0]}"
-                                              TextColor="White"
+                                              TextColor="{StaticResource TextPrimaryColorLight}"
                                               FontFamily="Montserrat-Medium"
                                               FontSize="12" />
                                     </FormattedString>
                                 </Label.FormattedText>
                             </Label>
+
                         </Grid>
                     </Border>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
-
         </CollectionView>
 
-        <!-- Row 4: Footer de navegación -->
+        <!-- Row 4: Footer -->
         <Button Grid.Row="4"
-                    Text="Crear rutina"
-                    Command="{Binding GoToRoutineBuilderCommand}"
-                    Style="{DynamicResource ButtonBold-XL-dark-yellow}"
-                    CornerRadius="8"
-                    VerticalOptions="Center" 
-                    Margin="15"/>
+                Text="Crear rutina"
+                Command="{Binding GoToRoutineBuilderCommand}"
+                Style="{StaticResource ButtonBold-XL-dark-yellow}"
+                CornerRadius="{StaticResource CornerRadiusRectangle}"
+                VerticalOptions="Center"
+                Margin="15,8,15,20" />
     </Grid>
 </ContentPage>

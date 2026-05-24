@@ -1,6 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Text;
-using IFit.Helper;
 using IFit.Models;
 using IFit.Models.Dtos.AI;
 using IFit.Models.Dtos.Questionnaire;
@@ -56,11 +54,12 @@ namespace IFit.Services
             try
             {
                 await _database.CreateTableAsync<CoachConversation>();
-                Debug.WriteLine("✓ Tabla CoachConversation inicializada correctamente");
+                await _database.CreateTableAsync<ExerciseExplanation>();
+                Debug.WriteLine("✓ Tablas AI inicializadas correctamente");
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"✗ Error inicializando tabla CoachConversation: {ex.Message}");
+                Debug.WriteLine($"✗ Error inicializando tablas AI: {ex.Message}");
             }
         }
 
@@ -141,6 +140,74 @@ namespace IFit.Services
                 Debug.WriteLine($"StackTrace: {ex.StackTrace}");
                 return null;
             }
+        }
+
+        #endregion
+
+        #region Explicación de Ejercicios
+
+        /// <summary>
+        /// Devuelve la explicación de un ejercicio: primero intenta desde caché SQLite;
+        /// si no existe, pregunta al coach del usuario y guarda el resultado.
+        /// </summary>
+        public async Task<string?> GetExerciseExplanationAsync(
+            string exerciseName, int? sets, string? reps, int? restSeconds,
+            long userId, string coachName, string experienceName = "")
+        {
+            var key        = exerciseName.ToLower().Trim();
+            var coach      = coachName.ToLower().Trim();
+            var experience = experienceName.ToLower().Trim();
+
+            // 1. Caché — la clave incluye el nivel para que principiantes y avanzados reciban explicaciones distintas
+            var cached = await _database.Table<ExerciseExplanation>()
+                .Where(e => e.ExerciseName == key && e.CoachName == coach && e.ExperienceName == experience)
+                .FirstOrDefaultAsync();
+
+            if (cached != null)
+            {
+                Debug.WriteLine($"✓ Explicación de '{exerciseName}' desde caché");
+                return cached.Explanation;
+            }
+
+            // 2. Llamada a la IA
+            var details = new System.Text.StringBuilder();
+            if (sets.HasValue)        details.Append($"{sets} series");
+            if (reps != null)         details.Append($", {reps} repeticiones");
+            if (restSeconds.HasValue) details.Append($", {restSeconds} seg descanso");
+
+            var levelContext = string.IsNullOrWhiteSpace(experience)
+                ? string.Empty
+                : $" Soy un usuario de nivel {experience}.";
+
+            var prompt = $"Explícame el ejercicio \"{exerciseName}\"" +
+                (details.Length > 0 ? $" ({details})" : "") +
+                $".{levelContext} Dame:\n" +
+                "1. Técnica detallada: posición inicial, ejecución paso a paso, respiración y errores comunes a evitar\n" +
+                "2. Músculos principales y secundarios que trabaja\n" +
+                "3. Por qué es valioso incluirlo en la rutina\n" +
+                "4. Un consejo clave para optimizar la ejecución\n" +
+                "Adapta el nivel de detalle técnico a mi experiencia. Máximo 220 palabras.";
+
+            var explanation = await SendMessageToCoach(userId, coach, prompt);
+
+            if (string.IsNullOrWhiteSpace(explanation))
+            {
+                Debug.WriteLine($"✗ Sin respuesta de IA para '{exerciseName}'");
+                return null;
+            }
+
+            // 3. Guardar en caché
+            await _database.InsertAsync(new ExerciseExplanation
+            {
+                ExerciseName   = key,
+                CoachName      = coach,
+                ExperienceName = experience,
+                Explanation    = explanation,
+                CreatedAt      = DateTime.UtcNow
+            });
+
+            Debug.WriteLine($"✓ Explicación de '{exerciseName}' guardada en caché");
+            return explanation;
         }
 
         #endregion

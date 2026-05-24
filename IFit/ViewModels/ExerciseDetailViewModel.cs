@@ -74,7 +74,7 @@ public partial class ExerciseDetailViewModel : ObservableObject
 
     partial void OnExerciseIdChanged(string value)
     {
-        if (long.TryParse(value, out long id) && id > 0)
+        if (long.TryParse(value, out long id) && id >= 0)
             _ = LoadExerciseAsync(id);
     }
 

@@ -97,7 +97,7 @@ namespace IFit.Services
         {
             try
             {
-                if (id <= 0)
+                if (id < 0)
                 {
                     Debug.WriteLine("✗ Error: id de ejercicio inválido");
                     return null;

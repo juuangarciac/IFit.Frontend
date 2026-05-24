@@ -7,9 +7,15 @@ using System.Diagnostics;
 
 namespace IFit.ViewModels;
 
+[QueryProperty(nameof(InitialSearch), "InitialSearch")]
 public partial class ExerciseCatalogViewModel : ObservableObject
 {
     #region Properties
+
+    public string InitialSearch
+    {
+        set { if (!string.IsNullOrWhiteSpace(value)) SearchText = value; }
+    }
 
     [ObservableProperty]
     public partial ObservableCollection<ExerciseSummaryDto> Exercises { get; set; } = new();
@@ -97,7 +103,8 @@ public partial class ExerciseCatalogViewModel : ObservableObject
     {
         if (exercise is null) return;
 
-        // Muestra el overlay antes de navegar para que la transición no parezca un cuelgue
+        Debug.WriteLine($"→ OpenDetail: Id={exercise.Id}, Name={exercise.Name}");
+
         IsNavigating = true;
         StatusMessage = "Cargando ejercicio...";
 
