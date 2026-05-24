@@ -3,132 +3,93 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="IFit.Views.ExperienceLevelSelectionView"
              xmlns:components="clr-namespace:IFit.Views.Components"
-             xmlns:vm="clr-namespace:IFit.ViewModels"  
+             xmlns:vm="clr-namespace:IFit.ViewModels"
              xmlns:models="clr-namespace:IFit.Models.Dtos.ExperienceLevel"
-             Shell.NavBarIsVisible="False"
-             BackgroundColor="{StaticResource BackgroundPrimaryDark}">
+             Shell.NavBarIsVisible="False">
+
     <ContentPage.BindingContext>
         <vm:ExperienceLevelViewModel/>
     </ContentPage.BindingContext>
-    <Grid Margin="15">
-        <!-- Main Content -->
-        <Grid RowSpacing="15">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
 
-            <!-- Header-->
-            <Grid Grid.Row="0">
+    <Grid RowDefinitions="Auto,Auto,*" Padding="20,50,20,20" RowSpacing="16">
 
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
+        <!-- Row 0: Header -->
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
 
-                <!-- Go Back -->
-                <Button Grid.Column="0"   
-                    HorizontalOptions="Center"  
-                    VerticalOptions="Center"  
-                    BackgroundColor="Transparent"  
-                    ImageSource="arrow.png"  
+            <Button Grid.Column="0"
+                    BackgroundColor="Transparent"
+                    ImageSource="arrow.png"
+                    VerticalOptions="Center"
                     Clicked="onCancelClicked" />
 
-                <!-- Center line -->
-                <Border Grid.Column="1"  
-                    BackgroundColor="{StaticResource TextSecondaryColorLight}"  
-                    VerticalOptions="Center"  
-                    WidthRequest="120"   
-                    StrokeThickness="1"/>
+            <BoxView Grid.Column="1"
+                     BackgroundColor="{StaticResource TextSecondaryColorLight}"
+                     HeightRequest="1"
+                     VerticalOptions="Center"
+                     Opacity="0.4" />
 
-                <!-- Cancel button  -->
-                <Button Grid.Column="2"
-                    HorizontalOptions="Center"
-                    VerticalOptions="Center"
+            <Button Grid.Column="2"
                     BackgroundColor="Transparent"
                     ImageSource="cancel.svg"
+                    VerticalOptions="Center"
                     Clicked="onCloseClicked" />
-            </Grid>
-
-            <!-- Title -->
-            <Label Grid.Row="1">
-                <Label.FormattedText>
-                    <FormattedString>
-                        <Span Text="¿Que experiencia tienes en el mundo fitness? " 
-                           Style="{StaticResource label-h1-white}" />
-                    </FormattedString>
-                </Label.FormattedText>
-            </Label>
-
-
-            <!-- Experience Levels -->
-            <CollectionView Grid.Row="2"
-                ItemsSource="{Binding ExperienceLevels}"
-                SelectionMode="Single"
-                SelectedItem="{Binding SelectedExperienceLevel, Mode=TwoWay}"
-                Margin="0,0,0,15">
-
-                <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="models:ExperienceLevelDto">
-                        <Border StrokeThickness="2"
-                    Stroke="{DynamicResource BackgroundPrimaryLight}"
-                    BackgroundColor="{DynamicResource PrimaryColorLightOpacity}"
-                    Margin="0,0,0,15">
-
-                            <VisualStateManager.VisualStateGroups>
-                                <VisualStateGroupList>
-                                    <VisualStateGroup x:Name="CommonStates">
-                                        <VisualState x:Name="Normal">
-                                            <VisualState.Setters>
-                                                <Setter Property="BackgroundColor" Value="{DynamicResource BackgroundPrimaryDark}" />
-                                            </VisualState.Setters>
-                                        </VisualState>
-                                        <VisualState x:Name="Selected">
-                                            <VisualState.Setters>
-                                                <Setter Property="BackgroundColor" Value="{DynamicResource BackgroundSecondaryDark}" />
-                                            </VisualState.Setters>
-                                        </VisualState>
-                                    </VisualStateGroup>
-                                </VisualStateGroupList>
-                            </VisualStateManager.VisualStateGroups>
-
-                            <Border.StrokeShape>
-                                <RoundRectangle CornerRadius="{DynamicResource CornerRadiusRectangle}" />
-                            </Border.StrokeShape>
-
-                            <Border.Shadow>
-                                <Shadow Brush="{DynamicResource BackgroundPrimaryLight}"
-                            Opacity="0.35"
-                            Radius="{DynamicResource CornerRadiusRectangle}" />
-                            </Border.Shadow>
-
-                            <Grid Margin="10"
-                      RowSpacing="5"
-                      BackgroundColor="Transparent">
-
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="Auto" />
-                                </Grid.RowDefinitions>
-
-                                <Label Grid.Column="0"
-                               Text="{Binding Name}"
-                               Style="{DynamicResource label-h1-white}" />
-
-                                <Label Grid.Row="1"
-                           Text="{Binding Description}"
-                           Style="{DynamicResource label-p-white}" />
-                            </Grid>
-                        </Border>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
         </Grid>
-        
-        <!-- Loading Overlay component -->
-        <components:LoadingOverlay IsLoading="{Binding IsLoading}"
-                                  Message="{Binding StatusMessage}"/>
+
+        <!-- Row 1: Title -->
+        <Label Grid.Row="1"
+               Text="¿Qué experiencia tienes en el mundo fitness?"
+               Style="{StaticResource label-h1-white}" />
+
+        <!-- Row 2: Experience Levels -->
+        <CollectionView Grid.Row="2"
+                        ItemsSource="{Binding ExperienceLevels}"
+                        SelectionMode="Single"
+                        SelectedItem="{Binding SelectedExperienceLevel, Mode=TwoWay}">
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:ExperienceLevelDto">
+                    <Border StrokeThickness="0"
+                            Margin="0,0,0,8">
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroupList>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal">
+                                        <VisualState.Setters>
+                                            <Setter Property="BackgroundColor" Value="{StaticResource BackgroundSecondaryDark}" />
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                    <VisualState x:Name="Selected">
+                                        <VisualState.Setters>
+                                            <Setter Property="BackgroundColor" Value="{StaticResource BackgroundPrimaryDark}" />
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateGroupList>
+                        </VisualStateManager.VisualStateGroups>
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="8" />
+                        </Border.StrokeShape>
+                        <Grid Padding="12,10" RowSpacing="5">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <Label Grid.Row="0"
+                                   Text="{Binding Name}"
+                                   Style="{StaticResource label-h2-white}" />
+                            <Label Grid.Row="1"
+                                   Text="{Binding Description}"
+                                   Style="{StaticResource label-p-white}"
+                                   Opacity="0.8" />
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <!-- Loading Overlay -->
+        <components:LoadingOverlay Grid.RowSpan="3"
+                                   IsLoading="{Binding IsLoading}"
+                                   Message="{Binding StatusMessage}" />
     </Grid>
 </ContentPage>

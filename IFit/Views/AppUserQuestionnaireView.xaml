@@ -1,58 +1,43 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:vm="clr-namespace:IFit.ViewModels"  
+             xmlns:vm="clr-namespace:IFit.ViewModels"
              xmlns:models="clr-namespace:IFit.Models.Dtos.Questionnaire"
              xmlns:components="clr-namespace:IFit.Views.Components"
              x:Class="IFit.Views.AppUserQuestionnaireView"
              Title="Cuestionario"
-             Shell.NavBarIsVisible="False"
-             BackgroundColor="{StaticResource BackgroundPrimaryDark}">
+             Shell.NavBarIsVisible="False">
 
     <ContentPage.BindingContext>
         <vm:AppUserQuestionnaireViewModel/>
     </ContentPage.BindingContext>
 
-    <Grid BackgroundColor="{StaticResource BackgroundPrimaryDark}">
+    <Grid>
 
         <!-- Loading Overlay -->
         <components:LoadingOverlay IsLoading="{Binding IsLoading}"
-                                   Message="{Binding  StatusMessage}"
-                                    ZIndex="999"/>
+                                   Message="{Binding StatusMessage}"
+                                   ZIndex="999"/>
 
         <!-- Main Content -->
         <ScrollView ZIndex="1">
-            <Grid Margin="15"
-                  RowSpacing="15">
+            <Grid Padding="20,50,20,20" RowSpacing="16">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
-                    <!-- Header -->
                     <RowDefinition Height="Auto" />
-                    <!-- Question Title -->
                     <RowDefinition Height="*" />
-                    <!-- Options -->
                     <RowDefinition Height="Auto" />
-                    <!-- Navigation Buttons -->
                 </Grid.RowDefinitions>
 
-                <!--Header -->
-                <Grid Grid.Row="0"
-                      ColumnSpacing="15">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
+                <!-- Row 0: Header -->
+                <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
 
-                    <!-- Back Button -->
                     <Button Grid.Column="0"
-                            HorizontalOptions="Start"
-                            VerticalOptions="Center"
                             BackgroundColor="Transparent"
                             ImageSource="arrow.png"
-                            Command="{Binding GoBackCommand}"/>
+                            VerticalOptions="Center"
+                            Command="{Binding GoBackCommand}" />
 
-                    <!-- Center line / Questionnaire Name -->
                     <Label Grid.Column="1"
                            Text="{Binding QuestionnaireName}"
                            Style="{StaticResource label-h3-white}"
@@ -61,76 +46,50 @@
                            LineBreakMode="TailTruncation"
                            MaxLines="1" />
 
-                    <!-- Cancel button -->
                     <Button Grid.Column="2"
-                            HorizontalOptions="End"
-                            VerticalOptions="Center"
                             BackgroundColor="Transparent"
                             ImageSource="cancel.svg"
+                            VerticalOptions="Center"
                             Clicked="onCancelClicked" />
                 </Grid>
 
-                <!-- Question text -->
+                <!-- Row 1: Question text -->
                 <Label Grid.Row="1"
                        Text="{Binding QuestionText}"
-                       Style="{StaticResource label-h1-white}"
-                       Margin="0,20,0,10" />
+                       Style="{StaticResource label-h1-white}" />
 
-                <!-- Options List -->
+                <!-- Row 2: Options List -->
                 <CollectionView Grid.Row="2"
                                 ItemsSource="{Binding Options}"
                                 SelectionMode="Single"
-                                SelectedItem="{Binding SelectedOption, Mode=TwoWay}"
-                                Margin="0,0,0,15">
+                                SelectedItem="{Binding SelectedOption, Mode=TwoWay}">
 
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="models:OptionDTO">
-                            <Border StrokeThickness="2"
-                                    Stroke="{DynamicResource BackgroundPrimaryLight}"
-                                    BackgroundColor="{DynamicResource PrimaryColorLightOpacity}"
-                                    Margin="0,0,0,15">
-
+                            <Border StrokeThickness="0"
+                                    Margin="0,0,0,8">
                                 <VisualStateManager.VisualStateGroups>
                                     <VisualStateGroupList>
                                         <VisualStateGroup x:Name="CommonStates">
                                             <VisualState x:Name="Normal">
                                                 <VisualState.Setters>
-                                                    <Setter Property="BackgroundColor" Value="{DynamicResource BackgroundPrimaryDark}" />
+                                                    <Setter Property="BackgroundColor" Value="{StaticResource BackgroundSecondaryDark}" />
                                                 </VisualState.Setters>
                                             </VisualState>
                                             <VisualState x:Name="Selected">
                                                 <VisualState.Setters>
-                                                    <Setter Property="BackgroundColor" Value="{DynamicResource BackgroundSecondaryDark}" />
+                                                    <Setter Property="BackgroundColor" Value="{StaticResource BackgroundPrimaryDark}" />
                                                 </VisualState.Setters>
                                             </VisualState>
                                         </VisualStateGroup>
                                     </VisualStateGroupList>
                                 </VisualStateManager.VisualStateGroups>
-
-                                <!-- Triggers para cambiar el estilo cuando está seleccionada -->
-                                <Border.Triggers>
-                                    <DataTrigger TargetType="Border"
-                                                 Binding="{Binding Source={RelativeSource AncestorType={x:Type CollectionView}}, Path=SelectedItem}"
-                                                 Value="{Binding .}">
-                                        <Setter Property="Stroke" Value="{StaticResource PrimaryColor}" />
-                                        <Setter Property="BackgroundColor" Value="{StaticResource PrimaryColorLightOpacity70}" />
-                                    </DataTrigger>
-                                </Border.Triggers>
-
                                 <Border.StrokeShape>
-                                    <RoundRectangle CornerRadius="{DynamicResource CornerRadiusRectangle}" />
+                                    <RoundRectangle CornerRadius="8" />
                                 </Border.StrokeShape>
-
-                                <Border.Shadow>
-                                    <Shadow Brush="{DynamicResource BackgroundPrimaryLight}"
-                                            Opacity="0.35"
-                                            Radius="{DynamicResource CornerRadiusRectangle}" />
-                                </Border.Shadow>
-
-                                <Grid Margin="10"
-                                      BackgroundColor="Transparent">
+                                <Grid Padding="12,10">
                                     <Label Text="{Binding Text}"
-                                           Style="{DynamicResource label-h1-white}"
+                                           Style="{StaticResource label-h2-white}"
                                            VerticalOptions="Center" />
                                 </Grid>
                             </Border>
@@ -138,16 +97,8 @@
                     </CollectionView.ItemTemplate>
                 </CollectionView>
 
-                <!--Navigation Buttons -->
-                <Grid Grid.Row="3"
-                      ColumnSpacing="15"
-                      Margin="0,5,0,5">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-
-                    <!-- Next Button -->
+                <!-- Row 3: Navigation Buttons -->
+                <Grid Grid.Row="3" ColumnDefinitions="*,*" ColumnSpacing="12">
                     <Button Grid.Column="1"
                             Text="{Binding NextButtonText}"
                             Style="{StaticResource ButtonBold-XL-dark-yellow}"
@@ -158,54 +109,46 @@
             </Grid>
         </ScrollView>
 
-        <!-- ========== INPUT TEXT OVERLAY ========== -->
+        <!-- INPUT TEXT OVERLAY -->
         <Grid IsVisible="{Binding RequiresTextInput}"
               BackgroundColor="#CC000000"
               ZIndex="998"
               Padding="20">
 
-            <!-- Al hacer clic en el fondo oscuro, se cierra el overlay -->
             <Grid.GestureRecognizers>
                 <TapGestureRecognizer Command="{Binding CloseInputCommand}" />
             </Grid.GestureRecognizers>
 
-            <!-- Input Container (no se cierra al hacer clic aquí) -->
-            <Border StrokeThickness="2"
-                    Stroke="{DynamicResource BackgroundPrimaryLight}"
-                    BackgroundColor="{DynamicResource PrimaryColorLightOpacity90}"
+            <Border StrokeThickness="0"
+                    BackgroundColor="{StaticResource BackgroundSecondaryDark}"
                     Padding="20"
                     VerticalOptions="Center"
                     MaximumWidthRequest="500">
-
                 <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="{DynamicResource CornerRadiusRectangle}" />
+                    <RoundRectangle CornerRadius="12" />
                 </Border.StrokeShape>
 
-                <!-- Grid interno con GestureRecognizer para detener propagación del tap -->
-                <Grid RowSpacing="10">
+                <Grid RowSpacing="12">
                     <Grid.GestureRecognizers>
                         <TapGestureRecognizer />
                     </Grid.GestureRecognizers>
-
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
-                        <!-- Close button -->
                         <RowDefinition Height="Auto" />
-                        <!-- Prompt Label -->
                         <RowDefinition Height="Auto" />
-                        <!-- Text Entry -->
                         <RowDefinition Height="Auto" />
-                        <!-- Save Button -->
                     </Grid.RowDefinitions>
 
                     <!-- Close button -->
                     <Label Grid.Row="0"
                            Text="✕"
-                           FontSize="24"
+                           FontSize="18"
                            TextColor="{StaticResource TextPrimaryColorLight}"
                            HorizontalOptions="End"
-                           VerticalOptions="Start"
-                           Padding="5">
+                           MinimumWidthRequest="36"
+                           MinimumHeightRequest="36"
+                           HorizontalTextAlignment="Center"
+                           VerticalTextAlignment="Center">
                         <Label.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding CloseInputCommand}" />
                         </Label.GestureRecognizers>
@@ -214,25 +157,22 @@
                     <!-- Prompt Label -->
                     <Label Grid.Row="1"
                            Text="{Binding SelectedOption.TextInputPrompt}"
-                           Style="{DynamicResource label-h2-white}"
+                           Style="{StaticResource label-h2-white}"
                            HorizontalTextAlignment="Center"
                            IsVisible="{Binding SelectedOption.TextInputPrompt, Converter={StaticResource StringNotNullOrEmptyConverter}}" />
 
                     <!-- Text Entry -->
                     <Border Grid.Row="2"
-                            StrokeThickness="1"
-                            Stroke="{StaticResource QuaternaryColor}"
-                            BackgroundColor="{StaticResource BackgroundPrimaryDark}">
-
+                            BackgroundColor="{StaticResource BackgroundPrimaryLight}"
+                            StrokeThickness="0">
                         <Border.StrokeShape>
                             <RoundRectangle CornerRadius="8" />
                         </Border.StrokeShape>
-
                         <Entry x:Name="AdditionalTextEntry"
                                Text="{Binding AdditionalText, Mode=TwoWay}"
                                Placeholder="{Binding SelectedOption.TextInputPlaceholder}"
-                               PlaceholderColor="{StaticResource QuaternaryColor}"
-                               TextColor="{StaticResource QuaternaryColor}"
+                               PlaceholderColor="{StaticResource BackgroundSecondaryDark}"
+                               TextColor="{StaticResource BackgroundPrimaryDark}"
                                BackgroundColor="Transparent"
                                HeightRequest="120"
                                MaxLength="500"
@@ -243,7 +183,6 @@
                                IsTextPredictionEnabled="False"
                                HandlerChanged="OnEntryHandlerChanged"
                                Margin="10" />
-                        
                     </Border>
 
                     <!-- Save Button -->
@@ -251,8 +190,7 @@
                             Text="Guardar"
                             Style="{StaticResource ButtonBold-XL-dark-yellow}"
                             Command="{Binding SaveTextInputCommand}"
-                            HorizontalOptions="Fill"
-                            Margin="0,10,0,0" />
+                            HorizontalOptions="Fill" />
                 </Grid>
             </Border>
         </Grid>
