@@ -46,6 +46,12 @@ namespace IFit.ViewModels
         [ObservableProperty]
         public partial Boolean IsRoutineCompleted { get; set; } = false;
 
+        [ObservableProperty]
+        public partial string CoachDisplayName { get; set; } = string.Empty;
+
+        [ObservableProperty]
+        public partial string UserDisplayName { get; set; } = string.Empty;
+
         /// <summary>
         /// Propiedad para controlar la visibilidad del detalle del día de entrenamiento seleccionado. Se establece en true cuando se selecciona un día, lo que muestra el detalle correspondiente en la interfaz de usuario.
         /// </summary>
@@ -125,6 +131,8 @@ namespace IFit.ViewModels
         [RelayCommand]
         public async Task AppearingAsync()
         {
+            CoachDisplayName = Preferences.Get("CoachModelTypeName", "");
+            UserDisplayName  = Preferences.Get("UserName", "");
             _ = InitializeAsync();
         }
 

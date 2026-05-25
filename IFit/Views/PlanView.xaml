@@ -100,7 +100,7 @@
                             <Label.FormattedText>
                                 <FormattedString>
                                     <Span Text="Tu entrenador " />
-                                    <Span Text="{Binding User.CoachModelTypeName}"
+                                    <Span Text="{Binding CoachDisplayName}"
                                           FontFamily="Montserrat-Bold"
                                           TextColor="{StaticResource TertiaryColor}"/>
                                     <Span Text=" te dice:" />
@@ -113,7 +113,7 @@
                             <Label.FormattedText>
                                 <FormattedString>
                                     <Span Text="¡Hola, " />
-                                    <Span Text="{Binding User.Name}"
+                                    <Span Text="{Binding UserDisplayName}"
                                           FontFamily="Montserrat-Bold"/>
                                     <Span Text="! Me alegra verte por aquí. 💪" />
                                 </FormattedString>
