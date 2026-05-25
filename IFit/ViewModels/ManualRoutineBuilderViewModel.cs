@@ -41,10 +41,12 @@ public partial class ManualRoutineBuilderViewModel : ObservableObject
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsStep1))]
     [NotifyPropertyChangedFor(nameof(IsStep2))]
+    [NotifyPropertyChangedFor(nameof(StepIndicatorText))]
     public partial int Step { get; set; } = 1;
 
     public bool IsStep1 => Step == 1;
     public bool IsStep2 => Step == 2;
+    public string StepIndicatorText => $"PASO {Step} DE 2";
 
     [ObservableProperty]
     public partial string Description { get; set; } = string.Empty;

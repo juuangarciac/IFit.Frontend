@@ -14,10 +14,11 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <!-- Loading overlay -->
-        <components:LoadingOverlay Grid.RowSpan="2"
+        <components:LoadingOverlay Grid.RowSpan="3"
                                    IsLoading="{Binding IsLoading}"
                                    Message="{Binding StatusMessage}"
                                    ZIndex="999" />
@@ -295,5 +296,14 @@
                 </VerticalStackLayout>
             </VerticalStackLayout>
         </ScrollView>
+
+        <!-- Row 2: CTA fija -->
+        <Button Grid.Row="2"
+                Text="Crear mi rutina"
+                Command="{Binding GoToRoutineBuilderCommand}"
+                Style="{StaticResource ButtonBold-XL-dark-yellow}"
+                CornerRadius="{StaticResource CornerRadiusRectangle}"
+                Margin="15,10,15,20"
+                IsVisible="{Binding HasError, Converter={StaticResource InvertedBoolConverter}}" />
     </Grid>
 </ContentPage>

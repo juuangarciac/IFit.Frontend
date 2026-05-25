@@ -109,6 +109,12 @@ public partial class ExerciseDetailViewModel : ObservableObject
     }
 
     [RelayCommand]
+    public async Task GoToRoutineBuilderAsync()
+    {
+        await Shell.Current.GoToAsync("ManualRoutineBuilderView");
+    }
+
+    [RelayCommand]
     public async Task RetryAsync()
     {
         if (long.TryParse(ExerciseId, out long id) && id > 0)
