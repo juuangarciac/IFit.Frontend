@@ -74,18 +74,11 @@
                               WidthRequest="65"
                               VerticalOptions="Center">
 
-                            <Image Source="{Binding AvatarSource}"
-                                   HeightRequest="45"
-                                   WidthRequest="45"
-                                   Aspect="AspectFit"
-                                   IsVisible="{Binding HasAvatar}" />
-
                             <Border HeightRequest="65"
                                     WidthRequest="65"
                                     BackgroundColor="{DynamicResource BackgroundSecondaryDark}"
                                     StrokeThickness="2"
-                                    Stroke="{DynamicResource TertiaryColor}"
-                                    IsVisible="{Binding HasAvatar, Converter={StaticResource InvertedBoolConverter}}">
+                                    Stroke="{DynamicResource TertiaryColor}">
                                 <Border.StrokeShape>
                                     <Ellipse />
                                 </Border.StrokeShape>
