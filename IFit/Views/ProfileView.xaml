@@ -82,18 +82,19 @@
 
                             <Border HeightRequest="65"
                                     WidthRequest="65"
-                                    BackgroundColor="{DynamicResource QuaternaryColor}"
-                                    StrokeThickness="0"
+                                    BackgroundColor="{DynamicResource BackgroundSecondaryDark}"
+                                    StrokeThickness="2"
+                                    Stroke="{DynamicResource TertiaryColor}"
                                     IsVisible="{Binding HasAvatar, Converter={StaticResource InvertedBoolConverter}}">
                                 <Border.StrokeShape>
                                     <Ellipse />
                                 </Border.StrokeShape>
-                                <Label Text="{Binding UserInitials}"
+                                <Image Source="profile_icon_white.png"
+                                       HeightRequest="34"
+                                       WidthRequest="34"
+                                       Aspect="AspectFit"
                                        HorizontalOptions="Center"
-                                       VerticalOptions="Center"
-                                       FontSize="24"
-                                       FontAttributes="Bold"
-                                       Style="{DynamicResource label-h1-white}" />
+                                       VerticalOptions="Center" />
                             </Border>
                         </Grid>
 
