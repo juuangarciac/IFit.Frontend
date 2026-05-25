@@ -45,6 +45,7 @@ public partial class ExerciseCatalogViewModel : ObservableObject
     #region Services
 
     private readonly ExerciseCatalogService _exerciseCatalogService;
+    private readonly DatabaseService _databaseService;
 
     #endregion
 
@@ -54,15 +55,21 @@ public partial class ExerciseCatalogViewModel : ObservableObject
 
     #region Constructor
 
-    public ExerciseCatalogViewModel(ExerciseCatalogService exerciseCatalogService)
+    public ExerciseCatalogViewModel(
+        ExerciseCatalogService exerciseCatalogService,
+        DatabaseService databaseService)
     {
         _exerciseCatalogService = exerciseCatalogService
             ?? throw new ArgumentNullException(nameof(exerciseCatalogService));
+        _databaseService = databaseService
+            ?? throw new ArgumentNullException(nameof(databaseService));
     }
 
     public ExerciseCatalogViewModel() : this(
         App.GetService<ExerciseCatalogService>()
-            ?? throw new InvalidOperationException("ExerciseCatalogService no registrado"))
+            ?? throw new InvalidOperationException("ExerciseCatalogService no registrado"),
+        App.GetService<DatabaseService>()
+            ?? throw new InvalidOperationException("DatabaseService no registrado"))
     { }
 
     #endregion
@@ -80,6 +87,7 @@ public partial class ExerciseCatalogViewModel : ObservableObject
 
         // Fire-and-forget: la vista aparece inmediatamente y los datos cargan en segundo plano
         _ = LoadExercisesAsync(reset: true);
+        _ = WarmUpCacheAsync();
         return Task.CompletedTask;
     }
 
@@ -130,6 +138,31 @@ public partial class ExerciseCatalogViewModel : ObservableObject
     #endregion
 
     #region Private methods
+
+    private static readonly TimeSpan CacheTtl = TimeSpan.FromDays(7);
+
+    private async Task WarmUpCacheAsync()
+    {
+        try
+        {
+            var count = await _databaseService.GetExerciseCountAsync();
+            var lastTicks = Preferences.Get("ExerciseCacheDateTicks", 0L);
+            var isStale = lastTicks == 0L || (DateTime.UtcNow.Ticks - lastTicks) > CacheTtl.Ticks;
+
+            if (count > 0 && !isStale) return;
+
+            var all = await _exerciseCatalogService.GetAllExercisesAsync();
+            if (all.Count > 0)
+            {
+                await _databaseService.BulkInsertExercisesAsync(all);
+                Preferences.Set("ExerciseCacheDateTicks", DateTime.UtcNow.Ticks);
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"✗ Error calentando caché de ejercicios: {ex.Message}");
+        }
+    }
 
     private async Task LoadExercisesAsync(bool reset)
     {

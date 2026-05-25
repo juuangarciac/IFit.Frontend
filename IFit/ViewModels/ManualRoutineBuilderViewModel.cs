@@ -91,12 +91,24 @@ public partial class ManualRoutineBuilderViewModel : ObservableObject
     [ObservableProperty]
     public partial bool IsSaving { get; set; }
 
+    // Autocomplete
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasSuggestions))]
+    public partial ObservableCollection<ExerciseSummaryDto> Suggestions { get; set; } = new();
+
+    public bool HasSuggestions => Suggestions.Count > 0;
+
+    // Info overlay
+    [ObservableProperty]
+    public partial bool IsInfoVisible { get; set; }
+
     #endregion
 
     #region Services
 
     private readonly ExerciseCatalogService _exerciseCatalogService;
     private readonly TrainingService _trainingService;
+    private readonly DatabaseService _databaseService;
 
     #endregion
 
@@ -104,20 +116,44 @@ public partial class ManualRoutineBuilderViewModel : ObservableObject
 
     public ManualRoutineBuilderViewModel(
         ExerciseCatalogService exerciseCatalogService,
-        TrainingService trainingService)
+        TrainingService trainingService,
+        DatabaseService databaseService)
     {
         _exerciseCatalogService = exerciseCatalogService
             ?? throw new ArgumentNullException(nameof(exerciseCatalogService));
         _trainingService = trainingService
             ?? throw new ArgumentNullException(nameof(trainingService));
+        _databaseService = databaseService
+            ?? throw new ArgumentNullException(nameof(databaseService));
     }
 
     public ManualRoutineBuilderViewModel() : this(
         App.GetService<ExerciseCatalogService>()
             ?? throw new InvalidOperationException("ExerciseCatalogService no registrado"),
         App.GetService<TrainingService>()
-            ?? throw new InvalidOperationException("TrainingService no registrado"))
+            ?? throw new InvalidOperationException("TrainingService no registrado"),
+        App.GetService<DatabaseService>()
+            ?? throw new InvalidOperationException("DatabaseService no registrado"))
     { }
+
+    #endregion
+
+    #region Partial callbacks
+
+    partial void OnSearchTextChanged(string value)
+    {
+        if (value.Length < 2)
+        {
+            if (HasSuggestions)
+            {
+                Suggestions.Clear();
+                OnPropertyChanged(nameof(HasSuggestions));
+            }
+            return;
+        }
+
+        _ = UpdateSuggestionsAsync(value);
+    }
 
     #endregion
 
@@ -133,6 +169,12 @@ public partial class ManualRoutineBuilderViewModel : ObservableObject
             return;
         }
         await Shell.Current.GoToAsync("..");
+    }
+
+    [RelayCommand]
+    private void ToggleInfo()
+    {
+        IsInfoVisible = !IsInfoVisible;
     }
 
     [RelayCommand]
@@ -203,6 +245,10 @@ public partial class ManualRoutineBuilderViewModel : ObservableObject
             return;
         }
 
+        // Ocultar sugerencias al hacer búsqueda por músculo
+        Suggestions.Clear();
+        OnPropertyChanged(nameof(HasSuggestions));
+
         IsLoading = true;
         StatusMessage = "Buscando...";
 
@@ -223,7 +269,7 @@ public partial class ManualRoutineBuilderViewModel : ObservableObject
             }
             else
             {
-                IsSearching = true; // Mostramos el panel de resultados vacío
+                IsSearching = true;
                 StatusMessage = "Sin resultados para ese término.";
             }
         }
@@ -244,6 +290,8 @@ public partial class ManualRoutineBuilderViewModel : ObservableObject
     {
         SearchText = string.Empty;
         SearchResults.Clear();
+        Suggestions.Clear();
+        OnPropertyChanged(nameof(HasSuggestions));
         IsSearching = false;
         StatusMessage = string.Empty;
     }
@@ -337,6 +385,29 @@ public partial class ManualRoutineBuilderViewModel : ObservableObject
         finally
         {
             IsSaving = false;
+        }
+    }
+
+    #endregion
+
+    #region Private methods
+
+    private async Task UpdateSuggestionsAsync(string query)
+    {
+        try
+        {
+            var results = await _databaseService.SearchExercisesAsync(query, limit: 8);
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                Suggestions.Clear();
+                foreach (var item in results)
+                    Suggestions.Add(item);
+                OnPropertyChanged(nameof(HasSuggestions));
+            });
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"✗ Error en autocomplete: {ex.Message}");
         }
     }
 

@@ -90,6 +90,29 @@ namespace IFit.Services
         }
 
         /// <summary>
+        /// Descarga la totalidad del catálogo iterando todas las páginas.
+        /// Devuelve una lista plana con todos los ejercicios disponibles.
+        /// </summary>
+        public async Task<List<ExerciseSummaryDto>> GetAllExercisesAsync()
+        {
+            var all = new List<ExerciseSummaryDto>();
+            int page = 0;
+            bool isLast = false;
+
+            while (!isLast)
+            {
+                var result = await GetExercisesAsync(page: page, size: 50);
+                if (result?.Content == null || result.Content.Count == 0) break;
+                all.AddRange(result.Content);
+                isLast = result.Last;
+                page++;
+            }
+
+            Debug.WriteLine($"✓ GetAllExercisesAsync: {all.Count} ejercicios descargados en {page} página(s)");
+            return all;
+        }
+
+        /// <summary>
         /// Obtiene el detalle completo de un ejercicio por su ID.
         /// </summary>
         /// <param name="id">ID del ejercicio.</param>

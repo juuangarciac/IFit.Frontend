@@ -1,4 +1,5 @@
 ﻿using IFit.Models;
+using IFit.Models.Dtos.Exercise;
 using SQLite;
 using System;
 using System.Collections.Generic;
@@ -24,6 +25,7 @@ namespace IFit.Services
             // Create database tables
             await _db.CreateTableAsync<AppUser>();
             await _db.CreateTableAsync<CoachModelTypeDto>();
+            await _db.CreateTableAsync<ExerciseCacheEntity>();
             _initialized = true;
         }
 
@@ -154,5 +156,32 @@ namespace IFit.Services
                 Console.WriteLine($"Error deleting all users from database: {ex.Message}");
             }
         }
+
+        #region Exercise cache
+
+        public async Task<int> GetExerciseCountAsync()
+        {
+            if (!_initialized) await InitializeAsync();
+            return await _db.Table<ExerciseCacheEntity>().CountAsync();
+        }
+
+        public async Task BulkInsertExercisesAsync(IEnumerable<ExerciseSummaryDto> exercises)
+        {
+            if (!_initialized) await InitializeAsync();
+            var entities = exercises.Select(ExerciseCacheEntity.FromDto).ToList();
+            await _db.DeleteAllAsync<ExerciseCacheEntity>();
+            await _db.InsertAllAsync(entities);
+        }
+
+        public async Task<List<ExerciseSummaryDto>> SearchExercisesAsync(string query, int limit = 8)
+        {
+            if (!_initialized) await InitializeAsync();
+            var entities = await _db.QueryAsync<ExerciseCacheEntity>(
+                "SELECT * FROM ExerciseCache WHERE Name LIKE ? LIMIT ?",
+                $"%{query}%", limit);
+            return entities.Select(e => e.ToDto()).ToList();
+        }
+
+        #endregion
     }
 }
