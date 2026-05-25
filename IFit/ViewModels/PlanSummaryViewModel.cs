@@ -165,7 +165,7 @@ namespace IFit.ViewModels
             if (ActiveRoutines?.Count > 0)
                 await NotificationService.ShowInfoAsync("Al generar una nueva rutina, tu rutina actual quedará desactivada automáticamente.");
 
-            await Shell.Current.GoToAsync("CoachModelTypeSelectionView?fromHome=true");
+            await Shell.Current.GoToAsync("ExperienceLevelSelectionView");
         }
 
         #endregion
