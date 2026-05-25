@@ -90,7 +90,9 @@
                             </CollectionView.ItemsLayout>
                             <CollectionView.ItemTemplate>
                                 <DataTemplate x:DataType="dtos:RoutineResponseDto">
-                                    <Border StrokeThickness="0">
+                                    <Border StrokeThickness="0"
+                                            HorizontalOptions="Fill"
+                                            HeightRequest="80">
                                         <VisualStateManager.VisualStateGroups>
                                             <VisualStateGroupList>
                                                 <VisualStateGroup x:Name="CommonStates">

@@ -28,13 +28,12 @@
               ColumnSpacing="12"
               ColumnDefinitions="Auto,*">
 
-            <ImageButton Grid.Column="0"
-                         Source="arrow_icon_white.png"
-                         HeightRequest="20"
-                         WidthRequest="20"
-                         VerticalOptions="Center"
-                         Rotation="180"
-                         Command="{Binding GoBackCommand}" />
+            <Button Grid.Column="0"
+              HorizontalOptions="Start"
+              VerticalOptions="Center"
+              BackgroundColor="Transparent"
+              ImageSource="arrow.png"
+              Command="{Binding GoBackCommand}" />
 
             <Label Grid.Column="1"
                    Text="{Binding Exercise.Name}"
