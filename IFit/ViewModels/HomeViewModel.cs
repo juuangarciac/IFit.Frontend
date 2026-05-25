@@ -185,6 +185,10 @@ public partial class HomeViewModel : ObservableObject
     {
         long currentUserId = Preferences.Get("UserId", 0L);
 
+        // Siempre refrescar el nombre del coach — puede haber cambiado en ProfileView
+        var coachName = Preferences.Get("CoachModelTypeName", "tu coach");
+        ButtonContent = "Pregunta a " + coachName;
+
         // Si CurrentRoutineId fue eliminado (sesión completada), forzar recarga
         long cachedRoutineId = 0;
         try { cachedRoutineId = Preferences.Get("CurrentRoutineId", 0L); }

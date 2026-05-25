@@ -152,14 +152,14 @@
                                                 <Border StrokeThickness="0"
                                                         Padding="8,4"
                                                         IsVisible="{Binding IsActive}"
-                                                        Background="{StaticResource CardPremiumGradientColor}">
+                                                        BackgroundColor="{StaticResource TertiaryColor}">
                                                     <Border.StrokeShape>
                                                         <RoundRectangle CornerRadius="6" />
                                                     </Border.StrokeShape>
                                                     <Label Text="ACTIVA"
                                                            FontSize="9"
                                                            CharacterSpacing="1"
-                                                           TextColor="{StaticResource TextPrimaryColorLight}"
+                                                           TextColor="{StaticResource BackgroundPrimaryDark}"
                                                            FontFamily="Montserrat-Bold" />
                                                 </Border>
 

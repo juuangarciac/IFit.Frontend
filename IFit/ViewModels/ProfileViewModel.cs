@@ -180,13 +180,21 @@ public partial class ProfileViewModel : ObservableObject
     {
         if (item.IsActive) { IsCoachPanelExpanded = false; return; }
 
-        IsSaving = true;
-        var userId = Preferences.Get("UserId", 0L);
-        var updatedUser = await _appUserService.SetCoachModelType(userId, item.Id)
-                          ?? await _appUserService.findUserById(userId);
-        if (updatedUser != null) PopulateFromUser(updatedUser);
         IsCoachPanelExpanded = false;
-        IsSaving = false;
+        IsLoading = true;
+        StatusMessage = "Actualizando perfil...";
+
+        var userId = Preferences.Get("UserId", 0L);
+        var saveTask = _appUserService.SetCoachModelType(userId, item.Id);
+        await Task.WhenAll(saveTask, Task.Delay(3000));
+
+        var updatedUser = saveTask.Result ?? await _appUserService.findUserById(userId);
+        if (updatedUser != null)
+        {
+            PopulateFromUser(updatedUser);
+            Preferences.Set("CoachModelTypeName", CoachModel);
+        }
+        IsLoading = false;
     }
 
     [RelayCommand]
@@ -194,13 +202,17 @@ public partial class ProfileViewModel : ObservableObject
     {
         if (item.IsActive) { IsExperiencePanelExpanded = false; return; }
 
-        IsSaving = true;
-        var userId = Preferences.Get("UserId", 0L);
-        var updatedUser = await _appUserService.SetExperienceLevel(userId, item.Id)
-                          ?? await _appUserService.findUserById(userId);
-        if (updatedUser != null) PopulateFromUser(updatedUser);
         IsExperiencePanelExpanded = false;
-        IsSaving = false;
+        IsLoading = true;
+        StatusMessage = "Actualizando perfil...";
+
+        var userId = Preferences.Get("UserId", 0L);
+        var saveTask = _appUserService.SetExperienceLevel(userId, item.Id);
+        await Task.WhenAll(saveTask, Task.Delay(3000));
+
+        var updatedUser = saveTask.Result ?? await _appUserService.findUserById(userId);
+        if (updatedUser != null) PopulateFromUser(updatedUser);
+        IsLoading = false;
     }
 
     [RelayCommand]

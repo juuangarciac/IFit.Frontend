@@ -4,6 +4,7 @@
              xmlns:vm="clr-namespace:IFit.ViewModels"
              xmlns:views="clr-namespace:IFit.Views.Templates"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:components="clr-namespace:IFit.Views.Components"
              x:Class="IFit.Views.ProfileView"
              x:Name="ProfilePage"
              Shell.NavBarIsVisible="False">
@@ -225,20 +226,18 @@
                                             <!-- Badge ACTIVO -->
                                             <Border Grid.Column="1"
                                                     StrokeThickness="0"
+                                                    BackgroundColor="{StaticResource TertiaryColor}"
                                                     Padding="8,4"
                                                     VerticalOptions="Center"
                                                     IsVisible="{Binding IsActive}">
                                                 <Border.StrokeShape>
                                                     <RoundRectangle CornerRadius="6" />
                                                 </Border.StrokeShape>
-                                                <Border.BackgroundColor>
-                                                    <Color>#4CAF50</Color>
-                                                </Border.BackgroundColor>
                                                 <Label Text="ACTIVO"
+                                                       FontFamily="Montserrat-Bold"
                                                        FontSize="10"
                                                        CharacterSpacing="1"
-                                                       TextColor="{StaticResource White}"
-                                                       FontAttributes="Bold" />
+                                                       TextColor="{StaticResource BackgroundPrimaryDark}" />
                                             </Border>
 
                                             <!-- Label Seleccionar -->
@@ -352,20 +351,18 @@
                                             <!-- Badge ACTIVO -->
                                             <Border Grid.Column="1"
                                                     StrokeThickness="0"
+                                                    BackgroundColor="{StaticResource TertiaryColor}"
                                                     Padding="8,4"
                                                     VerticalOptions="Center"
                                                     IsVisible="{Binding IsActive}">
                                                 <Border.StrokeShape>
                                                     <RoundRectangle CornerRadius="6" />
                                                 </Border.StrokeShape>
-                                                <Border.BackgroundColor>
-                                                    <Color>#4CAF50</Color>
-                                                </Border.BackgroundColor>
                                                 <Label Text="ACTIVO"
+                                                       FontFamily="Montserrat-Bold"
                                                        FontSize="10"
                                                        CharacterSpacing="1"
-                                                       TextColor="{StaticResource White}"
-                                                       FontAttributes="Bold" />
+                                                       TextColor="{StaticResource BackgroundPrimaryDark}" />
                                             </Border>
 
                                             <!-- Label Seleccionar -->
@@ -406,12 +403,6 @@
                     </VerticalStackLayout>
                 </Border>
 
-                <!-- Indicador de guardado -->
-                <ActivityIndicator IsRunning="{Binding IsSaving}"
-                                   IsVisible="{Binding IsSaving}"
-                                   Color="{DynamicResource TertiaryColor}"
-                                   HorizontalOptions="Center" />
-
                 <!-- Cerrar sesión -->
                 <Button Text="Cerrar sesión"
                         Style="{DynamicResource ButtonBold-XL-dark-white}"
@@ -425,5 +416,9 @@
 
         <!-- Footer -->
         <views:HomeFooterView Grid.Row="2" />
+
+        <components:LoadingOverlay Grid.RowSpan="3"
+                                   IsLoading="{Binding IsLoading}"
+                                   Message="{Binding StatusMessage}" />
     </Grid>
 </ContentPage>
