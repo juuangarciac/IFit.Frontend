@@ -43,13 +43,12 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <ImageButton Grid.Column="0"
-                         Source="arrow_icon_white.png"
-                         HeightRequest="20"
-                         WidthRequest="20"
-                         VerticalOptions="Center"
-                         Command="{Binding GoToHomeCommand}"
-                         Rotation="180" />
+            <Button Grid.Column="0"
+                    HorizontalOptions="Start"
+                    VerticalOptions="Center"
+                    BackgroundColor="Transparent"
+                    ImageSource="arrow.png"
+                    Command="{Binding GoToHomeCommand}" />
 
             <HorizontalStackLayout Grid.Column="1"
                                    HorizontalOptions="Start"

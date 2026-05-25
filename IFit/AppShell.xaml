@@ -62,5 +62,9 @@
         ContentTemplate="{DataTemplate views:PlanSummaryView}"
         Route="PlanSummaryView" />
 
+    <ShellContent
+        Title="Comunidad"
+        ContentTemplate="{DataTemplate views:CommunityView}"
+        Route="CommunityPage" />
 
 </Shell>
