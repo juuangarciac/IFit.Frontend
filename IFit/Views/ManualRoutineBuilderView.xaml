@@ -376,6 +376,7 @@
                                 <Button Grid.Column="1"
                                         Text="Buscar"
                                         Command="{Binding SearchCommand}"
+                                        IsEnabled="{Binding IsLoading, Converter={StaticResource InvertedBoolConverter}}"
                                         Style="{StaticResource ButtonBold-XL-yellow}"
                                         FontSize="13"
                                         Padding="15,0"

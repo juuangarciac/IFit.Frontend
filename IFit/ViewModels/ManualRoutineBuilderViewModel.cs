@@ -249,6 +249,9 @@ public partial class ManualRoutineBuilderViewModel : ObservableObject
         Suggestions.Clear();
         OnPropertyChanged(nameof(HasSuggestions));
 
+        // Mostrar panel de búsqueda antes del await para que StatusMessage sea visible
+        SearchResults.Clear();
+        IsSearching = true;
         IsLoading = true;
         StatusMessage = "Buscando...";
 
@@ -257,19 +260,15 @@ public partial class ManualRoutineBuilderViewModel : ObservableObject
             var result = await _exerciseCatalogService.GetExercisesAsync(
                 page: 0, size: 20, muscle: SearchText.Trim());
 
-            SearchResults.Clear();
-
             if (result?.Content != null && result.Content.Count > 0)
             {
                 foreach (var ex in result.Content)
                     SearchResults.Add(ex);
 
-                IsSearching = true;
                 StatusMessage = string.Empty;
             }
             else
             {
-                IsSearching = true;
                 StatusMessage = "Sin resultados para ese término.";
             }
         }
