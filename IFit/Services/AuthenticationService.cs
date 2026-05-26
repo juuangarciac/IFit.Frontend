@@ -113,7 +113,8 @@ namespace IFit.Services
                         409 => "Este email ya está registrado.",
                         500 => "Tenemos problemas en nuestros servidores. Inténtalo de nuevo en unos minutos.",
                         503 => "El servicio no está disponible temporalmente. Por favor, inténtalo más tarde.",
-                        _ => "Servicio no disponible. Por favor, inténtalo más tarde."
+                        0   => "No se pudo conectar con el servidor. Comprueba tu conexión e inténtalo de nuevo.",
+                        _   => "Servicio no disponible. Por favor, inténtalo más tarde."
                     };
 
                     return new RegisterResponseDto

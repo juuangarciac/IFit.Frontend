@@ -357,47 +357,67 @@ namespace IFit.ViewModels
         /// </summary>
         private async Task<RegisterResponseDto?> TryRegisterAsync()
         {
-            try
+            const int maxAttempts = 2;
+
+            for (int attempt = 1; attempt <= maxAttempts; attempt++)
             {
-                Debug.WriteLine($"Intentando registrar usuario: {Email}");
-
-                var response = await _authenticationService.RegisterAsync(
-                    ValidatableName.Value,
-                    ValidatableEmail.Value,
-                    ValidatablePassword.Value
-                );
-
-                if (response == null)
+                try
                 {
+                    Debug.WriteLine($"Intentando registrar usuario (intento {attempt}): {Email}");
+
+                    var response = await _authenticationService.RegisterAsync(
+                        ValidatableName.Value,
+                        ValidatableEmail.Value,
+                        ValidatablePassword.Value
+                    );
+
+                    if (response == null)
+                    {
+                        CurrentState = RegistrationState.Error;
+                        ErrorMessage = "No se pudo crear la cuenta. Por favor, inténtalo más tarde.";
+                        Debug.WriteLine("Registro fallido: Respuesta nula del servidor");
+                        return null;
+                    }
+
+                    if (!response.Success)
+                    {
+                        // Error de conexión (StatusCode=0): reintentar una vez
+                        bool isConnectionError = response.Message?.Contains("conectar") == true
+                                              || response.Message?.Contains("disponible") == true;
+
+                        if (isConnectionError && attempt < maxAttempts)
+                        {
+                            Debug.WriteLine($"Error de conexión en intento {attempt}, reintentando...");
+                            await Task.Delay(1500);
+                            continue;
+                        }
+
+                        CurrentState = RegistrationState.Error;
+                        ErrorMessage = response.Message ?? "Error desconocido durante el registro.";
+                        Debug.WriteLine($"Registro fallido: {response.Message}");
+                        return null;
+                    }
+
+                    Debug.WriteLine($"Registro exitoso. Email: {response.Email}");
+                    return response;
+                }
+                catch (Exception ex)
+                {
+                    if (attempt < maxAttempts)
+                    {
+                        Debug.WriteLine($"Excepción en intento {attempt}, reintentando: {ex.Message}");
+                        await Task.Delay(1500);
+                        continue;
+                    }
+
                     CurrentState = RegistrationState.Error;
-                    ErrorMessage = "No se pudo crear la cuenta. Por favor, inténtalo más tarde.";
-
-                    Debug.WriteLine("Registro fallido: Respuesta nula del servidor");
-
+                    ErrorMessage = "Error de conexión. Por favor, verifica tu conexión a internet.";
+                    Debug.WriteLine($"Excepción en TryRegisterAsync: {ex.Message}");
                     return null;
                 }
-
-                if(response.Success == false)
-                {
-                    CurrentState = RegistrationState.Error;
-                    ErrorMessage = response.Message ?? "Error desconocido durante el registro.";
-                    Debug.WriteLine($"Registro fallido: {response.Message}");
-                    return null;
-                }
-
-                Debug.WriteLine($"Registro exitoso. Email: {response.Email}");
-
-                return response;
             }
-            catch (Exception ex)
-            {
-                CurrentState = RegistrationState.Error;
-                ErrorMessage = "Error de conexión. Por favor, verifica tu conexión a internet.";
 
-                Debug.WriteLine($"Excepción en TryRegisterAsync: {ex.Message}");
-
-                return null;
-            }
+            return null;
         }
 
         /// <summary>

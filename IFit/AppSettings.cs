@@ -18,7 +18,7 @@ namespace IFit
 
         public static readonly HttpClient _HttpClient = new HttpClient
         {
-            Timeout = TimeSpan.FromSeconds(5)
+            Timeout = TimeSpan.FromSeconds(15)
         };
 
         // SQLite database
