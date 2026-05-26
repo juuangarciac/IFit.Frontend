@@ -34,6 +34,6 @@ public partial class HomeFooterView : ContentView
     // Navega a la pantalla de Ayuda
     private async void OnHelpClicked(object sender, EventArgs e)
     {
-        await Shell.Current.GoToAsync("//HelpPage");
+        await Shell.Current.GoToAsync("//HelpView");
     }
 }

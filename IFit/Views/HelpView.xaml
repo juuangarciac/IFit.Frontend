@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:IFit.ViewModels"
+             xmlns:views="clr-namespace:IFit.Views.Templates"
+             x:Class="IFit.Views.HelpView"
+             Shell.NavBarIsVisible="False">
+
+    <ContentPage.BindingContext>
+        <vm:HelpViewModel />
+    </ContentPage.BindingContext>
+
+    <Grid RowDefinitions="Auto,*,Auto,Auto" RowSpacing="0">
+
+        <!-- Header con gradiente -->
+        <Grid Grid.Row="0"
+              Background="{StaticResource CardPremiumYellowGradientColor}"
+              RowDefinitions="Auto,Auto">
+
+            <!-- Navbar -->
+            <Grid Grid.Row="0" Margin="15">
+                <Image Source="ifit_logo_white.png"
+                       HeightRequest="20"
+                       WidthRequest="120"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center" />
+            </Grid>
+
+            <!-- Títulos -->
+            <VerticalStackLayout Grid.Row="1"
+                                 Margin="15,0,15,20"
+                                 Spacing="6">
+                <Label Text="SOPORTE"
+                       FontSize="11"
+                       CharacterSpacing="2"
+                       Opacity="0.7"
+                       Style="{StaticResource label-p-white}" />
+                <Label Text="Ayuda"
+                       Style="{StaticResource label-Title-white}" />
+                <Label Text="Estamos aquí para resolver cualquier duda o problema."
+                       Style="{StaticResource label-p-white}"
+                       Opacity="0.8"
+                       LineBreakMode="WordWrap" />
+            </VerticalStackLayout>
+        </Grid>
+
+        <!-- Contenido -->
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="15,16,15,16" Spacing="12">
+
+                <!-- Card hero: contactar soporte -->
+                <Border BackgroundColor="{StaticResource BackgroundSecondaryDark}"
+                        StrokeThickness="0">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="8" />
+                    </Border.StrokeShape>
+                    <Grid ColumnDefinitions="24,*" ColumnSpacing="0">
+                        <Border Grid.Column="0"
+                                StrokeThickness="0"
+                                Margin="0"
+                                Background="{StaticResource CardPremiumYellowGradientColor}">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="8,0,8,0" />
+                            </Border.StrokeShape>
+                        </Border>
+                        <VerticalStackLayout Grid.Column="1" Padding="12,10" Spacing="4">
+                            <Label Text="Ticket de soporte"
+                                   Style="{StaticResource label-h2-white}" />
+                            <Label Text="Describe tu problema y te responderemos por email en menos de 24 horas."
+                                   Style="{StaticResource label-p-white}"
+                                   Opacity="0.7"
+                                   LineBreakMode="WordWrap" />
+                        </VerticalStackLayout>
+                    </Grid>
+                </Border>
+
+                <!-- Sección: tipos de consulta -->
+                <Label Text="Tipos de consulta"
+                       Style="{StaticResource label-h2-white}"
+                       Margin="0,4,0,0" />
+
+                <!-- TECNICO -->
+                <Border BackgroundColor="{StaticResource BackgroundSecondaryDark}"
+                        StrokeThickness="0">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="8" />
+                    </Border.StrokeShape>
+                    <Grid Padding="12,10" ColumnDefinitions="44,*" ColumnSpacing="12">
+                        <Border Grid.Column="0"
+                                BackgroundColor="{StaticResource TertiaryColor}"
+                                StrokeThickness="0"
+                                WidthRequest="36"
+                                HeightRequest="36"
+                                VerticalOptions="Center">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="8" />
+                            </Border.StrokeShape>
+                            <Label Text="T"
+                                   TextColor="{StaticResource BackgroundPrimaryDark}"
+                                   FontFamily="Montserrat-Bold"
+                                   FontSize="16"
+                                   HorizontalOptions="Center"
+                                   VerticalOptions="Center" />
+                        </Border>
+                        <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                            <Label Text="Técnico"
+                                   Style="{StaticResource label-h3-white}" />
+                            <Label Text="Errores, fallos o comportamientos inesperados de la app."
+                                   Style="{StaticResource label-p-white}"
+                                   FontSize="12"
+                                   Opacity="0.65"
+                                   LineBreakMode="WordWrap" />
+                        </VerticalStackLayout>
+                    </Grid>
+                </Border>
+
+                <!-- RUTINA -->
+                <Border BackgroundColor="{StaticResource BackgroundSecondaryDark}"
+                        StrokeThickness="0">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="8" />
+                    </Border.StrokeShape>
+                    <Grid Padding="12,10" ColumnDefinitions="44,*" ColumnSpacing="12">
+                        <Border Grid.Column="0"
+                                BackgroundColor="{StaticResource TertiaryColor}"
+                                StrokeThickness="0"
+                                WidthRequest="36"
+                                HeightRequest="36"
+                                VerticalOptions="Center">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="8" />
+                            </Border.StrokeShape>
+                            <Label Text="R"
+                                   TextColor="{StaticResource BackgroundPrimaryDark}"
+                                   FontFamily="Montserrat-Bold"
+                                   FontSize="16"
+                                   HorizontalOptions="Center"
+                                   VerticalOptions="Center" />
+                        </Border>
+                        <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                            <Label Text="Rutina"
+                                   Style="{StaticResource label-h3-white}" />
+                            <Label Text="Problemas con la generación o configuración de tu rutina de entrenamiento."
+                                   Style="{StaticResource label-p-white}"
+                                   FontSize="12"
+                                   Opacity="0.65"
+                                   LineBreakMode="WordWrap" />
+                        </VerticalStackLayout>
+                    </Grid>
+                </Border>
+
+                <!-- CUENTA -->
+                <Border BackgroundColor="{StaticResource BackgroundSecondaryDark}"
+                        StrokeThickness="0">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="8" />
+                    </Border.StrokeShape>
+                    <Grid Padding="12,10" ColumnDefinitions="44,*" ColumnSpacing="12">
+                        <Border Grid.Column="0"
+                                BackgroundColor="{StaticResource TertiaryColor}"
+                                StrokeThickness="0"
+                                WidthRequest="36"
+                                HeightRequest="36"
+                                VerticalOptions="Center">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="8" />
+                            </Border.StrokeShape>
+                            <Label Text="C"
+                                   TextColor="{StaticResource BackgroundPrimaryDark}"
+                                   FontFamily="Montserrat-Bold"
+                                   FontSize="16"
+                                   HorizontalOptions="Center"
+                                   VerticalOptions="Center" />
+                        </Border>
+                        <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                            <Label Text="Cuenta"
+                                   Style="{StaticResource label-h3-white}" />
+                            <Label Text="Acceso, verificación de email, perfil o datos de usuario."
+                                   Style="{StaticResource label-p-white}"
+                                   FontSize="12"
+                                   Opacity="0.65"
+                                   LineBreakMode="WordWrap" />
+                        </VerticalStackLayout>
+                    </Grid>
+                </Border>
+
+                <!-- OTRO -->
+                <Border BackgroundColor="{StaticResource BackgroundSecondaryDark}"
+                        StrokeThickness="0">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="8" />
+                    </Border.StrokeShape>
+                    <Grid Padding="12,10" ColumnDefinitions="44,*" ColumnSpacing="12">
+                        <Border Grid.Column="0"
+                                BackgroundColor="{StaticResource TertiaryColor}"
+                                StrokeThickness="0"
+                                WidthRequest="36"
+                                HeightRequest="36"
+                                VerticalOptions="Center">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="8" />
+                            </Border.StrokeShape>
+                            <Label Text="O"
+                                   TextColor="{StaticResource BackgroundPrimaryDark}"
+                                   FontFamily="Montserrat-Bold"
+                                   FontSize="16"
+                                   HorizontalOptions="Center"
+                                   VerticalOptions="Center" />
+                        </Border>
+                        <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                            <Label Text="Otro"
+                                   Style="{StaticResource label-h3-white}" />
+                            <Label Text="Sugerencias, comentarios o cualquier otra consulta."
+                                   Style="{StaticResource label-p-white}"
+                                   FontSize="12"
+                                   Opacity="0.65"
+                                   LineBreakMode="WordWrap" />
+                        </VerticalStackLayout>
+                    </Grid>
+                </Border>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- CTA fijo -->
+        <Button Grid.Row="2"
+                Text="Enviar ticket de soporte"
+                Command="{Binding GoToSupportTicketCommand}"
+                Style="{StaticResource ButtonBold-XL-yellow}"
+                CornerRadius="{StaticResource CornerRadiusRectangle}"
+                Margin="15,8,15,0" />
+
+        <!-- Footer de navegación -->
+        <views:HomeFooterView Grid.Row="3" />
+
+    </Grid>
+</ContentPage>

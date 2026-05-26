@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:IFit.ViewModels"
+             x:Class="IFit.Views.SupportTicketView"
+             Shell.NavBarIsVisible="False">
+
+    <ContentPage.BindingContext>
+        <vm:SupportTicketViewModel />
+    </ContentPage.BindingContext>
+
+    <Grid RowDefinitions="Auto,*,Auto" RowSpacing="0">
+
+        <!-- Header con gradiente -->
+        <Grid Grid.Row="0"
+              Background="{StaticResource CardPremiumYellowGradientColor}"
+              RowDefinitions="Auto,Auto">
+
+            <!-- Navbar -->
+            <Grid Grid.Row="0" Margin="15">
+                <Button HorizontalOptions="Start"
+                        VerticalOptions="Center"
+                        BackgroundColor="Transparent"
+                        ImageSource="arrow.png"
+                        Command="{Binding GoBackCommand}"
+                        HeightRequest="44"
+                        WidthRequest="44" />
+                <Image Source="ifit_logo_white.png"
+                       HeightRequest="20"
+                       WidthRequest="120"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center" />
+            </Grid>
+
+            <!-- Títulos -->
+            <VerticalStackLayout Grid.Row="1"
+                                 Margin="15,0,15,20"
+                                 Spacing="6">
+                <Label Text="SOPORTE"
+                       FontSize="11"
+                       CharacterSpacing="2"
+                       Opacity="0.7"
+                       Style="{StaticResource label-p-white}" />
+                <Label Text="Ticket de soporte"
+                       Style="{StaticResource label-Title-white}" />
+                <Label Text="Describe tu problema y te responderemos en menos de 24 horas."
+                       Style="{StaticResource label-p-white}"
+                       Opacity="0.8"
+                       LineBreakMode="WordWrap" />
+            </VerticalStackLayout>
+        </Grid>
+
+        <!-- Formulario -->
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="15,16,15,16" Spacing="12">
+
+                <!-- Asunto -->
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="Asunto"
+                           Style="{StaticResource label-h3-white}" />
+                    <Border BackgroundColor="{StaticResource BackgroundSecondaryDark}"
+                            StrokeThickness="0"
+                            Padding="12,0">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="8" />
+                        </Border.StrokeShape>
+                        <Entry Text="{Binding Subject}"
+                               Placeholder="Resumen breve del problema"
+                               PlaceholderColor="#888"
+                               TextColor="White"
+                               BackgroundColor="Transparent"
+                               HeightRequest="44" />
+                    </Border>
+                </VerticalStackLayout>
+
+                <!-- Categoría -->
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="Categoría"
+                           Style="{StaticResource label-h3-white}" />
+                    <Border BackgroundColor="{StaticResource BackgroundSecondaryDark}"
+                            StrokeThickness="0"
+                            Padding="12,0">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="8" />
+                        </Border.StrokeShape>
+                        <Picker ItemsSource="{Binding Categories}"
+                                SelectedItem="{Binding SelectedCategory}"
+                                Title="Selecciona una categoría"
+                                TitleColor="#888"
+                                TextColor="White"
+                                BackgroundColor="Transparent"
+                                HeightRequest="44" />
+                    </Border>
+                </VerticalStackLayout>
+
+                <!-- Mensaje -->
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="Descripción"
+                           Style="{StaticResource label-h3-white}" />
+                    <Border BackgroundColor="{StaticResource BackgroundSecondaryDark}"
+                            StrokeThickness="0"
+                            Padding="12,8">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="8" />
+                        </Border.StrokeShape>
+                        <Editor Text="{Binding Message}"
+                                Placeholder="Describe el problema con el mayor detalle posible"
+                                PlaceholderColor="#888"
+                                TextColor="White"
+                                BackgroundColor="Transparent"
+                                HeightRequest="140"
+                                AutoSize="Disabled" />
+                    </Border>
+                </VerticalStackLayout>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- CTA fijo -->
+        <Grid Grid.Row="2" Padding="15,8,15,8">
+            <Button Text="Enviar ticket"
+                    Command="{Binding SendTicketCommand}"
+                    Style="{StaticResource ButtonBold-XL-yellow}"
+                    CornerRadius="{StaticResource CornerRadiusRectangle}" />
+            <ActivityIndicator IsRunning="{Binding IsSending}"
+                               IsVisible="{Binding IsSending}"
+                               Color="{StaticResource BackgroundPrimaryDark}"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center" />
+        </Grid>
+
+    </Grid>
+</ContentPage>

@@ -67,4 +67,9 @@
         ContentTemplate="{DataTemplate views:CommunityView}"
         Route="CommunityPage" />
 
+    <ShellContent
+        Title="Ayuda"
+        ContentTemplate="{DataTemplate views:HelpView}"
+        Route="HelpView" />
+
 </Shell>
