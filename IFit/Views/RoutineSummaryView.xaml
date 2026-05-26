@@ -77,9 +77,10 @@
 
             <!-- Row 3: Carrusel de días — desliza horizontalmente, scroll vertical dentro de cada card -->
             <CarouselView Grid.Row="3"
+                          HorizontalOptions="Fill"
                           ItemsSource="{Binding Routine.Days}"
                           Position="{Binding CurrentDayIndex, Mode=TwoWay}"
-                          PeekAreaInsets="44"
+                          PeekAreaInsets="20"
                           Loop="False"
                           HorizontalScrollBarVisibility="Never">
                 <CarouselView.ItemTemplate>
