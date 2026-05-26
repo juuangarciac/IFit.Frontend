@@ -46,6 +46,7 @@ public partial class ExerciseCatalogViewModel : ObservableObject
 
     private readonly ExerciseCatalogService _exerciseCatalogService;
     private readonly DatabaseService _databaseService;
+    private CancellationTokenSource? _liveCts;
 
     #endregion
 
@@ -137,6 +138,18 @@ public partial class ExerciseCatalogViewModel : ObservableObject
 
     #endregion
 
+    #region Partial callbacks
+
+    partial void OnSearchTextChanged(string value)
+    {
+        _liveCts?.Cancel();
+        _liveCts?.Dispose();
+        _liveCts = new CancellationTokenSource();
+        _ = LiveFilterAsync(value, _liveCts.Token);
+    }
+
+    #endregion
+
     #region Private methods
 
     private static readonly TimeSpan CacheTtl = TimeSpan.FromDays(7);
@@ -164,6 +177,50 @@ public partial class ExerciseCatalogViewModel : ObservableObject
         }
     }
 
+    private async Task LiveFilterAsync(string query, CancellationToken ct)
+    {
+        if (!IsCacheWarm()) return;
+
+        try
+        {
+            List<ExerciseSummaryDto> results;
+            bool isFiltered;
+
+            if (query.Length >= 2)
+            {
+                results = await _databaseService.SearchExercisesAsync(query, limit: PageSize);
+                isFiltered = true;
+            }
+            else
+            {
+                results = await _databaseService.GetCachedExercisesAsync(0, PageSize);
+                isFiltered = false;
+            }
+
+            if (ct.IsCancellationRequested) return;
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                if (ct.IsCancellationRequested) return;
+                _currentPage = 1;
+                Exercises.Clear();
+                foreach (var ex in results) Exercises.Add(ex);
+                HasMorePages = !isFiltered && results.Count == PageSize;
+                IsEmpty = Exercises.Count == 0;
+            });
+        }
+        catch (OperationCanceledException) { }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"✗ Error en filtro en vivo: {ex.Message}");
+        }
+    }
+
+    private static bool IsCacheWarm()
+    {
+        var lastTicks = Preferences.Get("ExerciseCacheDateTicks", 0L);
+        return lastTicks != 0L && (DateTime.UtcNow.Ticks - lastTicks) <= CacheTtl.Ticks;
+    }
+
     private async Task LoadExercisesAsync(bool reset)
     {
         if (IsLoadingData) return;
@@ -180,6 +237,26 @@ public partial class ExerciseCatalogViewModel : ObservableObject
         try
         {
             var muscle = string.IsNullOrWhiteSpace(SearchText) ? null : SearchText.Trim();
+
+            // When cache is warm and no filter is active, serve from SQLite (instant)
+            if (muscle == null && IsCacheWarm())
+            {
+                var cached = await _databaseService.GetCachedExercisesAsync(_currentPage, PageSize);
+                if (cached.Count > 0)
+                {
+                    foreach (var exercise in cached)
+                        Exercises.Add(exercise);
+                    _currentPage++;
+                    HasMorePages = cached.Count == PageSize;
+                    IsEmpty = false;
+                }
+                else
+                {
+                    HasMorePages = false;
+                    IsEmpty = Exercises.Count == 0;
+                }
+                return;
+            }
 
             var result = await _exerciseCatalogService.GetExercisesAsync(
                 page: _currentPage,

@@ -167,7 +167,7 @@
                                                 <Border StrokeThickness="0"
                                                         Padding="8,4"
                                                         IsVisible="{Binding IsActive, Converter={StaticResource InvertedBoolConverter}}"
-                                                        BackgroundColor="{StaticResource TertiaryColor}">
+                                                        BackgroundColor="{StaticResource BackgroundSecondaryDark}">
                                                     <Border.StrokeShape>
                                                         <RoundRectangle CornerRadius="6" />
                                                     </Border.StrokeShape>
@@ -179,7 +179,7 @@
                                                     <Label Text="ACTIVAR"
                                                            FontSize="9"
                                                            CharacterSpacing="1"
-                                                           TextColor="{StaticResource BackgroundPrimaryDark}"
+                                                           TextColor="{StaticResource TertiaryColor}"
                                                            FontFamily="Montserrat-Bold"
                                                            InputTransparent="True" />
                                                 </Border>

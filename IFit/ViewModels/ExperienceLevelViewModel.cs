@@ -136,7 +136,7 @@ namespace IFit.ViewModels
 
             AppUserResponseDto? response = await appUserService.SetExperienceLevel(user.Id, selectedLevel.Id);
             if (response == null
-                && string.IsNullOrEmpty(response?.ExperienceLevelName))
+                || string.IsNullOrEmpty(response?.ExperienceLevelName))
             {
                 await ErrorHandler.HandleErrorAsync("Failed to set experience level type.", "//ErrorView",
                     "Error",

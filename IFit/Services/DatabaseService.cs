@@ -182,6 +182,15 @@ namespace IFit.Services
             return entities.Select(e => e.ToDto()).ToList();
         }
 
+        public async Task<List<ExerciseSummaryDto>> GetCachedExercisesAsync(int page, int size)
+        {
+            if (!_initialized) await InitializeAsync();
+            var entities = await _db.QueryAsync<ExerciseCacheEntity>(
+                "SELECT * FROM ExerciseCache ORDER BY Name LIMIT ? OFFSET ?",
+                size, page * size);
+            return entities.Select(e => e.ToDto()).ToList();
+        }
+
         #endregion
     }
 }

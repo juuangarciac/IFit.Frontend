@@ -109,6 +109,7 @@ public partial class ManualRoutineBuilderViewModel : ObservableObject
     private readonly ExerciseCatalogService _exerciseCatalogService;
     private readonly TrainingService _trainingService;
     private readonly DatabaseService _databaseService;
+    private CancellationTokenSource? _suggestionCts;
 
     #endregion
 
@@ -142,6 +143,10 @@ public partial class ManualRoutineBuilderViewModel : ObservableObject
 
     partial void OnSearchTextChanged(string value)
     {
+        _suggestionCts?.Cancel();
+        _suggestionCts?.Dispose();
+        _suggestionCts = new CancellationTokenSource();
+
         if (value.Length < 2)
         {
             if (HasSuggestions)
@@ -152,7 +157,7 @@ public partial class ManualRoutineBuilderViewModel : ObservableObject
             return;
         }
 
-        _ = UpdateSuggestionsAsync(value);
+        _ = UpdateSuggestionsAsync(value, _suggestionCts.Token);
     }
 
     #endregion
@@ -391,19 +396,22 @@ public partial class ManualRoutineBuilderViewModel : ObservableObject
 
     #region Private methods
 
-    private async Task UpdateSuggestionsAsync(string query)
+    private async Task UpdateSuggestionsAsync(string query, CancellationToken ct)
     {
         try
         {
             var results = await _databaseService.SearchExercisesAsync(query, limit: 8);
+            if (ct.IsCancellationRequested) return;
             MainThread.BeginInvokeOnMainThread(() =>
             {
+                if (ct.IsCancellationRequested) return;
                 Suggestions.Clear();
                 foreach (var item in results)
                     Suggestions.Add(item);
                 OnPropertyChanged(nameof(HasSuggestions));
             });
         }
+        catch (OperationCanceledException) { }
         catch (Exception ex)
         {
             Debug.WriteLine($"✗ Error en autocomplete: {ex.Message}");
