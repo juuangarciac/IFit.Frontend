@@ -2,7 +2,6 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:IFit.ViewModels"
-             xmlns:views="clr-namespace:IFit.Views.Templates"
              x:Class="IFit.Views.HelpView"
              Shell.NavBarIsVisible="False">
 
@@ -10,47 +9,46 @@
         <vm:HelpViewModel />
     </ContentPage.BindingContext>
 
-    <Grid RowDefinitions="Auto,*,Auto,Auto" RowSpacing="0">
+    <Grid RowDefinitions="Auto,*,Auto" RowSpacing="0">
 
-        <!-- Header con gradiente -->
+        <!-- Header -->
         <Grid Grid.Row="0"
-              Background="{StaticResource CardPremiumYellowGradientColor}"
-              RowDefinitions="Auto,Auto">
+              Padding="15,48,15,20"
+              ColumnDefinitions="44,*,44">
 
-            <!-- Navbar -->
-            <Grid Grid.Row="0" Margin="15">
-                <Image Source="ifit_logo_white.png"
-                       HeightRequest="20"
-                       WidthRequest="120"
-                       HorizontalOptions="Center"
-                       VerticalOptions="Center" />
-            </Grid>
+            <Button Grid.Column="0"
+                    BackgroundColor="Transparent"
+                    ImageSource="arrow.png"
+                    Command="{Binding GoBackCommand}"
+                    HeightRequest="44"
+                    WidthRequest="44"
+                    HorizontalOptions="Start"
+                    VerticalOptions="Center" />
 
-            <!-- Títulos -->
-            <VerticalStackLayout Grid.Row="1"
-                                 Margin="15,0,15,20"
-                                 Spacing="6">
+            <VerticalStackLayout Grid.Column="1"
+                                 HorizontalOptions="Center"
+                                 VerticalOptions="Center"
+                                 Spacing="2">
                 <Label Text="SOPORTE"
                        FontSize="11"
                        CharacterSpacing="2"
-                       Opacity="0.7"
-                       Style="{StaticResource label-p-white}" />
-                <Label Text="Ayuda"
-                       Style="{StaticResource label-Title-white}" />
-                <Label Text="Estamos aquí para resolver cualquier duda o problema."
+                       Opacity="0.5"
                        Style="{StaticResource label-p-white}"
-                       Opacity="0.8"
-                       LineBreakMode="WordWrap" />
+                       HorizontalOptions="Center" />
+                <Label Text="Ayuda"
+                       Style="{StaticResource label-h1-white}"
+                       HorizontalOptions="Center" />
             </VerticalStackLayout>
         </Grid>
 
         <!-- Contenido -->
         <ScrollView Grid.Row="1">
-            <VerticalStackLayout Padding="15,16,15,16" Spacing="12">
+            <VerticalStackLayout Padding="20,0,20,16" Spacing="12">
 
-                <!-- Card hero: contactar soporte -->
+                <!-- Card hero: ticket de soporte -->
                 <Border BackgroundColor="{StaticResource BackgroundSecondaryDark}"
-                        StrokeThickness="0">
+                        StrokeThickness="0"
+                        Margin="0,0,0,4">
                     <Border.StrokeShape>
                         <RoundRectangle CornerRadius="8" />
                     </Border.StrokeShape>
@@ -63,7 +61,7 @@
                                 <RoundRectangle CornerRadius="8,0,8,0" />
                             </Border.StrokeShape>
                         </Border>
-                        <VerticalStackLayout Grid.Column="1" Padding="12,10" Spacing="4">
+                        <VerticalStackLayout Grid.Column="1" Padding="12,14" Spacing="4">
                             <Label Text="Ticket de soporte"
                                    Style="{StaticResource label-h2-white}" />
                             <Label Text="Describe tu problema y te responderemos por email en menos de 24 horas."
@@ -77,11 +75,12 @@
                 <!-- Sección: tipos de consulta -->
                 <Label Text="Tipos de consulta"
                        Style="{StaticResource label-h2-white}"
-                       Margin="0,4,0,0" />
+                       Margin="0,8,0,0" />
 
                 <!-- TECNICO -->
                 <Border BackgroundColor="{StaticResource BackgroundSecondaryDark}"
-                        StrokeThickness="0">
+                        StrokeThickness="0"
+                        Margin="0,0,0,0">
                     <Border.StrokeShape>
                         <RoundRectangle CornerRadius="8" />
                     </Border.StrokeShape>
@@ -227,11 +226,7 @@
                 Text="Enviar ticket de soporte"
                 Command="{Binding GoToSupportTicketCommand}"
                 Style="{StaticResource ButtonBold-XL-yellow}"
-                CornerRadius="{StaticResource CornerRadiusRectangle}"
-                Margin="15,8,15,0" />
-
-        <!-- Footer de navegación -->
-        <views:HomeFooterView Grid.Row="3" />
+                Margin="20,8,20,16" />
 
     </Grid>
 </ContentPage>
