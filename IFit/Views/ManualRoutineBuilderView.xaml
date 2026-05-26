@@ -174,11 +174,11 @@
             <Border Grid.Column="2"
                     BackgroundColor="{StaticResource BackgroundSecondaryDark}"
                     StrokeThickness="0"
-                    WidthRequest="40"
-                    HeightRequest="40"
+                    WidthRequest="44"
+                    HeightRequest="44"
                     VerticalOptions="Center">
                 <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="20" />
+                    <RoundRectangle CornerRadius="22" />
                 </Border.StrokeShape>
                 <Border.GestureRecognizers>
                     <TapGestureRecognizer Command="{Binding ToggleInfoCommand}" />
