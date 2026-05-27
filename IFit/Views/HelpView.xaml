@@ -2,6 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:IFit.ViewModels"
+             xmlns:components="clr-namespace:IFit.Views.Components"
              x:Class="IFit.Views.HelpView"
              Shell.NavBarIsVisible="False">
 
@@ -23,21 +24,21 @@
                     HeightRequest="44"
                     WidthRequest="44"
                     HorizontalOptions="Start"
-                    VerticalOptions="Center" />
+                    VerticalOptions="Start" />
 
             <VerticalStackLayout Grid.Column="1"
-                                 HorizontalOptions="Center"
-                                 VerticalOptions="Center"
+                                 HorizontalOptions="Start"
+                                 VerticalOptions="Start"
                                  Spacing="2">
                 <Label Text="SOPORTE"
                        FontSize="11"
                        CharacterSpacing="2"
                        Opacity="0.5"
                        Style="{StaticResource label-p-white}"
-                       HorizontalOptions="Center" />
+                       HorizontalOptions="Start" />
                 <Label Text="Ayuda"
                        Style="{StaticResource label-h1-white}"
-                       HorizontalOptions="Center" />
+                       HorizontalOptions="Start" />
             </VerticalStackLayout>
         </Grid>
 
@@ -45,45 +46,66 @@
         <ScrollView Grid.Row="1">
             <VerticalStackLayout Padding="20,0,20,16" Spacing="12">
 
-                <!-- Card hero: ticket de soporte -->
+                <!-- Card hero: descripción -->
                 <Border BackgroundColor="{StaticResource BackgroundSecondaryDark}"
                         StrokeThickness="0"
                         Margin="0,0,0,4">
                     <Border.StrokeShape>
                         <RoundRectangle CornerRadius="8" />
                     </Border.StrokeShape>
-                    <Grid ColumnDefinitions="24,*" ColumnSpacing="0">
-                        <Border Grid.Column="0"
-                                StrokeThickness="0"
-                                Margin="0"
-                                Background="{StaticResource CardPremiumYellowGradientColor}">
-                            <Border.StrokeShape>
-                                <RoundRectangle CornerRadius="8,0,8,0" />
-                            </Border.StrokeShape>
-                        </Border>
-                        <VerticalStackLayout Grid.Column="1" Padding="12,14" Spacing="4">
-                            <Label Text="Ticket de soporte"
-                                   Style="{StaticResource label-h2-white}" />
-                            <Label Text="Describe tu problema y te responderemos por email en menos de 24 horas."
-                                   Style="{StaticResource label-p-white}"
-                                   Opacity="0.7"
-                                   LineBreakMode="WordWrap" />
-                        </VerticalStackLayout>
-                    </Grid>
+                    <VerticalStackLayout Padding="12,14" Spacing="4">
+                        <Label Text="Ticket de soporte"
+                               Style="{StaticResource label-h2-white}" />
+                        <Label Text="Describe tu problema y te responderemos por email en menos de 24 horas."
+                               Style="{StaticResource label-p-white}"
+                               Opacity="0.7"
+                               LineBreakMode="WordWrap" />
+                    </VerticalStackLayout>
                 </Border>
 
-                <!-- Sección: tipos de consulta -->
-                <Label Text="Tipos de consulta"
-                       Style="{StaticResource label-h2-white}"
+                <!-- Asunto -->
+                <Label Text="Asunto"
+                       Style="{StaticResource label-h3-white}"
                        Margin="0,8,0,0" />
-
-                <!-- TECNICO -->
                 <Border BackgroundColor="{StaticResource BackgroundSecondaryDark}"
                         StrokeThickness="0"
-                        Margin="0,0,0,0">
+                        Padding="12,0">
                     <Border.StrokeShape>
                         <RoundRectangle CornerRadius="8" />
                     </Border.StrokeShape>
+                    <Entry Text="{Binding Subject}"
+                           Placeholder="Resumen breve del problema"
+                           PlaceholderColor="#888"
+                           TextColor="{StaticResource TextPrimaryColorLight}"
+                           BackgroundColor="Transparent"
+                           HeightRequest="44" />
+                </Border>
+
+                <!-- Categoría -->
+                <Label Text="Categoría"
+                       Style="{StaticResource label-h3-white}"
+                       Margin="0,8,0,0" />
+
+                <!-- TECNICO -->
+                <Border StrokeThickness="0">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="8" />
+                    </Border.StrokeShape>
+                    <Border.BackgroundColor>
+                        <StaticResource Key="BackgroundSecondaryDark" />
+                    </Border.BackgroundColor>
+                    <Border.Triggers>
+                        <DataTrigger TargetType="Border"
+                                     Binding="{Binding SelectedCategory}"
+                                     Value="TECNICO">
+                            <Setter Property="BackgroundColor"
+                                    Value="{StaticResource BackgroundPrimaryDark}" />
+                        </DataTrigger>
+                    </Border.Triggers>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding SelectCategoryCommand}"
+                                              CommandParameter="TECNICO" />
+                    </Border.GestureRecognizers>
                     <Grid Padding="12,10" ColumnDefinitions="44,*" ColumnSpacing="12">
                         <Border Grid.Column="0"
                                 BackgroundColor="{StaticResource TertiaryColor}"
@@ -114,11 +136,25 @@
                 </Border>
 
                 <!-- RUTINA -->
-                <Border BackgroundColor="{StaticResource BackgroundSecondaryDark}"
-                        StrokeThickness="0">
+                <Border StrokeThickness="0">
                     <Border.StrokeShape>
                         <RoundRectangle CornerRadius="8" />
                     </Border.StrokeShape>
+                    <Border.BackgroundColor>
+                        <StaticResource Key="BackgroundSecondaryDark" />
+                    </Border.BackgroundColor>
+                    <Border.Triggers>
+                        <DataTrigger TargetType="Border"
+                                     Binding="{Binding SelectedCategory}"
+                                     Value="RUTINA">
+                            <Setter Property="BackgroundColor"
+                                    Value="{StaticResource BackgroundPrimaryDark}" />
+                        </DataTrigger>
+                    </Border.Triggers>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding SelectCategoryCommand}"
+                                              CommandParameter="RUTINA" />
+                    </Border.GestureRecognizers>
                     <Grid Padding="12,10" ColumnDefinitions="44,*" ColumnSpacing="12">
                         <Border Grid.Column="0"
                                 BackgroundColor="{StaticResource TertiaryColor}"
@@ -149,11 +185,25 @@
                 </Border>
 
                 <!-- CUENTA -->
-                <Border BackgroundColor="{StaticResource BackgroundSecondaryDark}"
-                        StrokeThickness="0">
+                <Border StrokeThickness="0">
                     <Border.StrokeShape>
                         <RoundRectangle CornerRadius="8" />
                     </Border.StrokeShape>
+                    <Border.BackgroundColor>
+                        <StaticResource Key="BackgroundSecondaryDark" />
+                    </Border.BackgroundColor>
+                    <Border.Triggers>
+                        <DataTrigger TargetType="Border"
+                                     Binding="{Binding SelectedCategory}"
+                                     Value="CUENTA">
+                            <Setter Property="BackgroundColor"
+                                    Value="{StaticResource BackgroundPrimaryDark}" />
+                        </DataTrigger>
+                    </Border.Triggers>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding SelectCategoryCommand}"
+                                              CommandParameter="CUENTA" />
+                    </Border.GestureRecognizers>
                     <Grid Padding="12,10" ColumnDefinitions="44,*" ColumnSpacing="12">
                         <Border Grid.Column="0"
                                 BackgroundColor="{StaticResource TertiaryColor}"
@@ -184,11 +234,25 @@
                 </Border>
 
                 <!-- OTRO -->
-                <Border BackgroundColor="{StaticResource BackgroundSecondaryDark}"
-                        StrokeThickness="0">
+                <Border StrokeThickness="0">
                     <Border.StrokeShape>
                         <RoundRectangle CornerRadius="8" />
                     </Border.StrokeShape>
+                    <Border.BackgroundColor>
+                        <StaticResource Key="BackgroundSecondaryDark" />
+                    </Border.BackgroundColor>
+                    <Border.Triggers>
+                        <DataTrigger TargetType="Border"
+                                     Binding="{Binding SelectedCategory}"
+                                     Value="OTRO">
+                            <Setter Property="BackgroundColor"
+                                    Value="{StaticResource BackgroundPrimaryDark}" />
+                        </DataTrigger>
+                    </Border.Triggers>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding SelectCategoryCommand}"
+                                              CommandParameter="OTRO" />
+                    </Border.GestureRecognizers>
                     <Grid Padding="12,10" ColumnDefinitions="44,*" ColumnSpacing="12">
                         <Border Grid.Column="0"
                                 BackgroundColor="{StaticResource TertiaryColor}"
@@ -218,15 +282,40 @@
                     </Grid>
                 </Border>
 
+                <!-- Descripción -->
+                <Label Text="Descripción"
+                       Style="{StaticResource label-h3-white}"
+                       Margin="0,8,0,0" />
+                <Border BackgroundColor="{StaticResource BackgroundSecondaryDark}"
+                        StrokeThickness="0"
+                        Padding="12,8">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="8" />
+                    </Border.StrokeShape>
+                    <Editor Text="{Binding Message}"
+                            Placeholder="Describe el problema con el mayor detalle posible"
+                            PlaceholderColor="#888"
+                            TextColor="{StaticResource TextPrimaryColorLight}"
+                            BackgroundColor="Transparent"
+                            HeightRequest="140"
+                            AutoSize="Disabled" />
+                </Border>
+
             </VerticalStackLayout>
         </ScrollView>
 
         <!-- CTA fijo -->
         <Button Grid.Row="2"
-                Text="Enviar ticket de soporte"
-                Command="{Binding GoToSupportTicketCommand}"
+                Text="Enviar ticket"
+                Command="{Binding SendTicketCommand}"
+                IsEnabled="{Binding IsLoading, Converter={StaticResource InvertedBoolConverter}}"
                 Style="{StaticResource ButtonBold-XL-yellow}"
                 Margin="20,8,20,16" />
+
+        <!-- Loading overlay -->
+        <components:LoadingOverlay Grid.RowSpan="3"
+                                   IsLoading="{Binding IsLoading}"
+                                   Message="Enviando ticket..." />
 
     </Grid>
 </ContentPage>

@@ -12,18 +12,35 @@
 
     <Grid RowSpacing="0">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
+            <RowDefinition Height="220" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <!-- ── Header ── -->
-        <Grid Grid.Row="0"
-              Background="{StaticResource CardPremiumYellowGradientColor}">
+        <Grid Grid.Row="0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
             </Grid.RowDefinitions>
+
+            <!-- Imagen de fondo -->
+            <Image Grid.Row="0"
+                   Grid.RowSpan="2"
+                   Source="communitybanner.jpg"
+                   Aspect="AspectFill" />
+
+            <!-- Overlay gradiente oscuro para legibilidad -->
+            <BoxView Grid.Row="0"
+                     Grid.RowSpan="2">
+                <BoxView.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Color="#66000000" Offset="0.0" />
+                        <GradientStop Color="#22000000" Offset="0.5" />
+                        <GradientStop Color="#99000000" Offset="1.0" />
+                    </LinearGradientBrush>
+                </BoxView.Background>
+            </BoxView>
 
             <!-- Navbar: flecha izquierda + logo centrado -->
             <Grid Grid.Row="0" Margin="15,50,15,0">
@@ -48,8 +65,9 @@
 
             <!-- Eyebrow + título + subtítulo -->
             <VerticalStackLayout Grid.Row="1"
-                                 Margin="15,8,15,20"
-                                 Spacing="6">
+                                 Margin="15,0,15,20"
+                                 Spacing="6"
+                                 VerticalOptions="End">
                 <Label Text="COMUNIDAD"
                        FontSize="11"
                        CharacterSpacing="2"
@@ -146,22 +164,11 @@
                     </Border.StrokeShape>
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="24" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-
-                        <!-- Barra lateral amarilla -->
-                        <Border Grid.Column="0"
-                                StrokeThickness="0"
-                                Margin="0"
-                                Background="{StaticResource CardPremiumYellowGradientColor}">
-                            <Border.StrokeShape>
-                                <RoundRectangle CornerRadius="8,0,8,0" />
-                            </Border.StrokeShape>
-                        </Border>
-
+                        
                         <!-- Contenido -->
-                        <VerticalStackLayout Grid.Column="1"
+                        <VerticalStackLayout Grid.Column="0"
                                              Padding="12,14"
                                              Spacing="6">
                             <Label Text="¿Quieres compartirlo?"
